@@ -312,4 +312,11 @@ Pilot / CI package after GitHub publish:
 - `DEPLOY.md` — Vercel/Postgres and Compose deploy path; tagging notes
 - `MVP_STATUS.md` updated (Postgres rehearsal + CI marked done)
 
-Next human gates: production secrets, hosted deploy smoke, `LAUNCH_REVIEW.md` sign-off.
+### Phase 5.1 delivered (13 Aug 2026)
+
+- `vercel.json` → `npm run build:vercel` (`scripts/vercel-build.mjs`)
+- Build path: activate Postgres schema/migrations → `migrate deploy` → `next build`
+- Fails closed on SQLite `file:` URLs
+- Annotated release tag `v0.1.0`
+
+Next human gates: create hosted Postgres, set Vercel env secrets, deploy smoke, `LAUNCH_REVIEW.md` sign-off.

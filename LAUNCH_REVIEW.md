@@ -48,4 +48,4 @@ Use this before any public or regulated pilot. Tick in order; freeze code when s
 
 **Launch decision:** Go / No-go / Go with flags off: _______________
 
-**Freeze tag / commit:** _______________
+**Freeze tag / commit:** `v0.1.0` (see git tag; update SHA after `git push origin v0.1.0`)

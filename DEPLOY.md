@@ -40,14 +40,27 @@ On the host/CI that runs against Postgres, leave the schema on `postgresql` and 
 
 ### Vercel (app) + managed Postgres
 
-1. Import [yomibernard/WealthOS](https://github.com/yomibernard/WealthOS).
-2. Framework preset: Next.js.
-3. Add env vars from the table above.
-4. Build command: `prisma generate && next build` (or default `next build` — `postinstall` already runs `prisma generate`).
-5. Run migrations against Postgres **before** first traffic: `npx prisma migrate deploy` from a machine with prod `DATABASE_URL`, or a one-off deploy job.
+Repo includes [`vercel.json`](./vercel.json) → `npm run build:vercel` (Postgres schema + `migrate deploy` + `next build`).
+
+1. Create a Postgres database (Neon, Supabase, Railway, or Vercel Postgres).
+2. Import [yomibernard/WealthOS](https://github.com/yomibernard/WealthOS) into Vercel (Framework: Next.js).
+3. Project → Settings → Environment Variables (Production + Preview):
+
+| Name | Value |
+|------|--------|
+| `DATABASE_URL` | Postgres URL (pooled + `?schema=public` if required by host) |
+| `SESSION_SECRET` | ≥32 random chars (not the MVP default) |
+| `DEMO_MODE` | `false` for shared pilot URLs |
+| `BASE_CURRENCY` | `NGN` |
+| `OPENAI_API_KEY` | optional |
+
+4. Deploy. First build runs migrations via `build:vercel`. To migrate out-of-band instead, set `SKIP_MIGRATE_ON_BUILD=true` and run `npx prisma migrate deploy` locally against prod.
+5. Optional closed-demo seed (once, never against real customers): point `DATABASE_URL` at prod and `npm run db:seed` from a trusted machine after `db:use-postgres`.
 6. Smoke: `/api/health`, sign-in, `/app`, WealthAI with consent on.
 
-SQLite file URLs do **not** work on serverless — Postgres is required for Vercel.
+SQLite `file:` URLs fail closed in `build:vercel` — Postgres is required on Vercel.
+
+CLI (if logged in): `npx vercel link` then `npx vercel --prod`.
 
 ### Docker Compose (self-host demo)
 
@@ -69,12 +82,14 @@ npm run build && npm run start
 
 ## 5. Release tagging
 
+Annotated tag for the freeze candidate (created on `main` when cutting the release):
+
 ```bash
 git tag -a v0.1.0 -m "WealthOS MVP 0.1.0"
 git push origin v0.1.0
 ```
 
-Record the tag on [LAUNCH_REVIEW.md](./LAUNCH_REVIEW.md) go/no-go.
+Record the tag SHA on [LAUNCH_REVIEW.md](./LAUNCH_REVIEW.md) go/no-go.
 
 ## 6. What not to do
 

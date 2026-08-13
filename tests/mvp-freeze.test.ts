@@ -68,10 +68,16 @@ describe("MVP freeze inventory", () => {
     expect(existsSync(join(process.cwd(), ".github", "workflows", "ci.yml"))).toBe(true);
     expect(existsSync(join(process.cwd(), ".env.example"))).toBe(true);
     expect(existsSync(join(process.cwd(), "DEPLOY.md"))).toBe(true);
+    expect(existsSync(join(process.cwd(), "vercel.json"))).toBe(true);
+    expect(existsSync(join(process.cwd(), "scripts", "vercel-build.mjs"))).toBe(true);
     const envExample = readFileSync(join(process.cwd(), ".env.example"), "utf8");
     expect(envExample).toContain("DATABASE_URL");
     expect(envExample).toContain("SESSION_SECRET");
     expect(envExample).not.toMatch(/sk-[a-zA-Z0-9]{10,}/);
+    const pkg = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf8"));
+    expect(pkg.scripts["build:vercel"]).toBeTruthy();
+    const vercel = JSON.parse(readFileSync(join(process.cwd(), "vercel.json"), "utf8"));
+    expect(vercel.buildCommand).toContain("build:vercel");
   });
 
   it("seed still includes core demo personas", () => {

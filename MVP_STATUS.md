@@ -35,6 +35,8 @@
 - [x] `npm run db:rehearse-postgres` (Docker; port 5434)
 - [x] GitHub remote + initial push (`main`)
 - [x] GitHub Actions CI workflow
+- [x] Vercel build wiring (`build:vercel` + `vercel.json`)
+- [x] Release tag `v0.1.0`
 - [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets + Postgres URL)
 - [ ] Hosted deploy smoke (see [DEPLOY.md](./DEPLOY.md))
 - [ ] Human sign-off on `LAUNCH_REVIEW.md`

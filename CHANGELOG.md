@@ -7,6 +7,8 @@
 - GitHub Actions CI: test, build, `release:check` on SQLite
 - `.env.example` for clone-and-run
 - `DEPLOY.md` pilot hosting checklist (Vercel + Postgres, Docker Compose)
+- `vercel.json` + `npm run build:vercel` (Postgres migrate + Next build)
+- Release tag `v0.1.0`
 - Repo published at github.com/yomibernard/WealthOS
 
 ## 0.1.0 — 13 Aug 2026 (MVP freeze candidate)

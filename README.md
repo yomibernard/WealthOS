@@ -94,7 +94,8 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 
 - **CI** — `.github/workflows/ci.yml` (install → SQLite setup → test → build → `release:check`)
 - **Env template** — [`.env.example`](./.env.example)
-- **Deploy / pilot** — [DEPLOY.md](./DEPLOY.md)
+- **Deploy / pilot** — [DEPLOY.md](./DEPLOY.md) · `vercel.json` / `npm run build:vercel`
+- **Release** — git tag `v0.1.0`
 - Status freeze: [MVP_STATUS.md](./MVP_STATUS.md)
 
 ## Scripts
