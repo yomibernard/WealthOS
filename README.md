@@ -1,0 +1,114 @@
+# WealthOS MVP
+
+Nigeria-first, mobile-first **AI Personal Wealth Operating System**.
+
+> Know what you have. Know where you are going. Know what to do next.
+
+## Stack
+
+- Next.js 15 (App Router) + TypeScript
+- Prisma + SQLite (local MVP; swap to Postgres for production)
+- Deterministic financial engines (net worth, FX, health, goals, suitability, NBFA, WealthGuard)
+- Multi-agent WealthAI orchestration with tool/service calls
+- Vitest for engine and AI policy tests
+
+## Quick start
+
+```bash
+npm install
+npm run db:setup
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### Demo accounts
+
+Password for all: `WealthOSdemo1!`
+
+| Email | Role |
+|-------|------|
+| yomi@demo.wealthos.ng | Persona A — Nigerian executive |
+| amaka@demo.wealthos.ng | Persona B — Entrepreneur |
+| chioma@demo.wealthos.ng | Persona C — Diaspora |
+| adviser@demo.wealthos.ng | Adviser portal |
+| admin@demo.wealthos.ng | Admin portal (maker) |
+| checker@demo.wealthos.ng | Admin portal (checker) |
+
+## Optional LLM polish
+
+Set `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`) to enable a grounded explanation polish layer. Calculations still come only from deterministic engines; invented percentages are rejected.
+
+## Partner execution (Phase 2 demo)
+
+Material recommendations can be sent to a demo regulated-partner rail after step-up code `123456`. Flow: consent → instruction → partner confirmation → receipt. **No real funds move.** See **More → Partner executions**.
+
+## Open banking + pensions (Phase 3.1 demo)
+
+- **Connections** — connect demo banks, consent-gated sync, disconnect pauses consent. No real bank login.
+- **Pension** — `/app/pension` aggregates RSA and foreign pots with an illustrative retirement gap.
+
+## Inbox, life events, estate (Phase 3.2)
+
+- **Wealth Inbox** — `/app/inbox` consolidates actions, connection issues, and estate gaps.
+- **Life events** — recording an event creates planning checklists and inbox follow-ups (never auto-invests).
+- **Estate lite** — `/app/estate` tracks will / beneficiary readiness; not legal advice.
+
+## Adviser collab, tax, perf (Phase 3.3)
+
+- **Adviser portal** — shared/internal notes + customer timeline on each customer 360.
+- **Customer** — `/app/adviser-collab` for shared notes; `/app/tax` for illustrative Nigeria tax awareness.
+- **Perf** — after build, `npm run perf:check` enforces `perf-budget.json`.
+
+## Crypto + lending awareness (Phase 4.0)
+
+- **Crypto lite** — `/app/crypto` records holdings for net worth only. Trading, live prices, and token recommendations are explicitly deferred.
+- **Lending awareness** — `/app/lending` shows debt service pressure. No loan offers or credit decisioning.
+
+## Postgres production path
+
+Local MVP uses SQLite (`DATABASE_URL="file:./dev.db"`). Full cutover checklist: **[POSTGRES_CUTOVER.md](./POSTGRES_CUTOVER.md)**.
+
+```bash
+npm run db:postgres-ready          # static readiness
+npm run db:up                      # docker compose Postgres
+npm run db:use-postgres            # switch schema + install migrations
+npx prisma migrate deploy          # apply prisma/migrations-postgres
+npm run db:use-sqlite              # return local MVP to SQLite
+```
+
+Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturbed.
+
+## Ops, demo, launch freeze (Phase 4.1)
+
+- **Ops runbook** — [OPS_RUNBOOK.md](./OPS_RUNBOOK.md)
+- **Launch freeze** — [LAUNCH_REVIEW.md](./LAUNCH_REVIEW.md) + `npm run launch:check`
+- **Demo script** — [DEMO_SCRIPT.md](./DEMO_SCRIPT.md) and presenter UI at `/demo`
+- **Health** — `GET /api/health` for uptime probes
+- **Admin** — `/admin/ops` launch gate summary
+
+## Scripts
+
+- `npm run dev` — local app
+- `npm run test` — engine / AI tests
+- `npm run db:setup` — push schema + seed
+- `npm run build` — production build
+- `npm run launch:check` — env/policy launch gate
+- `npm run release:check` — umbrella gate (launch + postgres-ready + perf if built)
+- `npm run smoke` — HTTP journey smoke (requires `npm run dev`)
+- Status freeze: [MVP_STATUS.md](./MVP_STATUS.md)
+- `npm run perf:check` — post-build bundle budgets
+- `npm run db:postgres-ready` — static Postgres cutover readiness
+- `npm run db:rehearse-postgres` — Docker migrate+seed rehearsal (requires Docker Desktop)
+
+## Product principles (enforced in code)
+
+1. Customer before product  
+2. Goal before investment  
+3. Suitability before return  
+4. Explain before execute  
+5. Consent before action  
+6. Protect before optimise  
+7. AI does not invent balances, returns, fees or regulatory status  
+
+See `GAP_ASSESSMENT.md` for the greenfield audit and epic map.

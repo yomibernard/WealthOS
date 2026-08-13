@@ -1,0 +1,26 @@
+# Local Postgres for WealthOS cutover testing.
+# Usage: docker compose up -d
+# Then: npm run db:use-postgres && npx prisma migrate deploy && npm run db:seed
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: wealthos-postgres
+    restart: unless-stopped
+    ports:
+      # Host 5434 avoids clash with other local Postgres (often on 5432/5433)
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: wealthos
+      POSTGRES_PASSWORD: wealthos_dev_only
+      POSTGRES_DB: wealthos
+    volumes:
+      - wealthos_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wealthos -d wealthos"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  wealthos_pg_data:

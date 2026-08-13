@@ -1,0 +1,654 @@
+// Auto-synced mirror for Postgres cutover. Regenerate: npm run db:sync-pg-schema
+// Do not edit independently of schema.prisma.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADVISER
+  ADMIN
+  SUPPORT
+}
+
+enum DataSource {
+  CONNECTED
+  UPLOADED
+  MANUAL
+  ADVISER
+}
+
+enum VerificationStatus {
+  VERIFIED
+  ESTIMATED
+  UNVERIFIED
+  STALE
+}
+
+enum LiquidityClass {
+  HIGH
+  MEDIUM
+  LOW
+  ILLIQUID
+}
+
+enum RiskClass {
+  VERY_LOW
+  LOW
+  MEDIUM
+  HIGH
+  VERY_HIGH
+}
+
+enum AssetCategory {
+  CASH
+  INVESTMENT
+  PROPERTY
+  PENSION
+  BUSINESS
+  INSURANCE
+  CRYPTO
+  OTHER
+}
+
+enum LiabilityType {
+  MORTGAGE
+  PERSONAL_LOAN
+  BUSINESS_LOAN
+  CREDIT
+  OTHER
+}
+
+enum GoalType {
+  RETIREMENT
+  EDUCATION
+  PROPERTY
+  EMERGENCY
+  BUSINESS_CAPITAL
+  MIGRATION
+  REGULAR_INCOME
+  CUSTOM
+}
+
+enum ConsentStatus {
+  ACTIVE
+  PAUSED
+  REVOKED
+}
+
+enum EscalationLevel {
+  L0_SELF
+  L1_AI
+  L2_SUPPORT
+  L3_ADVISER
+  L4_SPECIALIST
+  L5_PRIVATE_WEALTH
+}
+
+enum RecommendationStatus {
+  PROPOSED
+  ACCEPTED
+  REJECTED
+  SUPERSEDED
+  EXECUTED
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  passwordHash      String
+  name              String
+  role              Role     @default(CUSTOMER)
+  baseCurrency      String   @default("NGN")
+  dateOfBirth       DateTime?
+  employmentStatus  String?
+  riskTolerance     String?
+  investmentExperience String?
+  liquidityNeeds    String?
+  profileCompleteness Int    @default(0)
+  vulnerableFlag    Boolean  @default(false)
+  deletedAt         DateTime?
+  status            String   @default("active")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  householdMembers  HouseholdMember[]
+  incomes           Income[]
+  expenses          Expense[]
+  assets            Asset[]
+  liabilities       Liability[]
+  goals             Goal[]
+  riskProfile       RiskProfile?
+  consents          Consent[]
+  documents         Document[]
+  recommendations   Recommendation[]
+  conversations     Conversation[]
+  memories          MemoryEntry[]
+  notifications     Notification[]
+  escalations       Escalation[]
+  auditEvents       AuditEvent[]
+  suitabilityAssessments SuitabilityAssessment[]
+  lifeEvents        LifeEvent[]
+  inboxItems        InboxItem[]
+  estateItems       EstateItem[]
+  adviserNotesAuthored AdviserNote[] @relation("AdviserNotesAuthored")
+  adviserNotesReceived AdviserNote[] @relation("AdviserNotesReceived")
+  adviserLinks      AdviserCustomer[] @relation("CustomerLinks")
+  advisedCustomers  AdviserCustomer[] @relation("AdviserLinks")
+}
+
+model HouseholdMember {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String
+  relationship String
+  dependant    Boolean  @default(false)
+  dateOfBirth  DateTime?
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Income {
+  id         String   @id @default(cuid())
+  userId     String
+  type       String
+  label      String
+  amount     Float
+  currency   String   @default("NGN")
+  frequency  String   @default("monthly")
+  source     DataSource @default(MANUAL)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id         String   @id @default(cuid())
+  userId     String
+  category   String
+  label      String
+  amount     Float
+  currency   String   @default("NGN")
+  frequency  String   @default("monthly")
+  source     DataSource @default(MANUAL)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Asset {
+  id                  String             @id @default(cuid())
+  userId              String
+  category            AssetCategory
+  assetType           String
+  name                String
+  provider            String?
+  value               Float
+  currency            String             @default("NGN")
+  ownershipPercent    Float              @default(100)
+  country             String             @default("NG")
+  liquidity           LiquidityClass     @default(MEDIUM)
+  riskClass           RiskClass?
+  incomeGenerated     Float              @default(0)
+  lastValuationDate   DateTime           @default(now())
+  source              DataSource         @default(MANUAL)
+  verificationStatus  VerificationStatus @default(ESTIMATED)
+  confidence          Float              @default(0.7)
+  notes               String?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents           Document[]
+}
+
+model Liability {
+  id                 String             @id @default(cuid())
+  userId             String
+  type               LiabilityType
+  name               String
+  provider           String?
+  balance            Float
+  currency           String             @default("NGN")
+  interestRate       Float?
+  monthlyPayment     Float?
+  ownershipPercent   Float              @default(100)
+  country            String             @default("NG")
+  lastValuationDate  DateTime           @default(now())
+  source             DataSource         @default(MANUAL)
+  verificationStatus VerificationStatus @default(ESTIMATED)
+  confidence         Float              @default(0.8)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Goal {
+  id                    String   @id @default(cuid())
+  userId                String
+  type                  GoalType
+  name                  String
+  targetAmount          Float
+  currency              String   @default("NGN")
+  targetDate            DateTime
+  priority              Int      @default(2)
+  existingAllocation    Float    @default(0)
+  monthlyContribution   Float    @default(0)
+  assumptionsJson       String   @default("{}")
+  riskLevel             String?
+  progressPercent       Float    @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RiskProfile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  riskTolerance      String
+  capacityForLoss    String
+  investmentHorizon  String
+  knowledgeLevel     String
+  answersJson        String   @default("{}")
+  version            String   @default("1.0")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Provider {
+  id               String    @id @default(cuid())
+  name             String
+  country          String    @default("NG")
+  licenceStatus    String
+  licenceNumber    String?
+  regulator        String?
+  verified         Boolean   @default(false)
+  website          String?
+  notes            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  products         Product[]
+}
+
+model Product {
+  id                    String   @id @default(cuid())
+  providerId            String
+  name                  String
+  assetClass            String
+  currency              String   @default("NGN")
+  minimumInvestment     Float    @default(0)
+  riskRating            RiskClass @default(MEDIUM)
+  liquidity             LiquidityClass @default(MEDIUM)
+  settlementDays        Int      @default(3)
+  feesJson              String   @default("{}")
+  historicalPerfJson    String   @default("{}")
+  durationMonths        Int?
+  creditExposure        String?
+  geographicExposure    String?
+  currencyExposure      String?
+  investmentObjective   String?
+  targetCustomer        String?
+  keyRisks              String?
+  documentsJson         String   @default("[]")
+  approvalStatus        String   @default("approved")
+  lastUpdated           DateTime @default(now())
+  createdAt             DateTime @default(now())
+  provider              Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+}
+
+model Recommendation {
+  id               String               @id @default(cuid())
+  userId           String
+  actionType       String
+  title            String
+  what             String
+  amount           Float?
+  amountCurrency   String?              @default("NGN")
+  why              String
+  goalLink         String?
+  risks            String
+  liquidityNote    String?
+  costsNote        String?
+  alternativesJson String               @default("[]")
+  providerNote     String?
+  regulatoryStatus String?
+  assumptionsJson  String               @default("{}")
+  confidence       Float
+  score            Float
+  status           RecommendationStatus @default(PROPOSED)
+  rejectionReason  String?
+  consentRequired  Boolean              @default(true)
+  modelVersion     String               @default("nbfa-1.0")
+  policyVersion    String               @default("policy-1.0")
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  user             User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SuitabilityAssessment {
+  id            String   @id @default(cuid())
+  userId        String
+  productId     String?
+  outcome       String
+  inputsJson    String
+  rulesJson     String
+  exceptionsJson String  @default("[]")
+  version       String   @default("suitability-1.0")
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Consent {
+  id           String        @id @default(cuid())
+  userId       String
+  serviceName  String
+  dataUsed     String
+  purpose      String
+  status       ConsentStatus @default(ACTIVE)
+  lastAccessAt DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Document {
+  id              String   @id @default(cuid())
+  userId          String
+  assetId         String?
+  name            String
+  mimeType        String
+  storageKey      String
+  scannedClean    Boolean  @default(true)
+  encryptedAtRest Boolean  @default(true)
+  checksum        String?
+  deletedAt       DateTime?
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  asset           Asset?   @relation(fields: [assetId], references: [id], onDelete: SetNull)
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  role           String
+  content        String
+  agentUsed      String?
+  intent         String?
+  toolsUsedJson  String   @default("[]")
+  confidence     Float?
+  escalated      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model MemoryEntry {
+  id           String   @id @default(cuid())
+  userId       String
+  category     String
+  content      String
+  source       String
+  confidence   Float    @default(0.8)
+  verified     Boolean  @default(false)
+  editable     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  category  String
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Escalation {
+  id          String          @id @default(cuid())
+  userId      String
+  level       EscalationLevel
+  reason      String
+  summary     String
+  status      String          @default("open")
+  assignedTo  String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditEvent {
+  id          String   @id @default(cuid())
+  userId      String?
+  eventType   String
+  entityType  String?
+  entityId    String?
+  payloadJson String
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model LifeEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  label     String
+  date      DateTime
+  notes     String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AdviserCustomer {
+  id         String   @id @default(cuid())
+  adviserId  String
+  customerId String
+  createdAt  DateTime @default(now())
+  adviser    User     @relation("AdviserLinks", fields: [adviserId], references: [id], onDelete: Cascade)
+  customer   User     @relation("CustomerLinks", fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([adviserId, customerId])
+}
+
+model AdviserNote {
+  id                 String   @id @default(cuid())
+  adviserId          String
+  customerId         String
+  kind               String   @default("note")
+  title              String
+  body               String
+  sharedWithCustomer Boolean  @default(false)
+  status             String   @default("open")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  adviser            User     @relation("AdviserNotesAuthored", fields: [adviserId], references: [id], onDelete: Cascade)
+  customer           User     @relation("AdviserNotesReceived", fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId, createdAt])
+  @@index([adviserId, createdAt])
+}
+
+model HealthScoreConfig {
+  id          String   @id @default(cuid())
+  version     String   @unique
+  weightsJson String
+  active      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model WealthSnapshot {
+  id              String   @id @default(cuid())
+  userId          String
+  netWorthNgn     Float
+  confidence      Float
+  healthScore     Float?
+  payloadJson     String   @default("{}")
+  createdAt       DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model WealthGuardAnalysis {
+  id                   String   @id @default(cuid())
+  userId               String
+  sourceType           String
+  rawText              String
+  extractedJson        String
+  providerVerification String
+  transparency         String
+  returnClaim          String
+  overallOutcome       String
+  explanation          String
+  warningIndicatorsJson String @default("[]")
+  createdAt            DateTime @default(now())
+}
+
+model FxRate {
+  id        String   @id @default(cuid())
+  from      String
+  to        String
+  rate      Float
+  asOf      DateTime
+  source    String   @default("seed")
+
+  @@unique([from, to, asOf])
+}
+
+model ChangeRequest {
+  id            String   @id @default(cuid())
+  entityType    String
+  entityId      String
+  action        String
+  payloadJson   String
+  status        String   @default("pending")
+  makerId       String
+  checkerId     String?
+  makerNote     String?
+  checkerNote   String?
+  createdAt     DateTime @default(now())
+  decidedAt     DateTime?
+
+  @@index([status, createdAt])
+}
+
+model Connection {
+  id           String   @id @default(cuid())
+  userId       String
+  providerName String
+  kind         String
+  status       String   @default("healthy")
+  lastSyncAt   DateTime?
+  lastError    String?
+  consentId    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model ExecutionInstruction {
+  id                 String   @id @default(cuid())
+  userId             String
+  recommendationId   String?
+  partnerCode        String
+  actionType         String
+  title              String
+  amount             Float?
+  currency           String   @default("NGN")
+  status             String   @default("pending_partner")
+  stepUpVerified     Boolean  @default(false)
+  suitabilityStatus  String?
+  payloadJson        String   @default("{}")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  receipt            ExecutionReceipt?
+
+  @@index([userId, createdAt])
+}
+
+model ExecutionReceipt {
+  id              String   @id @default(cuid())
+  instructionId   String   @unique
+  partnerCode     String
+  partnerRef      String
+  status          String
+  message         String
+  confirmedAt     DateTime @default(now())
+  rawJson         String   @default("{}")
+  instruction     ExecutionInstruction @relation(fields: [instructionId], references: [id], onDelete: Cascade)
+}
+
+model NotificationPreference {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  critical    Boolean @default(true)
+  important   Boolean @default(true)
+  advisory    Boolean @default(true)
+  informational Boolean @default(true)
+  updatedAt   DateTime @updatedAt
+}
+
+model PrivacyRequest {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String
+  status      String   @default("open")
+  details     String?
+  handledBy   String?
+  resolution  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model InboxItem {
+  id         String   @id @default(cuid())
+  userId     String
+  category   String
+  priority   String
+  title      String
+  body       String
+  href       String?
+  sourceType String
+  sourceId   String
+  status     String   @default("unread")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sourceType, sourceId])
+  @@index([userId, status, createdAt])
+}
+
+model EstateItem {
+  id             String    @id @default(cuid())
+  userId         String
+  kind           String
+  label          String
+  status         String    @default("missing")
+  notes          String?
+  lastReviewedAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

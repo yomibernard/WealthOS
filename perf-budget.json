@@ -1,0 +1,10 @@
+{
+  "$comment": "WealthOS mobile-first performance budgets (Post-build checks). Sizes in kilobytes.",
+  "maxSharedFirstLoadKb": 160,
+  "maxLargestClientPageKb": 30,
+  "maxTotalStaticChunksKb": 1200,
+  "notes": [
+    "Shared First Load JS should stay near ~100KB for 3G friendliness.",
+    "Client page bundles exclude RSC payloads; this is a guardrail not a Lighthouse substitute."
+  ]
+}

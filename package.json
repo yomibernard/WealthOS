@@ -1,0 +1,61 @@
+{
+  "name": "wealthos",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:setup": "prisma db push && tsx prisma/seed.ts",
+    "perf:check": "node scripts/check-perf-budget.mjs",
+    "db:postgres-ready": "node scripts/check-postgres-ready.mjs",
+    "db:sync-pg-schema": "node scripts/sync-postgres-schema.mjs",
+    "db:gen-pg-migration": "node scripts/gen-postgres-migration.mjs",
+    "db:use-postgres": "node scripts/use-database.mjs postgres",
+    "db:use-sqlite": "node scripts/use-database.mjs sqlite",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:rehearse-postgres": "node scripts/rehearse-postgres.mjs",
+    "launch:check": "node scripts/launch-check.mjs",
+    "release:check": "node scripts/release-check.mjs",
+    "smoke": "node scripts/smoke-journeys.mjs",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "bcryptjs": "^3.0.2",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.487.0",
+    "next": "^15.2.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "uuid": "^11.1.0",
+    "zod": "^3.24.2"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@tailwindcss/postcss": "^4.0.17",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.13.14",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "@types/uuid": "^10.0.0",
+    "eslint": "^9.23.0",
+    "eslint-config-next": "^15.2.4",
+    "prisma": "^6.5.0",
+    "tailwindcss": "^4.0.17",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9"
+  }
+}
