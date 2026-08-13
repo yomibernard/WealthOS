@@ -63,7 +63,11 @@ export default async function AdviserCollabPage() {
                 <div className="flex flex-wrap gap-2">
                   <Badge>{n.kind.replaceAll("_", " ")}</Badge>
                   <Badge>
-                    {n.kind === "customer_share" ? "you shared" : `from ${n.adviser.name}`}
+                    {n.kind === "customer_share"
+                      ? "you shared"
+                      : n.kind === "adviser_nudge"
+                        ? `nudge from ${n.adviser.name}`
+                        : `from ${n.adviser.name}`}
                   </Badge>
                 </div>
                 <p className="mt-2 font-semibold">{n.title}</p>

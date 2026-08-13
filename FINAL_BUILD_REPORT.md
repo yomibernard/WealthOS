@@ -386,3 +386,11 @@ Share with adviser:
 - `adviser-share` pack builder + `sharePackWithAdviser` service
 - Customer UI on `/app/digest`, `/app/profile`, `/app/adviser-collab`
 - Creates `customer_share` note, notifies adviser + customer, audits share
+
+## Phase 7.3 delivered (13 Aug 2026)
+
+Adviser nudges:
+
+- `adviser-nudge` templates with deep links into customer remediation flows
+- Adviser 360 panel + `POST /api/adviser/nudge`
+- Shared note + inbox item + audit (`ADVISER_NUDGE_SENT`)

@@ -32,6 +32,7 @@
 | Weekly digest | Ready (demo) | `/app/digest` |
 | Profile completeness | Ready (demo) | `/app/profile` checklist |
 | Share with adviser | Ready (demo) | digest / profile / collab share packs |
+| Adviser nudges | Ready (demo) | customer 360 → inbox deep links |
 
 ## Quality gates (this machine)
 

@@ -7,6 +7,7 @@ import { getAdviserInsightsPack } from "@/services/adviser-insights";
 import { formatNaira } from "@/lib/format";
 import { AdviserCopilot } from "@/components/AdviserCopilot";
 import { AdviserNotesPanel } from "@/components/AdviserNotesPanel";
+import { AdviserNudgePanel } from "@/components/AdviserNudgePanel";
 import { CustomerTimeline } from "@/components/CustomerTimeline";
 import { getFeatureFlags } from "@/lib/feature-flags";
 import Link from "next/link";
@@ -171,6 +172,7 @@ export default async function AdviserCustomerPage({
 
       {flags.adviserCollab ? (
         <>
+          <AdviserNudgePanel customerId={customer.id} />
           <AdviserNotesPanel customerId={customer.id} />
           <CustomerTimeline customerId={customer.id} />
         </>

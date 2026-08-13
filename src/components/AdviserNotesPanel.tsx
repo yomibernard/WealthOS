@@ -128,6 +128,8 @@ export function AdviserNotesPanel({ customerId }: { customerId: string }) {
               <Badge>{n.kind.replaceAll("_", " ")}</Badge>
               {n.kind === "customer_share" ? (
                 <Badge tone="warn">from customer</Badge>
+              ) : n.kind === "adviser_nudge" ? (
+                <Badge tone="warn">nudge sent</Badge>
               ) : (
                 <Badge tone={n.sharedWithCustomer ? "default" : "warn"}>
                   {n.sharedWithCustomer ? "shared" : "internal"}

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 7.3
+
+- Adviser → customer nudges (data, profile, digest, funding, actions)
+- `POST /api/adviser/nudge`; panel on customer 360; inbox deep-links
+
 ## Unreleased — Phase 7.2
 
 - Customer → adviser share packs (full / digest / profile / funding)

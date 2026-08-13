@@ -57,6 +57,7 @@ const engines = [
   "src/engines/adviser-insights.ts",
   "src/engines/profile-completeness.ts",
   "src/engines/adviser-share.ts",
+  "src/engines/adviser-nudge.ts",
 ];
 
 describe("MVP freeze inventory", () => {
