@@ -1,16 +1,15 @@
 # Changelog
 
-## Unreleased — Phase 11.2
+## 0.1.4 — 13 Aug 2026 (Adviser care UX pack)
 
-- Care radar last-ack cues + `?care=unacked` filter for customers still needing a first acknowledgment
+Care radar filters, acknowledgment history, and unacked cues on top of the 0.1.3 care pack.
 
-## Unreleased — Phase 11.1
+### Phase 11.x — Care UX
 
-- Care acknowledgment history on customer 360 Care desk (recent `care_ack` notes)
-
-## Unreleased — Phase 11.0
-
-- Adviser portfolio care filters on `/adviser` (`?care=` all / care / complaints / privacy / support)
+- **11.3** Freeze pack `v0.1.4`; `pilot:freeze` covers 11.x care UX surface
+- **11.2** Care radar last-ack cues + `?care=unacked` filter
+- **11.1** Care acknowledgment history on customer 360 Care desk
+- **11.0** Portfolio care filters (`?care=` all / care / complaints / privacy / support)
 
 ## 0.1.3 — 13 Aug 2026 (Adviser care pack)
 

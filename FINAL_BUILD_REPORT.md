@@ -544,3 +544,10 @@ Portfolio last-ack cues:
 
 - `/adviser` rows show ack age (`No care ack yet` / `Acked 3d ago`)
 - `?care=unacked` filter + book badge for first-acknowledgment gaps
+
+## Phase 11.3 delivered (13 Aug 2026)
+
+Adviser care UX freeze pack **v0.1.4**:
+
+- `npm run pilot:freeze` checks 11.x filters, unacked cues, and care history surface
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
