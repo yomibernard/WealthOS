@@ -13,7 +13,7 @@ Presenter checklist UI: `/demo`
 | Executive | yomi@demo.wealthos.ng | Property-heavy, education goals, inbox + estate |
 | Entrepreneur | amaka@demo.wealthos.ng | Business concentration, lending pressure |
 | Diaspora | chioma@demo.wealthos.ng | FX, UK pension, crypto awareness |
-| Adviser | adviser@demo.wealthos.ng | Insights pack, nudges, shared notes |
+| Adviser | adviser@demo.wealthos.ng | Care radar, Care desk, insights, nudges |
 | Admin / checker | admin@ / checker@ | Maker-checker |
 
 ## Act 1 — First value (3 min)

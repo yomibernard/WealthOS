@@ -1,19 +1,15 @@
 # Changelog
 
-## Unreleased — Phase 10.2
+## 0.1.3 — 13 Aug 2026 (Adviser care pack)
 
-- Adviser care acknowledgment from 360 Care desk (`POST /api/adviser/care-ack`)
-- Customer Inbox + notification; does not close admin queues
+Adviser-facing care desk, portfolio radar, and customer acknowledgments on top of the 0.1.2 trust loop.
 
-## Unreleased — Phase 10.1
+### Phase 10.x — Adviser care
 
-- Adviser portfolio care radar on `/adviser` (sort by complaints → privacy → cases)
-- Book-level care summary badges
-
-## Unreleased — Phase 10.0
-
-- Adviser care desk on customer 360 (open support/complaints + privacy requests)
-- Insights pack talking points for complaints and privacy before product talk
+- **10.3** Freeze pack `v0.1.3`; `pilot:freeze` covers 10.x care surface
+- **10.2** Care acknowledgment from 360 (`POST /api/adviser/care-ack`) → Inbox; ops queues stay authoritative
+- **10.1** Portfolio care radar on `/adviser` (complaints → privacy → cases)
+- **10.0** Care desk on customer 360 + insights talking points before product talk
 
 ## 0.1.2 — 13 Aug 2026 (Customer trust loop)
 

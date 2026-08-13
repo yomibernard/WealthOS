@@ -103,11 +103,11 @@ Local laptop smoke remains `npm run smoke` (allows localhost).
 Annotated tag for the freeze candidate (created on `main` when cutting the release):
 
 ```bash
-git tag -a v0.1.2 -m "WealthOS trust loop pack 0.1.2"
-git push origin v0.1.2
+git tag -a v0.1.3 -m "WealthOS adviser care pack 0.1.3"
+git push origin v0.1.3
 ```
 
-Prior tags: `v0.1.1` (ops), `v0.1.0` (MVP). Record the tag SHA on [LAUNCH_REVIEW.md](./LAUNCH_REVIEW.md) go/no-go. Run `npm run pilot:freeze` before tagging.
+Prior tags: `v0.1.2` (trust loop), `v0.1.1` (ops), `v0.1.0` (MVP). Record the tag SHA on [LAUNCH_REVIEW.md](./LAUNCH_REVIEW.md) go/no-go. Run `npm run pilot:freeze` before tagging.
 
 ## 6. What not to do
 

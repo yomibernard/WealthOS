@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.2 (ops 8.x + customer trust loop 9.x).
+ * Current pack: v0.1.3 (ops 8.x + trust loop 9.x + adviser care 10.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.2";
+const EXPECTED = "0.1.3";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -49,6 +49,18 @@ mustExist("src/app/app/privacy/page.tsx");
 mustExist("src/app/app/notifications/page.tsx");
 mustExist("src/app/app/inbox/page.tsx");
 
+// 10.x adviser care surface
+mustExist("src/engines/adviser-care.ts");
+mustExist("src/engines/adviser-portfolio.ts");
+mustExist("src/engines/adviser-care-ack.ts");
+mustExist("src/services/adviser-care.ts");
+mustExist("src/services/adviser-portfolio.ts");
+mustExist("src/services/adviser-care-ack.ts");
+mustExist("src/app/api/adviser/care-ack/route.ts");
+mustExist("src/components/AdviserCareAck.tsx");
+mustExist("src/app/adviser/page.tsx");
+mustExist("src/app/adviser/customers/[id]/page.tsx");
+
 mustExist("DEPLOY.md");
 mustExist("OPS_RUNBOOK.md");
 mustExist("LAUNCH_REVIEW.md");
@@ -59,9 +71,10 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.2")) failures.push("CHANGELOG.md missing 0.1.2 section");
+if (!changelog.includes("0.1.3")) failures.push("CHANGELOG.md missing 0.1.3 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
+if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
 
 const deploy = read("DEPLOY.md");
 if (!deploy.includes("smoke:hosted")) failures.push("DEPLOY.md missing smoke:hosted");
@@ -72,9 +85,12 @@ if (!demo.includes("/admin/ops")) failures.push("DEMO_SCRIPT.md missing /admin/o
 if (!demo.includes("/app/support")) failures.push("DEMO_SCRIPT.md missing /app/support");
 if (!demo.includes("Trust loop")) failures.push("DEMO_SCRIPT.md missing Trust loop");
 if (!demo.includes("Privacy loop")) failures.push("DEMO_SCRIPT.md missing Privacy loop");
+if (!demo.includes("Care radar")) failures.push("DEMO_SCRIPT.md missing Care radar");
+if (!demo.includes("Care desk")) failures.push("DEMO_SCRIPT.md missing Care desk");
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.2")) failures.push("MVP_STATUS.md missing 0.1.2");
+if (!status.includes("0.1.3")) failures.push("MVP_STATUS.md missing 0.1.3");
+if (!status.includes("Adviser care ack")) failures.push("MVP_STATUS.md missing Adviser care ack");
 
 const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
@@ -84,6 +100,16 @@ if (!launch.includes("pilot:freeze")) failures.push("LAUNCH_REVIEW.md missing pi
 const notificationsPage = read("src/app/app/notifications/page.tsx");
 if (!notificationsPage.includes("resolveNotificationLink")) {
   failures.push("notifications page missing resolveNotificationLink");
+}
+
+const adviserHome = read("src/app/adviser/page.tsx");
+if (!adviserHome.includes("care")) {
+  failures.push("adviser home missing care radar cues");
+}
+
+const careAck = read("src/components/AdviserCareAck.tsx");
+if (!careAck.includes("/api/adviser/care-ack")) {
+  failures.push("AdviserCareAck missing care-ack API call");
 }
 
 if (failures.length) {

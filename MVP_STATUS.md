@@ -1,8 +1,8 @@
 # WealthOS MVP status freeze
 
-**Version:** 0.1.2  
+**Version:** 0.1.3  
 **Date:** 13 August 2026  
-**Verdict:** Feature-complete for local/pilot demo + ops pack + customer trust loop (support/privacy/notifications). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
+**Verdict:** Feature-complete for local/pilot demo + ops pack + customer trust loop + adviser care pack. Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
 
 ## Promise
 
@@ -59,6 +59,7 @@
 - [x] Release tag `v0.1.0`
 - [x] Pilot ops pack `v0.1.1` (`npm run pilot:freeze`)
 - [x] Trust loop pack `v0.1.2` (`npm run pilot:freeze`)
+- [x] Adviser care pack `v0.1.3` (`npm run pilot:freeze`)
 - [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets + Postgres URL)
 - [ ] Hosted deploy smoke (`SMOKE_BASE_URL=… npm run smoke:hosted` — see [DEPLOY.md](./DEPLOY.md))
 - [ ] Human sign-off on `LAUNCH_REVIEW.md`
