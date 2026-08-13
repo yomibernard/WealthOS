@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 17.1
+
+- Smoke covers adviser `/api/notifications` + mark-as-read; hosted smoke hits the notifications API
+
 ## Unreleased — Phase 17.0
 
 - Adviser notification centre at `/adviser/notifications` with unread pulse, mark-as-read, and Care desk deep-links

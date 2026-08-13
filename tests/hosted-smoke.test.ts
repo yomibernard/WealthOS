@@ -73,6 +73,9 @@ describe("hosted smoke rules", () => {
     expect(local).toContain("care=awaiting");
     expect(local).toContain("/admin/ops");
     expect(local).toContain("/adviser/notifications");
+    expect(local).toContain("PATCH");
+    expect(local).toContain("/api/notifications");
     expect(hosted).toContain("/adviser/notifications");
+    expect(hosted).toContain("/api/notifications");
   });
 });

@@ -689,3 +689,10 @@ Adviser notification centre:
 - `/adviser/notifications` lists care receipts / shares with mark-as-read and Care desk links
 - Adviser portal unread pulse; seed leaves Ada an unread Amaka receipt notify
 - Share notifies include `Path: /adviser/customers/{id}`; smoke hits the new route
+
+## Phase 17.1 delivered (13 Aug 2026)
+
+Adviser notification smoke:
+
+- Local smoke GETs `/api/notifications` as adviser and PATCHes mark-as-read when unread exists
+- Hosted smoke includes `/api/notifications` on the adviser path set

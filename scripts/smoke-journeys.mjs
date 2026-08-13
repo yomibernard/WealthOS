@@ -139,6 +139,31 @@ try {
       console.log(`  [${ok ? "OK" : "FAIL"}] GET ${path} → ${res.status}`);
       if (!ok) failures.push(`${path} status ${res.status}`);
     }
+
+    const noteRes = await authedGet("/api/notifications", adviserLogin.cookie);
+    const noteOk = noteRes.status === 200;
+    console.log(`  [${noteOk ? "OK" : "FAIL"}] GET /api/notifications (adviser) → ${noteRes.status}`);
+    if (!noteOk) {
+      failures.push(`/api/notifications adviser status ${noteRes.status}`);
+    } else {
+      const notes = await noteRes.json().catch(() => []);
+      const unread = Array.isArray(notes) ? notes.find((n) => n && n.read === false && n.id) : null;
+      if (unread?.id) {
+        const patchRes = await fetch(`${base}/api/notifications/${unread.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(adviserLogin.cookie ? { cookie: adviserLogin.cookie } : {}),
+          },
+          body: JSON.stringify({ read: true }),
+        });
+        const patchOk = patchRes.status === 200;
+        console.log(`  [${patchOk ? "OK" : "FAIL"}] PATCH /api/notifications/:id read → ${patchRes.status}`);
+        if (!patchOk) failures.push(`adviser notification mark-read status ${patchRes.status}`);
+      } else {
+        console.log("  [SKIP] PATCH /api/notifications/:id (no unread adviser notification in seed)");
+      }
+    }
   }
 
   const adminLogin = await signIn("admin@demo.wealthos.ng", "WealthOSdemo1!");
