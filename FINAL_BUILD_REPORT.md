@@ -600,3 +600,10 @@ Privacy care updates + smoke:
 
 - `/app/privacy` shows privacy-related care acknowledgments
 - Local/hosted smoke checks support, privacy, and `/api/care-updates`
+
+## Phase 13.3 delivered (13 Aug 2026)
+
+Customer care loop freeze pack **v0.1.6**:
+
+- `npm run pilot:freeze` checks Home/Support/Privacy care updates + care-updates API/smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

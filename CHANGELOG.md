@@ -1,16 +1,15 @@
 # Changelog
 
-## Unreleased — Phase 13.2
+## 0.1.6 — 13 Aug 2026 (Customer care loop pack)
 
-- Privacy Centre lists privacy-related care updates; smoke journeys cover support/privacy/`/api/care-updates`
+Customer-visible care acknowledgments on Home, Support, and Privacy on top of the 0.1.5 ops care pack.
 
-## Unreleased — Phase 13.1
+### Phase 13.x — Customer care loop
 
-- Support page lists recent adviser care updates (`GET /api/care-updates`) for the Home pulse destination
-
-## Unreleased — Phase 13.0
-
-- Customer Home care-update pulse when an adviser recently acknowledged open care
+- **13.3** Freeze pack `v0.1.6`; `pilot:freeze` covers 13.x customer care surface
+- **13.2** Privacy Centre care updates; smoke covers support/privacy/`/api/care-updates`
+- **13.1** Support page recent care updates (`GET /api/care-updates`)
+- **13.0** Home care-update pulse for recent adviser acknowledgments
 
 ## 0.1.5 — 13 Aug 2026 (Ops care handoff pack)
 

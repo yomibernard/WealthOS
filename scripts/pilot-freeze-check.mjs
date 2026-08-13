@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.5 (ops 8.x + trust 9.x + care 10.x + care UX 11.x + ops care 12.x).
+ * Current pack: v0.1.6 (… + ops care 12.x + customer care loop 13.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.5";
+const EXPECTED = "0.1.6";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -62,6 +62,9 @@ mustExist("src/components/AdviserCareAck.tsx");
 mustExist("src/app/adviser/page.tsx");
 mustExist("src/app/adviser/customers/[id]/page.tsx");
 
+// 13.x customer care loop
+mustExist("src/app/api/care-updates/route.ts");
+
 mustExist("DEPLOY.md");
 mustExist("OPS_RUNBOOK.md");
 mustExist("LAUNCH_REVIEW.md");
@@ -72,13 +75,16 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.5")) failures.push("CHANGELOG.md missing 0.1.5 section");
+if (!changelog.includes("0.1.6")) failures.push("CHANGELOG.md missing 0.1.6 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
 if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
 if (!changelog.includes("unacked")) failures.push("CHANGELOG.md missing unacked filter mention");
 if (!changelog.includes("care handoff") && !changelog.includes("care_handoff")) {
   failures.push("CHANGELOG.md missing care handoff mention");
+}
+if (!changelog.includes("care-update") && !changelog.includes("care update")) {
+  failures.push("CHANGELOG.md missing customer care-update mention");
 }
 
 const deploy = read("DEPLOY.md");
@@ -94,13 +100,16 @@ if (!demo.includes("Care radar")) failures.push("DEMO_SCRIPT.md missing Care rad
 if (!demo.includes("Care desk")) failures.push("DEMO_SCRIPT.md missing Care desk");
 if (!demo.includes("Unacked")) failures.push("DEMO_SCRIPT.md missing Unacked filter");
 if (!demo.includes("care handoff")) failures.push("DEMO_SCRIPT.md missing care handoff");
+if (!demo.includes("care update")) failures.push("DEMO_SCRIPT.md missing care update CTA");
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.5")) failures.push("MVP_STATUS.md missing 0.1.5");
+if (!status.includes("0.1.6")) failures.push("MVP_STATUS.md missing 0.1.6");
 if (!status.includes("Adviser care ack")) failures.push("MVP_STATUS.md missing Adviser care ack");
 if (!status.includes("Adviser unacked radar")) failures.push("MVP_STATUS.md missing Adviser unacked radar");
 if (!status.includes("Ops care handoff")) failures.push("MVP_STATUS.md missing Ops care handoff");
 if (!status.includes("Privacy care cues")) failures.push("MVP_STATUS.md missing Privacy care cues");
+if (!status.includes("Customer care pulse")) failures.push("MVP_STATUS.md missing Customer care pulse");
+if (!status.includes("Privacy care updates")) failures.push("MVP_STATUS.md missing Privacy care updates");
 
 const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
@@ -140,6 +149,9 @@ const careAckEngine = read("src/engines/adviser-care-ack.ts");
 if (!careAckEngine.includes("buildCareAckHistory")) {
   failures.push("care-ack engine missing history builder");
 }
+if (!careAckEngine.includes("buildCareUpdatePulse")) {
+  failures.push("care-ack engine missing buildCareUpdatePulse");
+}
 
 const customer360 = read("src/app/adviser/customers/[id]/page.tsx");
 if (!customer360.includes("Recent care acknowledgments") && !customer360.includes("careHistory")) {
@@ -178,6 +190,37 @@ if (!adminEsc.includes("careAck")) {
 const adminPrivacy = read("src/app/admin/privacy/page.tsx");
 if (!adminPrivacy.includes("careAck")) {
   failures.push("admin privacy page missing careAck cue");
+}
+
+// 13.x customer care loop surface
+const homePage = read("src/app/app/page.tsx");
+if (!homePage.includes("carePulse") && !homePage.includes("loadCareUpdatePulse")) {
+  failures.push("Home missing care-update pulse");
+}
+
+const supportPage = read("src/app/app/support/page.tsx");
+if (!supportPage.includes("care-updates") && !supportPage.includes("careUpdates")) {
+  failures.push("Support page missing care updates");
+}
+
+const privacyPage = read("src/app/app/privacy/page.tsx");
+if (!privacyPage.includes("care-updates") && !privacyPage.includes("careUpdates")) {
+  failures.push("Privacy page missing care updates");
+}
+
+const careUpdatesApi = read("src/app/api/care-updates/route.ts");
+if (!careUpdatesApi.includes("loadCareUpdatePulse")) {
+  failures.push("care-updates API missing loadCareUpdatePulse");
+}
+
+const smokeHosted = read("scripts/smoke-hosted.mjs");
+if (!smokeHosted.includes("/api/care-updates")) {
+  failures.push("smoke-hosted missing /api/care-updates path");
+}
+
+const smokeLocal = read("scripts/smoke-journeys.mjs");
+if (!smokeLocal.includes("/app/support") || !smokeLocal.includes("/api/care-updates")) {
+  failures.push("smoke-journeys missing support/care-updates coverage");
 }
 
 if (failures.length) {
