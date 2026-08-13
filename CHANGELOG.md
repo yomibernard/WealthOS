@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Phase 6.2
+
+- Data quality remediation engine + actionable `/app/wealth/confidence` queue
+- `POST /api/wealth/refresh` confirm/update valuations; Home “Fix data quality” CTA
+- WealthAI `data_quality` intent
+
 ## Unreleased — Phase 6.1
 
 - Month-over-month insights engine + net-worth sparkline on `/app/reports`

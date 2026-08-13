@@ -27,6 +27,7 @@
 | Postgres production | Rehearsed locally | `db:rehearse-postgres` succeeded (host port 5434) |
 | CI / deploy package | Ready | GitHub Actions + [DEPLOY.md](./DEPLOY.md) |
 | Monthly reports | Ready (demo) | `/app/reports`, MoM insights, print |
+| Data confidence | Ready (demo) | `/app/wealth/confidence` remediation queue |
 
 ## Quality gates (this machine)
 

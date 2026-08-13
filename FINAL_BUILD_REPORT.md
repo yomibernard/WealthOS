@@ -337,3 +337,12 @@ Report intelligence layer:
 - `report-insights` engine — MoM net worth / health / confidence narratives
 - Sparkline on report list + detail; print CSS + Print/save PDF control
 - Inbox draft on generate; WealthAI monthly report intent
+
+## Phase 6.2 delivered (13 Aug 2026)
+
+Data confidence remediation:
+
+- `data-quality` engine ranks stale / estimated / low-confidence holdings
+- `/app/wealth/confidence` remediation queue with confirm or update value
+- `POST /api/wealth/refresh`; Home CTA when confidence low or stale assets exist
+- WealthAI `data_quality` intent

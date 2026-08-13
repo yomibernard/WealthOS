@@ -22,6 +22,7 @@ const routes = [
   "src/app/app/crypto/page.tsx",
   "src/app/app/lending/page.tsx",
   "src/app/app/reports/page.tsx",
+  "src/app/app/wealth/confidence/page.tsx",
   "src/app/app/estate/page.tsx",
   "src/app/app/connections/page.tsx",
   "src/app/app/privacy/page.tsx",
@@ -48,6 +49,7 @@ const engines = [
   "src/engines/estate.ts",
   "src/engines/life-events.ts",
   "src/engines/report-insights.ts",
+  "src/engines/data-quality.ts",
 ];
 
 describe("MVP freeze inventory", () => {

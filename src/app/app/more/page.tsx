@@ -24,6 +24,7 @@ const links = [
   { href: "/app/privacy", label: "Privacy Centre" },
   { href: "/app/memory", label: "AI Memory" },
   { href: "/app/wealth/net-worth", label: "Net worth detail" },
+  { href: "/app/wealth/confidence", label: "Data confidence" },
   { href: "/app/documents", label: "Documents" },
   { href: "/app/notifications", label: "Notifications" },
   { href: "/app/connections", label: "Connections (open banking)" },

@@ -37,8 +37,8 @@ export default async function HomePage() {
         ) : null}
       </header>
 
-      <Link href="/app/wealth/net-worth" className="block">
-        <Panel className="mt-5 animate-rise transition hover:border-accent">
+      <Panel className="mt-5 animate-rise transition hover:border-accent">
+        <Link href="/app/wealth/net-worth" className="block">
           <p className="eyebrow">Net worth</p>
           <p className="font-display mt-1 text-4xl tracking-tight">
             {formatNaira(dash.netWorth.netWorthNgn, true)}
@@ -56,8 +56,19 @@ export default async function HomePage() {
               Confidence {Math.round(dash.netWorth.confidence * 100)}%
             </Badge>
           </div>
-        </Panel>
-      </Link>
+        </Link>
+        {dash.netWorth.confidence < 0.75 || dash.netWorth.staleAssetIds.length > 0 ? (
+          <Link
+            href="/app/wealth/confidence"
+            className="mt-3 inline-flex text-sm font-semibold text-accent"
+          >
+            Fix data quality
+            {dash.netWorth.staleAssetIds.length
+              ? ` · ${dash.netWorth.staleAssetIds.length} stale`
+              : ""}
+          </Link>
+        ) : null}
+      </Panel>
 
       <div className="mt-3 grid grid-cols-2 gap-3 animate-rise-delay">
         <Link href="/app/health">

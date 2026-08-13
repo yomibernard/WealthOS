@@ -51,6 +51,7 @@ export type Intent =
   | "goals"
   | "actions"
   | "monthly_report"
+  | "data_quality"
   | "escalation"
   | "general";
 
@@ -162,6 +163,12 @@ export function classifyIntent(message: string): Intent {
   if (/top three|what should i do|next best|priority/.test(m)) return "actions";
   if (/monthly (wealth )?report|wealth report|month.over.month|mom (change|report)/.test(m))
     return "monthly_report";
+  if (
+    /data (quality|confidence)|stale (asset|valuation)|refresh (my )?(valuation|wealth)|fix (my )?data/.test(
+      m,
+    )
+  )
+    return "data_quality";
   return "general";
 }
 
@@ -194,6 +201,7 @@ export function routeAgent(intent: Intent): AgentName {
       return "ComplianceAI";
     case "actions":
     case "monthly_report":
+    case "data_quality":
       return "CoachAI";
     case "net_worth":
     case "general":
@@ -746,6 +754,19 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
         "Path: /app/reports",
       ].join(" ");
       confidence = Math.min(confidence, 0.85);
+      break;
+    }
+    case "data_quality": {
+      toolsUsed.push("dataQualityEngine");
+      content = [
+        `Overall net-worth confidence is about ${Math.round(nw.confidence * 100)}%.`,
+        nw.staleAssetIds.length
+          ? `${nw.staleAssetIds.length} holding(s) look stale — confirm today’s estimate or enter a new value.`
+          : "No heavily stale valuations were flagged, but estimated private holdings should still be reviewed quarterly.",
+        "Open Data confidence to work the remediation queue. WealthOS will not invent balances.",
+        "Path: /app/wealth/confidence",
+      ].join(" ");
+      confidence = Math.min(confidence, 0.8);
       break;
     }
     case "affordability":

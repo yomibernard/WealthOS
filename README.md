@@ -90,6 +90,11 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - **Health** — `GET /api/health` for uptime probes
 - **Admin** — `/admin/ops` launch gate summary
 
+## Data confidence (Phase 6.2)
+
+- **Remediation** — `/app/wealth/confidence` lists stale/estimated holdings with confirm or update actions
+- Home surfaces **Fix data quality** when confidence is low or valuations are stale
+
 ## Monthly reports (Phase 6.0–6.1)
 
 - **Reports** — `/app/reports` generates an informational monthly snapshot (net worth, health, attention, next steps)
