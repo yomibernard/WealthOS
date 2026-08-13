@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 8.5
+
+- Admin audit filter + redacted JSON export (`GET /api/admin/audit?download=1`)
+- Category taxonomy (privacy, escalation, cadence, adviser, …); export itself audited
+
 ## Unreleased — Phase 8.4
 
 - Admin daily ops board (`/admin/ops`, summary on `/admin`, `GET /api/admin/ops-daily`)

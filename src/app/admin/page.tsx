@@ -114,8 +114,8 @@ export default async function AdminPage() {
         </Link>
         <Link href="/admin/audit">
           <Panel>
-            <p className="font-semibold">Audit logs</p>
-            <p className="muted text-sm">Structured recommendation and consent events.</p>
+            <p className="font-semibold">Audit logs & export</p>
+            <p className="muted text-sm">Filter by category; download redacted JSON pack.</p>
           </Panel>
         </Link>
         <Link href="/admin/rules">

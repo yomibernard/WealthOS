@@ -439,3 +439,10 @@ Daily ops board:
 
 - Attention-scored queues on `/admin/ops` + summary strip on `/admin`
 - `GET /api/admin/ops-daily`; demo Act 5 + OPS_RUNBOOK on-call start at the board
+
+## Phase 8.5 delivered (13 Aug 2026)
+
+Audit export:
+
+- Filterable `/admin/audit` by category / event type / search
+- Redacted JSON download via `GET /api/admin/audit?download=1`; `AUDIT_EXPORT_DOWNLOADED`

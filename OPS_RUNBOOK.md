@@ -21,9 +21,15 @@ Never run `npm run db:setup` in production (wipes and reseeds).
 
 ### AI / suitability
 
-1. Capture conversation id and audit events (`/admin/audit`)
+1. Capture conversation id and audit events (`/admin/audit` — filter `ai`, Download JSON)
 2. Confirm ComplianceAI still blocks prompt-injection / suitability bypass
 3. Prefer deterministic engines only until LLM polish is re-approved
+
+### Audit export
+
+1. Open `/admin/audit`, filter by category (privacy / escalation / consent / cadence…)
+2. Download JSON — payloads redact password/secret/token fields
+3. Each download writes `AUDIT_EXPORT_DOWNLOADED` for chain-of-custody
 
 ### Open-banking demo rail
 

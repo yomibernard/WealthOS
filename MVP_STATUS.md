@@ -37,6 +37,7 @@
 | Privacy export (cadence) | Ready (demo) | digests, shares, nudges in JSON pack |
 | Support & complaints | Ready (demo) | `/app/support` L2 cases + admin resolve loop |
 | Daily ops board | Ready (demo) | `/admin/ops` attention queues + `/admin` strip |
+| Audit export | Ready (demo) | filterable `/admin/audit` + redacted JSON pack |
 
 ## Quality gates (this machine)
 

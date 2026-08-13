@@ -18,6 +18,7 @@ const moduleIndex = [
   { href: "/app/privacy", label: "Privacy export", flag: null },
   { href: "/app/support", label: "Support & complaints", flag: null },
   { href: "/admin/escalations", label: "Admin escalations queue", flag: null },
+  { href: "/admin/audit", label: "Audit export", flag: null },
 ];
 
 export default async function AdminOpsPage() {
