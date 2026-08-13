@@ -40,6 +40,7 @@
 | Audit export | Ready (demo) | filterable `/admin/audit` + redacted JSON pack |
 | Flag profiles | Ready (demo) | safe pilot / incident lockdown snippets on `/admin/flags` |
 | Customer case pulse | Ready (demo) | Home CTAs + WealthAI support/privacy intents |
+| Case inbox deep-links | Ready (demo) | Support/complaint lifecycle → `/app/support` |
 
 ## Quality gates (this machine)
 

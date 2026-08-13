@@ -23,6 +23,50 @@ export type CustomerCasesPulse = {
   items: CustomerCaseRow[];
 };
 
+export type CaseInboxDraft = {
+  category: string;
+  priority: string;
+  title: string;
+  body: string;
+  href: string;
+  sourceType: string;
+  sourceId: string;
+};
+
+/** Inbox card for a support/complaint/adviser escalation (deep-links to Support). */
+export function buildCaseInboxDraft(input: {
+  id: string;
+  reason: string;
+  status: string;
+  resolution?: string | null;
+}): CaseInboxDraft {
+  const category = classifyEscalationReason(input.reason);
+  const isComplaint = category === "complaint";
+  const open = input.status === "open" || input.status === "in_progress";
+
+  let title: string;
+  if (open && isComplaint) title = "Open complaint";
+  else if (open && category === "support") title = "Open support case";
+  else if (open) title = "Open human escalation";
+  else if (input.status === "resolved") title = isComplaint ? "Complaint resolved" : "Support case resolved";
+  else title = isComplaint ? "Complaint closed" : "Support case closed";
+
+  const bodyParts = [input.reason];
+  if (input.resolution) bodyParts.push(`Update: ${input.resolution}`);
+  else if (open) bodyParts.push("Track progress and replies in Support & complaints.");
+
+  return {
+    category: isComplaint ? "complaint" : "escalation",
+    priority: isComplaint || open ? "important" : "informational",
+    title,
+    body: bodyParts.join(" "),
+    href: "/app/support",
+    sourceType: "escalation",
+    // Open cards share a stable id for refresh upserts; closed cards get a status suffix.
+    sourceId: open ? input.id : `${input.id}:${input.status}`,
+  };
+}
+
 export function buildCustomerCasesPulse(
   rows: Array<{
     id: string;

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { analyseEstate } from "@/engines/estate";
 import { getFeatureFlags } from "@/lib/feature-flags";
+import { buildCaseInboxDraft } from "@/engines/customer-cases";
 
 type Draft = {
   category: string;
@@ -75,7 +76,11 @@ export async function refreshInbox(userId: string) {
     prisma.asset.findMany({ where: { userId } }),
     prisma.estateItem.findMany({ where: { userId } }),
     prisma.householdMember.findMany({ where: { userId } }),
-    prisma.escalation.findMany({ where: { userId, status: "open" }, take: 5 }),
+    prisma.escalation.findMany({
+      where: { userId, status: { in: ["open", "in_progress"] } },
+      take: 8,
+      orderBy: { updatedAt: "desc" },
+    }),
   ]);
 
   let created = 0;
@@ -126,15 +131,12 @@ export async function refreshInbox(userId: string) {
   }
 
   for (const e of escalations) {
-    await upsertInbox(userId, {
-      category: "escalation",
-      priority: "critical",
-      title: "Open human escalation",
-      body: e.reason,
-      href: "/app/adviser-request",
-      sourceType: "escalation",
-      sourceId: e.id,
+    const draft = buildCaseInboxDraft({
+      id: e.id,
+      reason: e.reason,
+      status: e.status,
     });
+    await upsertInbox(userId, draft);
     created += 1;
   }
 

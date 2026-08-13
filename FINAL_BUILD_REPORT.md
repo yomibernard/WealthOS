@@ -467,3 +467,10 @@ Customer case awareness:
 
 - Home pulse for open complaints/support + recent resolutions → `/app/support`
 - WealthAI intents `support_case` / `privacy` with ComplianceAI routing
+
+## Phase 9.1 delivered (13 Aug 2026)
+
+Case inbox loop:
+
+- Create/resolve escalations write Wealth Inbox cards deep-linked to `/app/support`
+- `refreshInbox` covers open + in_progress; complaint titles; closes stale open cards on resolve

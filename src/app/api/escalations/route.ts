@@ -4,7 +4,9 @@ import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { buildHomeDashboard } from "@/services/wealth";
 import { createUserNotification } from "@/services/notifications";
+import { createInboxFromDrafts } from "@/services/inbox";
 import { parseEscalationSummary } from "@/engines/escalation-ops";
+import { buildCaseInboxDraft } from "@/engines/customer-cases";
 
 const schema = z.object({
   reason: z.string().min(3).max(2000),
@@ -93,6 +95,14 @@ export async function POST(req: Request) {
           : "Support request received",
     body: `Case ${escalation.id.slice(0, 8)} is open at ${body.level}. We will follow up in-product.`,
   });
+
+  await createInboxFromDrafts(user.id, [
+    buildCaseInboxDraft({
+      id: escalation.id,
+      reason: reasonLabel,
+      status: "open",
+    }),
+  ]);
 
   return NextResponse.json({ ok: true, id: escalation.id });
 }

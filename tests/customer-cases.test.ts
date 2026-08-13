@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildCustomerCasesPulse } from "@/engines/customer-cases";
+import { buildCaseInboxDraft, buildCustomerCasesPulse } from "@/engines/customer-cases";
 
 describe("customer cases pulse", () => {
   it("headlines open complaints first", () => {
@@ -51,5 +51,26 @@ describe("customer cases pulse", () => {
     const pulse = buildCustomerCasesPulse([]);
     expect(pulse.headline).toBeNull();
     expect(pulse.openCount).toBe(0);
+  });
+
+  it("builds inbox drafts that deep-link to Support", () => {
+    const open = buildCaseInboxDraft({
+      id: "e1",
+      reason: "COMPLAINT: fee",
+      status: "open",
+    });
+    expect(open.href).toBe("/app/support");
+    expect(open.title).toMatch(/complaint/i);
+    expect(open.sourceId).toBe("e1");
+
+    const resolved = buildCaseInboxDraft({
+      id: "e1",
+      reason: "SUPPORT: help",
+      status: "resolved",
+      resolution: "Fixed.",
+    });
+    expect(resolved.sourceId).toBe("e1:resolved");
+    expect(resolved.body).toContain("Fixed.");
+    expect(resolved.href).toBe("/app/support");
   });
 });

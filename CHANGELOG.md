@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 9.1
+
+- Wealth Inbox deep-links for support/complaint create + resolve (→ `/app/support`)
+- Refresh inbox includes in-progress cases; open cards no longer route to adviser-request
+
 ## Unreleased — Phase 9.0
 
 - Home CTAs for open/recent support & complaint cases

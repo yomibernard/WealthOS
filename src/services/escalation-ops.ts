@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/db";
 import { createUserNotification } from "@/services/notifications";
+import { createInboxFromDrafts } from "@/services/inbox";
+import { buildCaseInboxDraft } from "@/engines/customer-cases";
 import {
   classifyEscalationReason,
   customerCaseTitle,
@@ -74,6 +76,8 @@ export async function updateEscalationCase(input: {
   });
 
   const category = classifyEscalationReason(existing.reason);
+  const resolution = parseEscalationSummary(updated.summary).resolution ?? null;
+
   await createUserNotification({
     userId: existing.userId,
     category: "important",
@@ -81,13 +85,34 @@ export async function updateEscalationCase(input: {
     body: `Your case is now ${input.status}. ${input.resolution}`,
   });
 
+  if (input.status === "resolved" || input.status === "rejected") {
+    await prisma.inboxItem.updateMany({
+      where: {
+        userId: existing.userId,
+        sourceType: "escalation",
+        sourceId: existing.id,
+        status: { in: ["unread", "read"] },
+      },
+      data: { status: "acted" },
+    });
+  }
+
+  await createInboxFromDrafts(existing.userId, [
+    buildCaseInboxDraft({
+      id: updated.id,
+      reason: existing.reason,
+      status: updated.status,
+      resolution,
+    }),
+  ]);
+
   return {
     ok: true as const,
     escalation: {
       id: updated.id,
       status: updated.status,
       assignedTo: updated.assignedTo,
-      resolution: parseEscalationSummary(updated.summary).resolution ?? null,
+      resolution,
     },
   };
 }
