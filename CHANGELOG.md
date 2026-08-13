@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 15.0
+
+- Care receipts: customers mark adviser care updates as seen (optional thanks); Home pulse is unseen-only; Care desk shows Seen/Unseen
+
 ## 0.1.7 — 13 Aug 2026 (WealthAI care pack)
 
 WealthAI answers adviser care-update questions on top of the 0.1.6 customer care loop.

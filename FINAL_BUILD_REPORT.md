@@ -635,3 +635,12 @@ WealthAI care freeze pack **v0.1.7**:
 
 - `npm run pilot:freeze` checks WealthAI `care_update` intent, grounded pulse, `/app/ai` smoke
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 15.0 delivered (13 Aug 2026)
+
+Care receipts (customer mark-as-seen):
+
+- Support/Privacy mark care updates seen with optional thanks; related Inbox care_ack → acted
+- Home / default `GET /api/care-updates` pulse is unseen-only; `?list=1` includes seen history
+- Adviser 360 Care desk shows Seen/Unseen + thanks; WealthAI copy mentions mark-as-seen
+- Local smoke probes list + mark-seen when an unseen ack exists

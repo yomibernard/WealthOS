@@ -3,9 +3,12 @@ import { assertAdviserAccess, createAdviserNote } from "@/services/adviser-colla
 import { createUserNotification } from "@/services/notifications";
 import { createInboxFromDrafts } from "@/services/inbox";
 import {
+  appendCareReceipt,
   buildCareAckDraft,
   buildCareAckHistory,
+  buildCareUpdateList,
   buildCareUpdatePulse,
+  isCareAckSeen,
   type CareAckKind,
 } from "@/engines/adviser-care-ack";
 
@@ -95,13 +98,14 @@ export async function loadCareAckHistory(customerId: string, limit = 5) {
       body: n.body,
       createdAt: n.createdAt,
       adviserName: n.adviser.name,
+      status: n.status,
     })),
     limit,
   );
 }
 
-export async function loadCareUpdatePulse(customerId: string) {
-  const notes = await prisma.adviserNote.findMany({
+async function loadRecentCareAckNotes(customerId: string) {
+  return prisma.adviserNote.findMany({
     where: {
       customerId,
       kind: "care_ack",
@@ -111,7 +115,10 @@ export async function loadCareUpdatePulse(customerId: string) {
     take: 10,
     include: { adviser: { select: { name: true } } },
   });
+}
 
+export async function loadCareUpdatePulse(customerId: string) {
+  const notes = await loadRecentCareAckNotes(customerId);
   return buildCareUpdatePulse(
     notes.map((n) => ({
       id: n.id,
@@ -119,6 +126,75 @@ export async function loadCareUpdatePulse(customerId: string) {
       body: n.body,
       createdAt: n.createdAt,
       adviserName: n.adviser.name,
+      status: n.status,
     })),
   );
+}
+
+/** Recent care updates including seen receipts (Support / Privacy lists). */
+export async function loadCareUpdateList(customerId: string) {
+  const notes = await loadRecentCareAckNotes(customerId);
+  return buildCareUpdateList(
+    notes.map((n) => ({
+      id: n.id,
+      title: n.title,
+      body: n.body,
+      createdAt: n.createdAt,
+      adviserName: n.adviser.name,
+      status: n.status,
+    })),
+  );
+}
+
+/** Customer marks a care acknowledgment as seen (optional thanks). Does not close ops. */
+export async function markCareUpdateSeen(input: {
+  customerId: string;
+  noteId: string;
+  thanks?: string | null;
+}) {
+  const note = await prisma.adviserNote.findFirst({
+    where: {
+      id: input.noteId,
+      customerId: input.customerId,
+      kind: "care_ack",
+      sharedWithCustomer: true,
+    },
+  });
+  if (!note) throw new Error("Care update not found.");
+
+  if (isCareAckSeen(note.status)) {
+    return { noteId: note.id, alreadySeen: true as const };
+  }
+
+  const seenAt = new Date().toISOString();
+  const body = appendCareReceipt(note.body, seenAt, input.thanks);
+
+  await prisma.adviserNote.update({
+    where: { id: note.id },
+    data: { status: "seen", body },
+  });
+
+  await prisma.inboxItem.updateMany({
+    where: {
+      userId: input.customerId,
+      sourceType: "care_ack",
+      sourceId: note.id,
+      status: { in: ["unread", "read"] },
+    },
+    data: { status: "acted" },
+  });
+
+  await prisma.auditEvent.create({
+    data: {
+      userId: input.customerId,
+      eventType: "CUSTOMER_CARE_RECEIPT",
+      entityType: "AdviserNote",
+      entityId: note.id,
+      payloadJson: JSON.stringify({
+        thanks: Boolean((input.thanks ?? "").trim()),
+      }),
+    },
+  });
+
+  return { noteId: note.id, alreadySeen: false as const, seenAt };
 }

@@ -2,6 +2,10 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { Badge, Button, Field, PageHeader, Panel, TextInput } from "@/components/ui";
+import {
+  CareUpdateReceiptList,
+  type CareUpdateRow,
+} from "@/components/CareUpdateReceiptList";
 
 type PrivacyReq = {
   id: string;
@@ -12,18 +16,9 @@ type PrivacyReq = {
   resolution: string | null;
 };
 
-type CareUpdate = {
-  id: string;
-  title: string;
-  preview: string;
-  adviserName: string;
-  createdAt: string;
-  href: string;
-};
-
 export default function PrivacyPage() {
   const [requests, setRequests] = useState<PrivacyReq[]>([]);
-  const [careUpdates, setCareUpdates] = useState<CareUpdate[]>([]);
+  const [careUpdates, setCareUpdates] = useState<CareUpdateRow[]>([]);
   const [type, setType] = useState("access");
   const [details, setDetails] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -31,11 +26,11 @@ export default function PrivacyPage() {
   async function load() {
     const [reqRes, careRes] = await Promise.all([
       fetch("/api/privacy/requests"),
-      fetch("/api/care-updates"),
+      fetch("/api/care-updates?list=1"),
     ]);
     if (reqRes.ok) setRequests(await reqRes.json());
     if (careRes.ok) {
-      const data = (await careRes.json()) as { items?: CareUpdate[] };
+      const data = (await careRes.json()) as { items?: CareUpdateRow[] };
       setCareUpdates(
         (data.items ?? []).filter(
           (i) => i.href === "/app/privacy" || /privacy/i.test(i.title),
@@ -72,28 +67,21 @@ export default function PrivacyPage() {
         subtitle="Download your data or request access, correction, objection or erasure. Retention rules still apply where legally required."
       />
 
-      {careUpdates.length ? (
-        <Panel className="mb-3 space-y-2">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="font-semibold">Recent care updates</p>
-            <Badge>{careUpdates.length}</Badge>
-          </div>
-          <p className="muted text-sm">
-            Your adviser acknowledged a privacy-related item. Ops still handles formal completion.
-          </p>
-          <ul className="space-y-2">
-            {careUpdates.map((u) => (
-              <li key={u.id} className="rounded-xl border border-line px-3 py-2">
-                <p className="font-semibold text-sm">{u.title}</p>
-                <p className="mt-1 text-sm">{u.preview}</p>
-                <p className="muted mt-1 text-xs">
-                  {u.adviserName} · {new Date(u.createdAt).toLocaleString("en-GB")}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </Panel>
-      ) : null}
+      <Panel className="mb-3 space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="font-semibold">Recent care updates</p>
+          {careUpdates.length ? <Badge>{careUpdates.length}</Badge> : null}
+        </div>
+        <p className="muted text-sm">
+          Your adviser acknowledged a privacy-related item. Mark as seen when read — ops still
+          handles formal completion.
+        </p>
+        <CareUpdateReceiptList
+          items={careUpdates}
+          onChanged={load}
+          emptyHint="No recent privacy care updates."
+        />
+      </Panel>
 
       <Panel className="space-y-3">
         <p className="font-semibold">Data portability</p>

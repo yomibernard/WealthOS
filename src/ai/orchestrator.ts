@@ -141,6 +141,8 @@ export type CustomerContext = {
       adviserName: string;
       createdAt: string;
       href: string;
+      seen?: boolean;
+      thanksPreview?: string | null;
     }>;
   } | null;
 };

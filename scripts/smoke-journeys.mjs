@@ -81,6 +81,31 @@ try {
     console.log(`  [${careOk ? "OK" : "FAIL"}] GET /api/care-updates → ${careRes.status}`);
     if (!careOk) failures.push(`/api/care-updates status ${careRes.status}`);
 
+    const careListRes = await authedGet("/api/care-updates?list=1", login.cookie);
+    const careListOk = careListRes.status === 200;
+    console.log(`  [${careListOk ? "OK" : "FAIL"}] GET /api/care-updates?list=1 → ${careListRes.status}`);
+    if (!careListOk) failures.push(`/api/care-updates?list=1 status ${careListRes.status}`);
+
+    const careListData = await careListRes.json().catch(() => ({}));
+    const firstUnseen = Array.isArray(careListData.items)
+      ? careListData.items.find((i) => i && i.seen === false && i.id)
+      : null;
+    if (firstUnseen?.id) {
+      const seenRes = await fetch(`${base}/api/care-updates/${firstUnseen.id}/seen`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(login.cookie ? { cookie: login.cookie } : {}),
+        },
+        body: JSON.stringify({ thanks: "Smoke receipt — thanks" }),
+      });
+      const seenOk = seenRes.status === 200;
+      console.log(`  [${seenOk ? "OK" : "FAIL"}] POST /api/care-updates/:id/seen → ${seenRes.status}`);
+      if (!seenOk) failures.push(`care receipt seen status ${seenRes.status}`);
+    } else {
+      console.log("  [SKIP] POST /api/care-updates/:id/seen (no unseen care update in seed)");
+    }
+
     const aiRes = await fetch(`${base}/api/ai/chat`, {
       method: "POST",
       headers: {

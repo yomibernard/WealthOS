@@ -3,6 +3,10 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { Badge, Button, Field, PageHeader, Panel, TextInput } from "@/components/ui";
+import {
+  CareUpdateReceiptList,
+  type CareUpdateRow,
+} from "@/components/CareUpdateReceiptList";
 
 type CaseRow = {
   id: string;
@@ -13,30 +17,21 @@ type CaseRow = {
   resolution: string | null;
 };
 
-type CareUpdate = {
-  id: string;
-  title: string;
-  preview: string;
-  adviserName: string;
-  createdAt: string;
-  href: string;
-};
-
 export default function SupportPage() {
   const [category, setCategory] = useState<"support" | "complaint">("support");
   const [reason, setReason] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [cases, setCases] = useState<CaseRow[]>([]);
-  const [careUpdates, setCareUpdates] = useState<CareUpdate[]>([]);
+  const [careUpdates, setCareUpdates] = useState<CareUpdateRow[]>([]);
 
   async function load() {
     const [casesRes, careRes] = await Promise.all([
       fetch("/api/escalations"),
-      fetch("/api/care-updates"),
+      fetch("/api/care-updates?list=1"),
     ]);
     if (casesRes.ok) setCases(await casesRes.json());
     if (careRes.ok) {
-      const data = (await careRes.json()) as { items?: CareUpdate[] };
+      const data = (await careRes.json()) as { items?: CareUpdateRow[] };
       setCareUpdates(
         (data.items ?? []).filter(
           (i) => i.href === "/app/support" || !/privacy/i.test(i.title),
@@ -81,28 +76,21 @@ export default function SupportPage() {
         subtitle="Human help when AI confidence is low, something went wrong, or you want a person on the case."
       />
 
-      {careUpdates.length ? (
-        <Panel className="mb-3 space-y-2">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="font-semibold">Recent care updates</p>
-            <Badge>{careUpdates.length}</Badge>
-          </div>
-          <p className="muted text-sm">
-            Your adviser sent these acknowledgments. Formal ops resolution still applies when needed.
-          </p>
-          <ul className="space-y-2">
-            {careUpdates.map((u) => (
-              <li key={u.id} className="rounded-xl border border-line px-3 py-2">
-                <p className="font-semibold text-sm">{u.title}</p>
-                <p className="mt-1 text-sm">{u.preview}</p>
-                <p className="muted mt-1 text-xs">
-                  {u.adviserName} · {new Date(u.createdAt).toLocaleString("en-GB")}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </Panel>
-      ) : null}
+      <Panel className="mb-3 space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="font-semibold">Recent care updates</p>
+          {careUpdates.length ? <Badge>{careUpdates.length}</Badge> : null}
+        </div>
+        <p className="muted text-sm">
+          Your adviser sent these acknowledgments. Mark as seen when you have read them — that does
+          not close the ops queue.
+        </p>
+        <CareUpdateReceiptList
+          items={careUpdates}
+          onChanged={load}
+          emptyHint="No recent support care updates."
+        />
+      </Panel>
 
       <Panel className="space-y-3">
         <p className="font-semibold">Escalation ladder</p>

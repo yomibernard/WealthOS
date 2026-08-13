@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/session";
-import { loadCareUpdatePulse } from "@/services/adviser-care-ack";
+import {
+  loadCareUpdateList,
+  loadCareUpdatePulse,
+} from "@/services/adviser-care-ack";
 
-export async function GET() {
+export async function GET(req: Request) {
   const user = await getSessionUser();
   if (!user) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
@@ -11,6 +14,9 @@ export async function GET() {
     return NextResponse.json({ error: "Customers only." }, { status: 403 });
   }
 
-  const pulse = await loadCareUpdatePulse(user.id);
-  return NextResponse.json(pulse);
+  const list = new URL(req.url).searchParams.get("list") === "1";
+  const data = list
+    ? await loadCareUpdateList(user.id)
+    : await loadCareUpdatePulse(user.id);
+  return NextResponse.json(data);
 }

@@ -146,10 +146,21 @@ export default async function AdviserCustomerPage({
             <ul className="space-y-2">
               {careHistory.items.map((h) => (
                 <li key={h.id} className="rounded-xl border border-line px-3 py-2">
-                  <p className="font-semibold text-sm">{h.title}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold text-sm">{h.title}</p>
+                    <Badge tone={h.seen ? "default" : "warn"}>
+                      {h.seen ? "Seen" : "Unseen"}
+                    </Badge>
+                  </div>
                   <p className="mt-1 text-sm">{h.preview}</p>
+                  {h.thanksPreview ? (
+                    <p className="mt-1 text-sm">Customer thanks: {h.thanksPreview}</p>
+                  ) : null}
                   <p className="muted mt-1 text-xs">
                     {h.adviserName} · {new Date(h.createdAt).toLocaleString("en-GB")}
+                    {h.seenAt
+                      ? ` · receipt ${new Date(h.seenAt).toLocaleString("en-GB")}`
+                      : ""}
                   </p>
                 </li>
               ))}
