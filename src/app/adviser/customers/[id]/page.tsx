@@ -9,6 +9,7 @@ import { formatNaira } from "@/lib/format";
 import { AdviserCopilot } from "@/components/AdviserCopilot";
 import { AdviserNotesPanel } from "@/components/AdviserNotesPanel";
 import { AdviserNudgePanel } from "@/components/AdviserNudgePanel";
+import { AdviserCareAck } from "@/components/AdviserCareAck";
 import { CustomerTimeline } from "@/components/CustomerTimeline";
 import { getFeatureFlags } from "@/lib/feature-flags";
 import Link from "next/link";
@@ -132,6 +133,9 @@ export default async function AdviserCustomerPage({
               Admin privacy queue
             </Link>
           </div>
+        ) : null}
+        {flags.adviserCollab && care.items.length ? (
+          <AdviserCareAck customerId={customer.id} items={care.items} />
         ) : null}
       </Panel>
 

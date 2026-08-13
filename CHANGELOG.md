@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 10.2
+
+- Adviser care acknowledgment from 360 Care desk (`POST /api/adviser/care-ack`)
+- Customer Inbox + notification; does not close admin queues
+
 ## Unreleased — Phase 10.1
 
 - Adviser portfolio care radar on `/adviser` (sort by complaints → privacy → cases)

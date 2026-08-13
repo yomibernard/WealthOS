@@ -18,12 +18,21 @@ const RULES: Array<{ href: string; label: string; patterns: RegExp[] }> = [
       /support case/i,
       /\bcase is now\b/i,
       /escalation/i,
+      /acknowledged your (complaint|support|escalation)/i,
+      /care update · (complaint|support|escalation)/i,
     ],
   },
   {
     href: "/app/privacy",
     label: "Open privacy",
-    patterns: [/privacy request/i, /\berasure\b/i, /data pack/i, /ndpr/i],
+    patterns: [
+      /privacy request/i,
+      /\berasure\b/i,
+      /data pack/i,
+      /ndpr/i,
+      /acknowledged your privacy/i,
+      /care update · privacy/i,
+    ],
   },
   {
     href: "/app/digest",

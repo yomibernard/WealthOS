@@ -509,3 +509,10 @@ Portfolio care radar:
 
 - `/adviser` lists customers ranked by care load with complaint/privacy badges
 - Summary strip for the book; deep-link into each Care desk
+
+## Phase 10.2 delivered (13 Aug 2026)
+
+Care acknowledgments:
+
+- Advisers send calm care updates from 360; Inbox/notification deep-links to support or privacy
+- Ops queues remain authoritative for formal resolution

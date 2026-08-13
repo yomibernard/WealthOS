@@ -45,6 +45,7 @@
 | Notification deep-links | Ready (demo) | `/app/notifications` → support/privacy/cadence |
 | Adviser care desk | Ready (demo) | 360 open support/privacy before product talk |
 | Adviser care radar | Ready (demo) | `/adviser` portfolio sorted by care load |
+| Adviser care ack | Ready (demo) | 360 acknowledgment → customer Inbox |
 
 ## Quality gates (this machine)
 
