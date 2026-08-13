@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.8 (… + WealthAI care 14.x + care receipts 15.x).
+ * Current pack: v0.1.9 (… + care receipts 15.x + close-loop 16.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.8";
+const EXPECTED = "0.1.9";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -84,7 +84,7 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.8")) failures.push("CHANGELOG.md missing 0.1.8 section");
+if (!changelog.includes("0.1.9")) failures.push("CHANGELOG.md missing 0.1.9 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
 if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
@@ -106,11 +106,14 @@ if (
 ) {
   failures.push("CHANGELOG.md missing care receipt / mark-as-seen mention");
 }
+if (!changelog.includes("awaiting") && !changelog.includes("close-loop")) {
+  failures.push("CHANGELOG.md missing care close-loop / awaiting mention");
+}
 
 const deploy = read("DEPLOY.md");
 if (!deploy.includes("smoke:hosted")) failures.push("DEPLOY.md missing smoke:hosted");
 if (!deploy.includes("safe pilot")) failures.push("DEPLOY.md missing safe pilot guidance");
-if (!deploy.includes("v0.1.8")) failures.push("DEPLOY.md missing v0.1.8 tag guidance");
+if (!deploy.includes("v0.1.9")) failures.push("DEPLOY.md missing v0.1.9 tag guidance");
 
 const demo = read("DEMO_SCRIPT.md");
 if (!demo.includes("/admin/ops")) failures.push("DEMO_SCRIPT.md missing /admin/ops");
@@ -128,9 +131,15 @@ if (!demo.includes("WealthAI") || !demo.includes("/app/ai")) {
 if (!demo.includes("Mark as seen") && !demo.includes("mark as seen")) {
   failures.push("DEMO_SCRIPT.md missing Mark as seen receipt beat");
 }
+if (!demo.includes("Awaiting receipt") && !demo.includes("awaiting")) {
+  failures.push("DEMO_SCRIPT.md missing Awaiting receipt close-loop beat");
+}
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.8")) failures.push("MVP_STATUS.md missing 0.1.8");
+if (!status.includes("0.1.9")) failures.push("MVP_STATUS.md missing 0.1.9");
+if (!status.includes("Care receipt close-loop")) {
+  failures.push("MVP_STATUS.md missing Care receipt close-loop");
+}
 if (!status.includes("Adviser care ack")) failures.push("MVP_STATUS.md missing Adviser care ack");
 if (!status.includes("Adviser unacked radar")) failures.push("MVP_STATUS.md missing Adviser unacked radar");
 if (!status.includes("Ops care handoff")) failures.push("MVP_STATUS.md missing Ops care handoff");
@@ -144,7 +153,7 @@ const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
 if (!launch.includes("/admin/flags")) failures.push("LAUNCH_REVIEW.md missing flag profiles path");
 if (!launch.includes("pilot:freeze")) failures.push("LAUNCH_REVIEW.md missing pilot:freeze");
-if (!launch.includes("0.1.8")) failures.push("LAUNCH_REVIEW.md missing 0.1.8 pack");
+if (!launch.includes("0.1.9")) failures.push("LAUNCH_REVIEW.md missing 0.1.9 pack");
 
 const notificationsPage = read("src/app/app/notifications/page.tsx");
 if (!notificationsPage.includes("resolveNotificationLink")) {
@@ -157,6 +166,9 @@ if (!adviserHome.includes("care")) {
 }
 if (!adviserHome.includes("unacked")) {
   failures.push("adviser home missing unacked filter");
+}
+if (!adviserHome.includes("awaiting")) {
+  failures.push("adviser home missing awaiting receipt filter");
 }
 if (!adviserHome.includes("ackCue")) {
   failures.push("adviser home missing last-ack cue");
@@ -174,6 +186,9 @@ if (!portfolioEngine.includes("filterPortfolioCareRadar")) {
 if (!portfolioEngine.includes("formatCareAckCue")) {
   failures.push("portfolio engine missing ack cue formatter");
 }
+if (!portfolioEngine.includes('"awaiting"') && !portfolioEngine.includes("'awaiting'")) {
+  failures.push("portfolio engine missing awaiting filter");
+}
 
 const careAckEngine = read("src/engines/adviser-care-ack.ts");
 if (!careAckEngine.includes("buildCareAckHistory")) {
@@ -187,6 +202,9 @@ if (!careAckEngine.includes("formatCareUpdateAiContent")) {
 }
 if (!careAckEngine.includes("appendCareReceipt") || !careAckEngine.includes("buildCareUpdateList")) {
   failures.push("care-ack engine missing receipt helpers");
+}
+if (!careAckEngine.includes("buildAdviserCareReceiptNotify")) {
+  failures.push("care-ack engine missing buildAdviserCareReceiptNotify");
 }
 
 const customer360 = read("src/app/adviser/customers/[id]/page.tsx");
@@ -205,6 +223,9 @@ if (!opsDaily.includes("care_handoff")) {
 if (!opsDaily.includes("buildOpsCareHandoff")) {
   failures.push("ops-daily engine missing buildOpsCareHandoff");
 }
+if (!opsDaily.includes("awaitingReceiptCount") || !opsDaily.includes("recentReceipts")) {
+  failures.push("ops-daily engine missing receipt close-loop fields");
+}
 
 const escalationOps = read("src/engines/escalation-ops.ts");
 if (!escalationOps.includes("buildCaseCareAckCue")) {
@@ -219,6 +240,9 @@ if (!privacyRequests.includes("buildPrivacyAdminCareView")) {
 const adminOps = read("src/app/admin/ops/page.tsx");
 if (!adminOps.includes("careHandoff") && !adminOps.includes("Care handoff")) {
   failures.push("admin ops page missing care handoff strip");
+}
+if (!adminOps.includes("awaiting") || !adminOps.includes("recentReceipts")) {
+  failures.push("admin ops page missing awaiting/receipt close-loop UI");
 }
 
 const adminEsc = read("src/app/admin/escalations/page.tsx");
@@ -271,6 +295,9 @@ if (!smokeHosted.includes("/app/ai")) {
 if (!smokeHosted.includes("list=1")) {
   failures.push("smoke-hosted missing care-updates list path");
 }
+if (!smokeHosted.includes("care=awaiting") || !smokeHosted.includes("/admin/ops")) {
+  failures.push("smoke-hosted missing close-loop awaiting/ops paths");
+}
 
 const smokeLocal = read("scripts/smoke-journeys.mjs");
 if (!smokeLocal.includes("/app/support") || !smokeLocal.includes("/api/care-updates")) {
@@ -281,6 +308,9 @@ if (!smokeLocal.includes("/app/ai") || !smokeLocal.includes("/api/ai/chat")) {
 }
 if (!smokeLocal.includes("/seen")) {
   failures.push("smoke-journeys missing care receipt seen coverage");
+}
+if (!smokeLocal.includes("care=awaiting") || !smokeLocal.includes("/admin/ops")) {
+  failures.push("smoke-journeys missing close-loop awaiting/ops coverage");
 }
 
 // 14.x WealthAI care surface
@@ -302,6 +332,9 @@ const careService = read("src/services/adviser-care-ack.ts");
 if (!careService.includes("markCareUpdateSeen")) {
   failures.push("care-ack service missing markCareUpdateSeen");
 }
+if (!careService.includes("buildAdviserCareReceiptNotify")) {
+  failures.push("care-ack service missing adviser receipt notify");
+}
 
 const receiptUi = read("src/components/CareUpdateReceiptList.tsx");
 if (!receiptUi.includes("/api/care-updates/") || !receiptUi.includes("/seen")) {
@@ -311,6 +344,14 @@ if (!receiptUi.includes("/api/care-updates/") || !receiptUi.includes("/seen")) {
 const seed = read("prisma/seed.ts");
 if (!seed.includes('kind: "care_ack"') && !seed.includes("kind: 'care_ack'")) {
   failures.push("seed missing demo care_ack for receipts");
+}
+if (!seed.includes('status: "seen"') && !seed.includes("status: 'seen'")) {
+  failures.push("seed missing seen care receipt for ops close-loop demo");
+}
+
+const notificationLinks = read("src/lib/notification-links.ts");
+if (!notificationLinks.includes("/adviser")) {
+  failures.push("notification-links missing /adviser Path extraction");
 }
 
 if (failures.length) {

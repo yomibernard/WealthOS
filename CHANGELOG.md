@@ -1,12 +1,14 @@
 # Changelog
 
-## Unreleased — Phase 16.1
+## 0.1.9 — 13 Aug 2026 (Care receipt close-loop pack)
 
-- Smoke covers adviser `?care=awaiting` + admin `/admin/ops` close-loop paths (local + hosted)
+Adviser notify + ops receipts + awaiting radar on top of the 0.1.8 care receipts pack.
 
-## Unreleased — Phase 16.0
+### Phase 16.x — Care receipt close-loop
 
-- Care receipt close-loop: adviser notify on mark-as-seen; ops recent receipts + awaiting count; `/adviser?care=awaiting`
+- **16.2** Freeze pack `v0.1.9`; `pilot:freeze` covers 16.x close-loop surface
+- **16.1** Smoke covers adviser `?care=awaiting` + admin `/admin/ops` (local + hosted)
+- **16.0** Adviser notify on mark-as-seen; ops recent receipts + awaiting count; `/adviser?care=awaiting`
 
 ## 0.1.8 — 13 Aug 2026 (Care receipts pack)
 

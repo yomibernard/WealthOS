@@ -674,3 +674,10 @@ Care receipt close-loop smoke:
 
 - Local smoke signs in adviser/admin and hits `/adviser?care=awaiting` + `/admin/ops`
 - Hosted smoke covers the same close-loop paths when seed users exist
+
+## Phase 16.2 delivered (13 Aug 2026)
+
+Care receipt close-loop freeze pack **v0.1.9**:
+
+- `npm run pilot:freeze` checks adviser notify, awaiting radar, ops receipts, close-loop smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
