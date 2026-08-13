@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 14.2
+
+- Smoke covers `/app/ai` + local care_update chat probe; demo Act 5 includes WealthAI care-update question
+
 ## Unreleased — Phase 14.1
 
 - WealthAI `care_update` answers grounded in the live care-update pulse (count/headline/path)

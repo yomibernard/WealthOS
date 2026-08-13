@@ -72,7 +72,14 @@ const email = process.env.SMOKE_EMAIL || "yomi@demo.wealthos.ng";
 const password = process.env.SMOKE_PASSWORD || "WealthOSdemo1!";
 
 const publicPaths = ["/", "/demo", "/auth/sign-in", "/api/health"];
-const appPaths = ["/app", "/app/privacy", "/app/support", "/app/digest", "/api/care-updates"];
+const appPaths = [
+  "/app",
+  "/app/privacy",
+  "/app/support",
+  "/app/digest",
+  "/app/ai",
+  "/api/care-updates",
+];
 
 if (!base) {
   console.error("Set SMOKE_BASE_URL to your hosted origin, e.g.");

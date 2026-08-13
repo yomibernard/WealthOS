@@ -621,3 +621,10 @@ Grounded care-update answers:
 
 - CustomerContext loads care-update pulse for WealthAI
 - Responses cite recent ack headline/path when present; otherwise guide to Inbox/Care desk
+
+## Phase 14.2 delivered (13 Aug 2026)
+
+WealthAI care smoke + demo:
+
+- Local smoke POSTs a care_update question to `/api/ai/chat`; hosted smoke hits `/app/ai`
+- Demo Act 5 includes the WealthAI care-update prompt

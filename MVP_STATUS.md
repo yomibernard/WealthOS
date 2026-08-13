@@ -55,7 +55,7 @@
 | Customer care pulse | Ready (demo) | Home CTA for recent adviser care updates |
 | Support care updates | Ready (demo) | `/app/support` recent care acknowledgments |
 | Privacy care updates | Ready (demo) | `/app/privacy` recent care acknowledgments |
-| WealthAI care update | Ready (demo) | `care_update` intent grounded in live pulse |
+| WealthAI care update | Ready (demo) | `care_update` intent grounded + smoke/demo |
 
 ## Quality gates (this machine)
 

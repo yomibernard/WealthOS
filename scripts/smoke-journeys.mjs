@@ -67,6 +67,7 @@ try {
       "/app/wealthguard",
       "/app/support",
       "/app/privacy",
+      "/app/ai",
     ];
     for (const path of appPaths) {
       const res = await authedGet(path, login.cookie);
@@ -79,6 +80,26 @@ try {
     const careOk = careRes.status === 200;
     console.log(`  [${careOk ? "OK" : "FAIL"}] GET /api/care-updates → ${careRes.status}`);
     if (!careOk) failures.push(`/api/care-updates status ${careRes.status}`);
+
+    const aiRes = await fetch(`${base}/api/ai/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(login.cookie ? { cookie: login.cookie } : {}),
+      },
+      body: JSON.stringify({ message: "Where do I see my adviser care update?" }),
+    });
+    const aiData = await aiRes.json().catch(() => ({}));
+    const aiOk =
+      aiRes.status === 200 &&
+      typeof aiData.content === "string" &&
+      /care update|does not close|\/app\/support|\/app\/privacy/i.test(aiData.content);
+    console.log(`  [${aiOk ? "OK" : "FAIL"}] POST /api/ai/chat care_update → ${aiRes.status}`);
+    if (!aiOk) {
+      failures.push(
+        `ai care_update chat failed: ${aiRes.status} ${String(aiData.content ?? "").slice(0, 120)}`,
+      );
+    }
   }
 } catch (err) {
   console.error("\nSmoke could not reach the server.");

@@ -60,5 +60,11 @@ describe("hosted smoke rules", () => {
     expect(existsSync(join(root, "scripts", "smoke-hosted.mjs"))).toBe(true);
     expect(readFileSync(join(root, "package.json"), "utf8")).toContain("smoke:hosted");
     expect(readFileSync(join(root, "DEPLOY.md"), "utf8")).toContain("smoke:hosted");
+    const hosted = readFileSync(join(root, "scripts", "smoke-hosted.mjs"), "utf8");
+    expect(hosted).toContain("/app/ai");
+    expect(hosted).toContain("/api/care-updates");
+    const local = readFileSync(join(root, "scripts", "smoke-journeys.mjs"), "utf8");
+    expect(local).toContain("/app/ai");
+    expect(local).toContain("care update");
   });
 });
