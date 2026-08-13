@@ -21,6 +21,7 @@ const routes = [
   "src/app/app/tax/page.tsx",
   "src/app/app/crypto/page.tsx",
   "src/app/app/lending/page.tsx",
+  "src/app/app/reports/page.tsx",
   "src/app/app/estate/page.tsx",
   "src/app/app/connections/page.tsx",
   "src/app/app/privacy/page.tsx",

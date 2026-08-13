@@ -26,6 +26,7 @@
 | Crypto / lending | Boundary ready | awareness + explicit deferral |
 | Postgres production | Rehearsed locally | `db:rehearse-postgres` succeeded (host port 5434) |
 | CI / deploy package | Ready | GitHub Actions + [DEPLOY.md](./DEPLOY.md) |
+| Monthly reports | Ready (demo) | `/app/reports`, snapshot history |
 
 ## Quality gates (this machine)
 

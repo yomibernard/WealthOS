@@ -320,3 +320,12 @@ Pilot / CI package after GitHub publish:
 - Annotated release tag `v0.1.0`
 
 Next human gates: create hosted Postgres, set Vercel env secrets, deploy smoke, `LAUNCH_REVIEW.md` sign-off.
+
+## Phase 6.0 delivered (13 Aug 2026)
+
+Monthly report centre (independent of hosting):
+
+- `/app/reports` + `/app/reports/[id]` — generate, history with deltas, full sectioned report
+- API GET/POST `/api/reports/monthly`, GET `/api/reports/monthly/[id]`
+- Richer snapshot payload; home + More entry points
+- Flag: `FF_MONTHLY_REPORTS` (existing)

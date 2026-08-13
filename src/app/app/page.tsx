@@ -109,6 +109,12 @@ export default async function HomePage() {
         </Link>
       </Panel>
 
+      {flags.monthlyReports ? (
+        <Link href="/app/reports" className="btn btn-ghost mt-3 w-full">
+          Monthly wealth report
+        </Link>
+      ) : null}
+
       <Link
         href="/app/ai"
         className="btn btn-soft mt-4 w-full"

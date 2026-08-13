@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 6.0
+
+- Monthly wealth report centre at `/app/reports` with snapshot history and detail views
+- Structured report payload (sections, top actions, disclaimer); GET/POST `/api/reports/monthly`
+
 ## 0.1.0 — 13 Aug 2026 (MVP freeze + pilot package)
 
 ### Phase 5.0 — CI / deploy package
