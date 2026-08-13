@@ -1,12 +1,14 @@
 # Changelog
 
-## Unreleased — Phase 15.1
+## 0.1.8 — 13 Aug 2026 (Care receipts pack)
 
-- Seeded Yomi care_ack for demo/smoke receipts; hosted smoke hits `/api/care-updates?list=1`
+Customer mark-as-seen receipts on adviser care updates on top of the 0.1.7 WealthAI care pack.
 
-## Unreleased — Phase 15.0
+### Phase 15.x — Care receipts
 
-- Care receipts: customers mark adviser care updates as seen (optional thanks); Home pulse is unseen-only; Care desk shows Seen/Unseen
+- **15.2** Freeze pack `v0.1.8`; `pilot:freeze` covers 15.x care receipt surface
+- **15.1** Seeded Yomi care_ack for demo/smoke receipts; hosted smoke hits `/api/care-updates?list=1`
+- **15.0** Care receipts: mark as seen (optional thanks); Home pulse unseen-only; Care desk Seen/Unseen
 
 ## 0.1.7 — 13 Aug 2026 (WealthAI care pack)
 

@@ -71,7 +71,7 @@ describe("MVP freeze inventory", () => {
     const status = readFileSync(join(process.cwd(), "MVP_STATUS.md"), "utf8");
     const readme = readFileSync(join(process.cwd(), "README.md"), "utf8");
     const demo = readFileSync(join(process.cwd(), "DEMO_SCRIPT.md"), "utf8");
-    expect(status).toContain("0.1.7");
+    expect(status).toContain("0.1.8");
     expect(status).toContain("Know what you have");
     expect(readme).toContain("WealthOSdemo1!");
     expect(status).toContain("WealthOSdemo1!");

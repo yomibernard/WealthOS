@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.7 (… + customer care 13.x + WealthAI care 14.x).
+ * Current pack: v0.1.8 (… + WealthAI care 14.x + care receipts 15.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.7";
+const EXPECTED = "0.1.8";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -70,6 +70,10 @@ mustExist("src/ai/orchestrator.ts");
 mustExist("src/app/app/ai/page.tsx");
 mustExist("src/app/api/ai/chat/route.ts");
 
+// 15.x care receipts
+mustExist("src/app/api/care-updates/[id]/seen/route.ts");
+mustExist("src/components/CareUpdateReceiptList.tsx");
+
 mustExist("DEPLOY.md");
 mustExist("OPS_RUNBOOK.md");
 mustExist("LAUNCH_REVIEW.md");
@@ -80,7 +84,7 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.7")) failures.push("CHANGELOG.md missing 0.1.7 section");
+if (!changelog.includes("0.1.8")) failures.push("CHANGELOG.md missing 0.1.8 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
 if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
@@ -94,11 +98,19 @@ if (!changelog.includes("care-update") && !changelog.includes("care update")) {
 if (!changelog.includes("care_update") && !changelog.includes("WealthAI care")) {
   failures.push("CHANGELOG.md missing WealthAI care_update mention");
 }
+if (
+  !changelog.includes("Mark as seen") &&
+  !changelog.includes("mark as seen") &&
+  !changelog.includes("care receipt") &&
+  !changelog.includes("Care receipts")
+) {
+  failures.push("CHANGELOG.md missing care receipt / mark-as-seen mention");
+}
 
 const deploy = read("DEPLOY.md");
 if (!deploy.includes("smoke:hosted")) failures.push("DEPLOY.md missing smoke:hosted");
 if (!deploy.includes("safe pilot")) failures.push("DEPLOY.md missing safe pilot guidance");
-if (!deploy.includes("v0.1.7")) failures.push("DEPLOY.md missing v0.1.7 tag guidance");
+if (!deploy.includes("v0.1.8")) failures.push("DEPLOY.md missing v0.1.8 tag guidance");
 
 const demo = read("DEMO_SCRIPT.md");
 if (!demo.includes("/admin/ops")) failures.push("DEMO_SCRIPT.md missing /admin/ops");
@@ -113,9 +125,12 @@ if (!demo.includes("care update")) failures.push("DEMO_SCRIPT.md missing care up
 if (!demo.includes("WealthAI") || !demo.includes("/app/ai")) {
   failures.push("DEMO_SCRIPT.md missing WealthAI care path");
 }
+if (!demo.includes("Mark as seen") && !demo.includes("mark as seen")) {
+  failures.push("DEMO_SCRIPT.md missing Mark as seen receipt beat");
+}
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.7")) failures.push("MVP_STATUS.md missing 0.1.7");
+if (!status.includes("0.1.8")) failures.push("MVP_STATUS.md missing 0.1.8");
 if (!status.includes("Adviser care ack")) failures.push("MVP_STATUS.md missing Adviser care ack");
 if (!status.includes("Adviser unacked radar")) failures.push("MVP_STATUS.md missing Adviser unacked radar");
 if (!status.includes("Ops care handoff")) failures.push("MVP_STATUS.md missing Ops care handoff");
@@ -123,12 +138,13 @@ if (!status.includes("Privacy care cues")) failures.push("MVP_STATUS.md missing 
 if (!status.includes("Customer care pulse")) failures.push("MVP_STATUS.md missing Customer care pulse");
 if (!status.includes("Privacy care updates")) failures.push("MVP_STATUS.md missing Privacy care updates");
 if (!status.includes("WealthAI care update")) failures.push("MVP_STATUS.md missing WealthAI care update");
+if (!status.includes("Care receipts")) failures.push("MVP_STATUS.md missing Care receipts");
 
 const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
 if (!launch.includes("/admin/flags")) failures.push("LAUNCH_REVIEW.md missing flag profiles path");
 if (!launch.includes("pilot:freeze")) failures.push("LAUNCH_REVIEW.md missing pilot:freeze");
-if (!launch.includes("0.1.7")) failures.push("LAUNCH_REVIEW.md missing 0.1.7 pack");
+if (!launch.includes("0.1.8")) failures.push("LAUNCH_REVIEW.md missing 0.1.8 pack");
 
 const notificationsPage = read("src/app/app/notifications/page.tsx");
 if (!notificationsPage.includes("resolveNotificationLink")) {
@@ -169,10 +185,16 @@ if (!careAckEngine.includes("buildCareUpdatePulse")) {
 if (!careAckEngine.includes("formatCareUpdateAiContent")) {
   failures.push("care-ack engine missing formatCareUpdateAiContent");
 }
+if (!careAckEngine.includes("appendCareReceipt") || !careAckEngine.includes("buildCareUpdateList")) {
+  failures.push("care-ack engine missing receipt helpers");
+}
 
 const customer360 = read("src/app/adviser/customers/[id]/page.tsx");
 if (!customer360.includes("Recent care acknowledgments") && !customer360.includes("careHistory")) {
   failures.push("customer 360 missing care acknowledgment history");
+}
+if (!customer360.includes("Seen") || !customer360.includes("Unseen")) {
+  failures.push("customer 360 missing Seen/Unseen receipt cues");
 }
 
 // 12.x ops care handoff surface
@@ -219,15 +241,24 @@ const supportPage = read("src/app/app/support/page.tsx");
 if (!supportPage.includes("care-updates") && !supportPage.includes("careUpdates")) {
   failures.push("Support page missing care updates");
 }
+if (!supportPage.includes("CareUpdateReceiptList") && !supportPage.includes("Mark as seen")) {
+  failures.push("Support page missing care receipt UI");
+}
 
 const privacyPage = read("src/app/app/privacy/page.tsx");
 if (!privacyPage.includes("care-updates") && !privacyPage.includes("careUpdates")) {
   failures.push("Privacy page missing care updates");
 }
+if (!privacyPage.includes("CareUpdateReceiptList") && !privacyPage.includes("Mark as seen")) {
+  failures.push("Privacy page missing care receipt UI");
+}
 
 const careUpdatesApi = read("src/app/api/care-updates/route.ts");
 if (!careUpdatesApi.includes("loadCareUpdatePulse")) {
   failures.push("care-updates API missing loadCareUpdatePulse");
+}
+if (!careUpdatesApi.includes("loadCareUpdateList")) {
+  failures.push("care-updates API missing loadCareUpdateList");
 }
 
 const smokeHosted = read("scripts/smoke-hosted.mjs");
@@ -237,6 +268,9 @@ if (!smokeHosted.includes("/api/care-updates")) {
 if (!smokeHosted.includes("/app/ai")) {
   failures.push("smoke-hosted missing /app/ai path");
 }
+if (!smokeHosted.includes("list=1")) {
+  failures.push("smoke-hosted missing care-updates list path");
+}
 
 const smokeLocal = read("scripts/smoke-journeys.mjs");
 if (!smokeLocal.includes("/app/support") || !smokeLocal.includes("/api/care-updates")) {
@@ -244,6 +278,9 @@ if (!smokeLocal.includes("/app/support") || !smokeLocal.includes("/api/care-upda
 }
 if (!smokeLocal.includes("/app/ai") || !smokeLocal.includes("/api/ai/chat")) {
   failures.push("smoke-journeys missing WealthAI care coverage");
+}
+if (!smokeLocal.includes("/seen")) {
+  failures.push("smoke-journeys missing care receipt seen coverage");
 }
 
 // 14.x WealthAI care surface
@@ -258,6 +295,22 @@ if (!orchestrator.includes("formatCareUpdateAiContent")) {
 const wealthService = read("src/services/wealth.ts");
 if (!wealthService.includes("careUpdate") || !wealthService.includes("loadCareUpdatePulse")) {
   failures.push("wealth service missing careUpdate context for WealthAI");
+}
+
+// 15.x care receipts surface
+const careService = read("src/services/adviser-care-ack.ts");
+if (!careService.includes("markCareUpdateSeen")) {
+  failures.push("care-ack service missing markCareUpdateSeen");
+}
+
+const receiptUi = read("src/components/CareUpdateReceiptList.tsx");
+if (!receiptUi.includes("/api/care-updates/") || !receiptUi.includes("/seen")) {
+  failures.push("CareUpdateReceiptList missing seen API call");
+}
+
+const seed = read("prisma/seed.ts");
+if (!seed.includes('kind: "care_ack"') && !seed.includes("kind: 'care_ack'")) {
+  failures.push("seed missing demo care_ack for receipts");
 }
 
 if (failures.length) {

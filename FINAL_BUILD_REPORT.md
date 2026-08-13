@@ -651,3 +651,10 @@ Care receipt smoke + seed:
 
 - Seed includes a shared Yomi `care_ack` + Inbox/notification so Home pulse and mark-as-seen work after `db:setup`
 - Hosted smoke covers `/api/care-updates?list=1`; local smoke asserts `/seen` path
+
+## Phase 15.2 delivered (13 Aug 2026)
+
+Care receipts freeze pack **v0.1.8**:
+
+- `npm run pilot:freeze` checks mark-as-seen API/UI, unseen pulse, seed care_ack, list/seen smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
