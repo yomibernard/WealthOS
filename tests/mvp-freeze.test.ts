@@ -70,10 +70,14 @@ describe("MVP freeze inventory", () => {
   it("documents freeze status and demo password consistently", () => {
     const status = readFileSync(join(process.cwd(), "MVP_STATUS.md"), "utf8");
     const readme = readFileSync(join(process.cwd(), "README.md"), "utf8");
+    const demo = readFileSync(join(process.cwd(), "DEMO_SCRIPT.md"), "utf8");
     expect(status).toContain("0.1.0");
     expect(status).toContain("Know what you have");
     expect(readme).toContain("WealthOSdemo1!");
     expect(status).toContain("WealthOSdemo1!");
+    expect(demo).toContain("Act 3 — Cadence tools");
+    expect(demo).toContain("Act 5 — Trust, adviser loop");
+    expect(demo).toContain("/app/digest");
   });
 
   it("keeps CI and deploy pilot package", () => {

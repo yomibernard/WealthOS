@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 8.0
+
+- Demo script Acts 3–5 for cadence + adviser loop; `/demo` jump links
+- Admin ops module index for reports, digest, funding, profile, share/nudges
+
 ## Unreleased — Phase 7.4
 
 - Notification preference policy helper + `createUserNotification` gating

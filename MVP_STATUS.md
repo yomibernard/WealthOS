@@ -51,8 +51,9 @@
 
 ## Demo entry points
 
-- Presenter checklist: `/demo`
-- Script: `DEMO_SCRIPT.md`
+- Presenter checklist: `/demo` (Acts 1–5, jump links)
+- Script: `DEMO_SCRIPT.md` (~20–25 min)
+- Ops index: `/admin/ops`
 - Accounts: password `WealthOSdemo1!` (see README)
 
 ## Do not claim yet

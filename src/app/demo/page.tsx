@@ -15,14 +15,24 @@ const acts = [
     title: "Act 2 — Persona A (Yomi)",
     mins: "5 min",
     steps: [
-      "Home → Inbox → Wealth confidence",
-      "Property intelligence (equity / LTV / concentration)",
-      "Plan goals + Actions (explain before accept; do-nothing is valid)",
+      "Home → Inbox → Fix data quality if shown",
+      "Property intelligence + Plan → Goal funding pulse",
+      "Actions (explain before accept; do-nothing is valid)",
       "WealthGuard on a ‘guaranteed’ WhatsApp-style offer",
     ],
   },
   {
-    title: "Act 3 — Boundaries",
+    title: "Act 3 — Cadence tools",
+    mins: "4 min",
+    steps: [
+      "Monthly reports — generate (+ second run for MoM)",
+      "Weekly digest — generate; show watch sections",
+      "Profile checklist — Continue next gap",
+      "Notifications — channel prefs gate Informational digests/reports",
+    ],
+  },
+  {
+    title: "Act 4 — Boundaries",
     mins: "3 min",
     steps: [
       "Crypto lite — inventory only; trading deferred",
@@ -31,15 +41,26 @@ const acts = [
     ],
   },
   {
-    title: "Act 4 — Trust & ops",
-    mins: "4 min",
+    title: "Act 5 — Trust & adviser loop",
+    mins: "5 min",
     steps: [
       "Consent Centre — pause AI, show gate, restore",
-      "Connections sync (consent-gated demo bank)",
-      "Adviser shares a plan note → customer Adviser collaboration",
-      "Admin flags / monitoring / maker-checker (checker approves)",
+      "Customer shares briefing → Adviser 360 insights pack",
+      "Adviser sends nudge → customer Inbox deep link",
+      "Admin ops / maker-checker / flags",
     ],
   },
+];
+
+const quickLinks = [
+  { href: "/app/reports", label: "Monthly reports" },
+  { href: "/app/digest", label: "Weekly digest" },
+  { href: "/app/profile", label: "Profile" },
+  { href: "/app/plan/funding", label: "Funding pulse" },
+  { href: "/app/wealth/confidence", label: "Data confidence" },
+  { href: "/app/adviser-collab", label: "Adviser collab" },
+  { href: "/adviser", label: "Adviser portal" },
+  { href: "/admin/ops", label: "Admin ops" },
 ];
 
 const accounts = [
@@ -69,7 +90,7 @@ export default function DemoScriptPage() {
         <p className="font-display mt-1 text-2xl">WealthOSdemo1!</p>
         <p className="muted mt-2 text-sm">
           Full prose script lives in <code>DEMO_SCRIPT.md</code>. This page is the presenter
-          checklist.
+          checklist (~20–25 min).
         </p>
       </Panel>
 
@@ -108,12 +129,26 @@ export default function DemoScriptPage() {
         ))}
       </section>
 
+      <section className="mt-6" aria-labelledby="jump">
+        <h2 id="jump" className="font-display text-xl">
+          Jump links (after sign-in)
+        </h2>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {quickLinks.map((l) => (
+            <Link key={l.href} href={l.href} className="btn btn-ghost">
+              {l.label}
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <Panel className="mt-5">
         <p className="eyebrow">Closing lines</p>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
           <li>Engines are deterministic; AI explains and does not invent balances</li>
           <li>Partner execution is demo-only — funds do not move</li>
-          <li>Launch freeze and Postgres cutover docs exist for production</li>
+          <li>Cadence + adviser collaboration never auto-buy products</li>
+          <li>Launch freeze, CI, and Vercel Postgres build path exist for pilots</li>
         </ul>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link href="/wealth-check" className="btn btn-soft">

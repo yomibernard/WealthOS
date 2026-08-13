@@ -402,3 +402,10 @@ Notification preferences:
 - `notification-prefs` policy + `createUserNotification` (suppress by channel; critical always on)
 - Wired into reports, digests, adviser share/notes, funding updates
 - `/app/notifications` channel cards + generate monthly/weekly actions
+
+## Phase 8.0 delivered (13 Aug 2026)
+
+Demo & ops sync:
+
+- `DEMO_SCRIPT.md` expanded to ~20–25 min with cadence tools + adviser share/nudge loop
+- `/demo` presenter checklist updated; `/admin/ops` lists cadence/collab modules + `DEPLOY.md`
