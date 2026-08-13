@@ -48,6 +48,7 @@
 | Adviser care ack | Ready (demo) | 360 acknowledgment → customer Inbox |
 | Adviser care filters | Ready (demo) | `/adviser?care=` book slices |
 | Adviser care history | Ready (demo) | 360 recent care acknowledgments |
+| Adviser unacked radar | Ready (demo) | `/adviser?care=unacked` + ack age cues |
 
 ## Quality gates (this machine)
 

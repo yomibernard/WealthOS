@@ -51,7 +51,7 @@ Presenter checklist UI: `/demo`
 1. **Consent Centre** — pause AI consent; show AI blocked; restore
 2. **Connections** — sync demo bank (consent-gated)
 3. As Yomi — **Adviser collaboration** → **Share a briefing** (full or digest)
-4. **Adviser** portal — **Care radar** filters (`Needs care` / Complaints / Privacy / Support) → 360 **Care desk** (see **recent acks**, optional **acknowledge**) + **Insights**; send a **nudge**
+4. **Adviser** portal — **Care radar** filters (`Needs care` / **Unacked** / Complaints / Privacy / Support) → 360 **Care desk** (see **recent acks**, optional **acknowledge**) + **Insights**; send a **nudge**
 5. Back as Yomi — **Inbox** shows nudge deep link; open target page
 6. **Admin** — daily ops board on `/admin` / `/admin/ops` (escalations, privacy, maker-checker, flag risk)
 7. Optional: `/admin/flags` safe pilot snippet; `/admin/audit` filter + download

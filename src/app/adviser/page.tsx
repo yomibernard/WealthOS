@@ -13,6 +13,7 @@ import {
 const FILTER_CHIPS: { id: PortfolioCareFilter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "care", label: "Needs care" },
+  { id: "unacked", label: "Unacked" },
   { id: "complaints", label: "Complaints" },
   { id: "privacy", label: "Privacy" },
   { id: "support", label: "Support" },
@@ -56,6 +57,9 @@ export default async function AdviserHomePage({
           ) : null}
           {full.totalSupport > 0 ? (
             <Badge>{full.totalSupport} support</Badge>
+          ) : null}
+          {full.unackedCareCount > 0 ? (
+            <Badge tone="warn">{full.unackedCareCount} unacked</Badge>
           ) : null}
         </div>
         <p className="muted mt-1 text-sm">{radar.summary}</p>
@@ -105,7 +109,7 @@ export default async function AdviserHomePage({
               <p className="mt-2 text-sm">Profile {c.profileCompleteness}% complete</p>
               {c.careCount > 0 ? (
                 <p className="muted mt-1 text-xs">
-                  {c.openEscalations} case(s) · {c.openPrivacy} privacy · open Care desk on 360
+                  {c.openEscalations} case(s) · {c.openPrivacy} privacy · {c.ackCue}
                 </p>
               ) : null}
             </Panel>

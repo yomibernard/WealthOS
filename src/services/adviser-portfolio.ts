@@ -31,7 +31,7 @@ export async function loadAdviserPortfolioCareRadar(input: {
     return buildPortfolioCareRadar([]);
   }
 
-  const [customers, escalations, privacy] = await Promise.all([
+  const [customers, escalations, privacy, careAcks] = await Promise.all([
     prisma.user.findMany({
       where: { id: { in: customerIds } },
       select: {
@@ -56,6 +56,14 @@ export async function loadAdviserPortfolioCareRadar(input: {
       },
       select: { userId: true },
     }),
+    prisma.adviserNote.findMany({
+      where: {
+        customerId: { in: customerIds },
+        kind: "care_ack",
+      },
+      select: { customerId: true, createdAt: true },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   const escByUser = new Map<string, { open: number; complaints: number }>();
@@ -71,6 +79,13 @@ export async function loadAdviserPortfolioCareRadar(input: {
     privacyByUser.set(p.userId, (privacyByUser.get(p.userId) ?? 0) + 1);
   }
 
+  const lastAckByUser = new Map<string, string>();
+  for (const n of careAcks) {
+    if (!lastAckByUser.has(n.customerId)) {
+      lastAckByUser.set(n.customerId, n.createdAt.toISOString());
+    }
+  }
+
   const rows: PortfolioCustomerInput[] = customers.map((c) => {
     const esc = escByUser.get(c.id) ?? { open: 0, complaints: 0 };
     return {
@@ -81,6 +96,7 @@ export async function loadAdviserPortfolioCareRadar(input: {
       openEscalations: esc.open,
       openComplaints: esc.complaints,
       openPrivacy: privacyByUser.get(c.id) ?? 0,
+      lastCareAckAt: lastAckByUser.get(c.id) ?? null,
     };
   });
 

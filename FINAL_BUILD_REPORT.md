@@ -537,3 +537,10 @@ Care acknowledgment history:
 
 - Customer 360 Care desk shows recent shared care acks so advisers avoid blind re-acks
 - Pure history builder over `care_ack` notes; ops queues still authoritative
+
+## Phase 11.2 delivered (13 Aug 2026)
+
+Portfolio last-ack cues:
+
+- `/adviser` rows show ack age (`No care ack yet` / `Acked 3d ago`)
+- `?care=unacked` filter + book badge for first-acknowledgment gaps

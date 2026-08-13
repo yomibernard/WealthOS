@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 11.2
+
+- Care radar last-ack cues + `?care=unacked` filter for customers still needing a first acknowledgment
+
 ## Unreleased — Phase 11.1
 
 - Care acknowledgment history on customer 360 Care desk (recent `care_ack` notes)
