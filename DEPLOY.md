@@ -22,7 +22,7 @@ Copy [`.env.example`](./.env.example) and set at least:
 | `LAUNCH_PROFILE` | `production` (optional; forces hard gate) |
 | `OPENAI_API_KEY` | Optional; enables grounded LLM polish only |
 
-Feature flags can stay on for a closed pilot; turn off `FF_PARTNER_EXECUTION` if you do not want the demo rail visible.
+Feature flags can stay on for a closed walkthrough. For a **shared pilot URL**, prefer the **safe pilot** profile on `/admin/flags` (`FF_PARTNER_EXECUTION=false`, `FF_LLM_POLISH=false`). Copy the snippet into Vercel env and redeploy.
 
 ## 2. Database
 

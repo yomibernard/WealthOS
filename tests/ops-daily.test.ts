@@ -10,6 +10,7 @@ describe("ops daily board", () => {
       pendingChangeRequests: 0,
       launchBlocked: false,
       launchBlockers: [],
+      riskyFlagsOn: 0,
     });
     expect(board.attentionScore).toBe(0);
     expect(board.summary).toMatch(/clear/i);

@@ -446,3 +446,10 @@ Audit export:
 
 - Filterable `/admin/audit` by category / event type / search
 - Redacted JSON download via `GET /api/admin/audit?download=1`; `AUDIT_EXPORT_DOWNLOADED`
+
+## Phase 8.6 delivered (13 Aug 2026)
+
+Flag profiles:
+
+- `/admin/flags` compares env to full demo / safe pilot / incident lockdown with copy-paste snippets
+- Ops daily board includes high-risk flag attention; `GET /api/admin/flags`

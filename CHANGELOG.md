@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 8.6
+
+- Feature-flag launch profiles on `/admin/flags` (full demo / safe pilot / incident lockdown)
+- Env snippets + mismatch view; ops board warns on high-risk flags
+
 ## Unreleased — Phase 8.5
 
 - Admin audit filter + redacted JSON export (`GET /api/admin/audit?download=1`)

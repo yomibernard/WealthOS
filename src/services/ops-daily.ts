@@ -3,6 +3,8 @@ import { evaluateLaunchGate } from "@/lib/launch-gate";
 import { getFeatureFlags } from "@/lib/feature-flags";
 import { buildOpsDailyBoard } from "@/engines/ops-daily";
 import { classifyEscalationReason } from "@/engines/escalation-ops";
+import { riskyFlagsOn } from "@/engines/flag-profiles";
+import { getFeatureFlags } from "@/lib/feature-flags";
 
 export async function loadOpsDailyBoard() {
   const [
@@ -43,6 +45,8 @@ export async function loadOpsDailyBoard() {
   const blockers = launch.checks
     .filter((c) => c.severity === "blocker" && !c.ok)
     .map((c) => c.id);
+  const flags = getFeatureFlags();
+  const risky = riskyFlagsOn(flags);
 
   const board = buildOpsDailyBoard({
     openEscalations,
@@ -51,9 +55,9 @@ export async function loadOpsDailyBoard() {
     pendingChangeRequests,
     launchBlocked: !launch.ok,
     launchBlockers: blockers,
+    riskyFlagsOn: risky.length,
   });
 
-  const flags = getFeatureFlags();
   const flagEntries = Object.entries(flags).map(([key, on]) => ({ key, on }));
 
   return {

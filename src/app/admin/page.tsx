@@ -132,8 +132,8 @@ export default async function AdminPage() {
         </Link>
         <Link href="/admin/flags">
           <Panel>
-            <p className="font-semibold">Feature flags</p>
-            <p className="muted text-sm">Runtime FF_* rollout switches.</p>
+            <p className="font-semibold">Feature flags & profiles</p>
+            <p className="muted text-sm">Safe pilot / incident lockdown env snippets.</p>
           </Panel>
         </Link>
         <Link href="/admin/ops">

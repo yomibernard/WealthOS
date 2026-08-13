@@ -38,6 +38,7 @@
 | Support & complaints | Ready (demo) | `/app/support` L2 cases + admin resolve loop |
 | Daily ops board | Ready (demo) | `/admin/ops` attention queues + `/admin` strip |
 | Audit export | Ready (demo) | filterable `/admin/audit` + redacted JSON pack |
+| Flag profiles | Ready (demo) | safe pilot / incident lockdown snippets on `/admin/flags` |
 
 ## Quality gates (this machine)
 

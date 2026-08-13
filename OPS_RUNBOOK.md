@@ -15,9 +15,16 @@ Never run `npm run db:setup` in production (wipes and reseeds).
 
 | Severity | Examples | First actions |
 |----------|----------|----------------|
-| SEV-1 | Auth down, data leak, wrong balances widely | Disable public traffic; turn off AI/execution flags; rotate `SESSION_SECRET` if session theft suspected |
-| SEV-2 | WealthAI inventing numbers, partner rail errors | Set `FF_LLM_POLISH=false`, `FF_PARTNER_EXECUTION=false`; check `/admin/monitoring` |
+| SEV-1 | Auth down, data leak, wrong balances widely | Disable public traffic; apply **incident lockdown** profile on `/admin/flags`; rotate `SESSION_SECRET` if session theft suspected |
+| SEV-2 | WealthAI inventing numbers, partner rail errors | Apply lockdown / set `FF_LLM_POLISH=false`, `FF_PARTNER_EXECUTION=false`; check `/admin/monitoring` |
 | SEV-3 | Single-user sync/consent bug | Reproduce with demo persona; open escalation; fix forward |
+
+### Feature flag profiles
+
+1. Open `/admin/flags` — compare current env to **full demo**, **safe pilot**, **incident lockdown**
+2. Copy the profile env snippet into Vercel/host → redeploy (flags are not toggled in-app)
+3. Shared pilot URLs should match **safe pilot** (partner + LLM polish off)
+4. Daily ops board warns when high-risk flags remain on
 
 ### AI / suitability
 

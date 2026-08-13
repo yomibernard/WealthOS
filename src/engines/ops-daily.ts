@@ -7,7 +7,8 @@ export type OpsQueueId =
   | "complaints"
   | "privacy"
   | "change_requests"
-  | "launch_gate";
+  | "launch_gate"
+  | "flag_risk";
 
 export type OpsQueueInput = {
   openEscalations: number;
@@ -16,6 +17,7 @@ export type OpsQueueInput = {
   pendingChangeRequests: number;
   launchBlocked: boolean;
   launchBlockers: string[];
+  riskyFlagsOn?: number;
 };
 
 export type OpsQueueItem = {
@@ -87,6 +89,17 @@ export function buildOpsDailyBoard(input: OpsQueueInput): {
         ? `Blockers: ${input.launchBlockers.join(", ") || "see launch checks"}.`
         : "Launch gate reports no blockers for this profile.",
     },
+    {
+      id: "flag_risk",
+      label: "High-risk flags",
+      count: input.riskyFlagsOn ?? 0,
+      href: "/admin/flags",
+      tone: (input.riskyFlagsOn ?? 0) > 0 ? "warn" : "ok",
+      detail:
+        (input.riskyFlagsOn ?? 0) > 0
+          ? "Partner execution and/or LLM polish are on — confirm intended for this host."
+          : "Partner execution and LLM polish are off (or unset as off).",
+    },
   ];
 
   // Weighted attention: complaints & launch heavier than routine queues
@@ -95,7 +108,8 @@ export function buildOpsDailyBoard(input: OpsQueueInput): {
     (input.launchBlocked ? 4 : 0) +
     input.openEscalations * 2 +
     input.openPrivacy * 2 +
-    input.pendingChangeRequests;
+    input.pendingChangeRequests +
+    (input.riskyFlagsOn ?? 0);
 
   let summary: string;
   if (attentionScore === 0) {
