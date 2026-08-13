@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.4 (ops 8.x + trust 9.x + care 10.x + care UX 11.x).
+ * Current pack: v0.1.5 (ops 8.x + trust 9.x + care 10.x + care UX 11.x + ops care 12.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.4";
+const EXPECTED = "0.1.5";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -39,6 +39,7 @@ mustExist("src/app/admin/ops/page.tsx");
 mustExist("src/app/admin/flags/page.tsx");
 mustExist("src/app/admin/audit/page.tsx");
 mustExist("src/app/admin/escalations/page.tsx");
+mustExist("src/app/admin/privacy/page.tsx");
 mustExist("src/app/app/support/page.tsx");
 
 // 9.x trust loop surface
@@ -71,11 +72,14 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.4")) failures.push("CHANGELOG.md missing 0.1.4 section");
+if (!changelog.includes("0.1.5")) failures.push("CHANGELOG.md missing 0.1.5 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
 if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
 if (!changelog.includes("unacked")) failures.push("CHANGELOG.md missing unacked filter mention");
+if (!changelog.includes("care handoff") && !changelog.includes("care_handoff")) {
+  failures.push("CHANGELOG.md missing care handoff mention");
+}
 
 const deploy = read("DEPLOY.md");
 if (!deploy.includes("smoke:hosted")) failures.push("DEPLOY.md missing smoke:hosted");
@@ -89,11 +93,14 @@ if (!demo.includes("Privacy loop")) failures.push("DEMO_SCRIPT.md missing Privac
 if (!demo.includes("Care radar")) failures.push("DEMO_SCRIPT.md missing Care radar");
 if (!demo.includes("Care desk")) failures.push("DEMO_SCRIPT.md missing Care desk");
 if (!demo.includes("Unacked")) failures.push("DEMO_SCRIPT.md missing Unacked filter");
+if (!demo.includes("care handoff")) failures.push("DEMO_SCRIPT.md missing care handoff");
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.4")) failures.push("MVP_STATUS.md missing 0.1.4");
+if (!status.includes("0.1.5")) failures.push("MVP_STATUS.md missing 0.1.5");
 if (!status.includes("Adviser care ack")) failures.push("MVP_STATUS.md missing Adviser care ack");
 if (!status.includes("Adviser unacked radar")) failures.push("MVP_STATUS.md missing Adviser unacked radar");
+if (!status.includes("Ops care handoff")) failures.push("MVP_STATUS.md missing Ops care handoff");
+if (!status.includes("Privacy care cues")) failures.push("MVP_STATUS.md missing Privacy care cues");
 
 const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
@@ -137,6 +144,40 @@ if (!careAckEngine.includes("buildCareAckHistory")) {
 const customer360 = read("src/app/adviser/customers/[id]/page.tsx");
 if (!customer360.includes("Recent care acknowledgments") && !customer360.includes("careHistory")) {
   failures.push("customer 360 missing care acknowledgment history");
+}
+
+// 12.x ops care handoff surface
+const opsDaily = read("src/engines/ops-daily.ts");
+if (!opsDaily.includes("care_handoff")) {
+  failures.push("ops-daily engine missing care_handoff queue");
+}
+if (!opsDaily.includes("buildOpsCareHandoff")) {
+  failures.push("ops-daily engine missing buildOpsCareHandoff");
+}
+
+const escalationOps = read("src/engines/escalation-ops.ts");
+if (!escalationOps.includes("buildCaseCareAckCue")) {
+  failures.push("escalation-ops missing buildCaseCareAckCue");
+}
+
+const privacyRequests = read("src/engines/privacy-requests.ts");
+if (!privacyRequests.includes("buildPrivacyAdminCareView")) {
+  failures.push("privacy-requests missing buildPrivacyAdminCareView");
+}
+
+const adminOps = read("src/app/admin/ops/page.tsx");
+if (!adminOps.includes("careHandoff") && !adminOps.includes("Care handoff")) {
+  failures.push("admin ops page missing care handoff strip");
+}
+
+const adminEsc = read("src/app/admin/escalations/page.tsx");
+if (!adminEsc.includes("careAck")) {
+  failures.push("admin escalations page missing careAck cue");
+}
+
+const adminPrivacy = read("src/app/admin/privacy/page.tsx");
+if (!adminPrivacy.includes("careAck")) {
+  failures.push("admin privacy page missing careAck cue");
 }
 
 if (failures.length) {

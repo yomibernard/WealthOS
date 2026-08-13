@@ -1,16 +1,15 @@
 # Changelog
 
-## Unreleased — Phase 12.2
+## 0.1.5 — 13 Aug 2026 (Ops care handoff pack)
 
-- Admin privacy queue shows care-ack badge + customer name + Care desk deep-link
+Ops visibility into adviser care acknowledgments on top of the 0.1.4 care UX pack.
 
-## Unreleased — Phase 12.1
+### Phase 12.x — Ops care handoff
 
-- Admin escalations queue shows care-ack badge + Care desk deep-link per customer
-
-## Unreleased — Phase 12.0
-
-- Ops care handoff on daily board (`care_handoff` queue + recent adviser acks → `/adviser?care=unacked`)
+- **12.3** Freeze pack `v0.1.5`; `pilot:freeze` covers 12.x ops care surface
+- **12.2** Admin privacy queue care-ack badge + Care desk deep-link
+- **12.1** Admin escalations queue care-ack badge + Care desk deep-link
+- **12.0** Daily ops `care_handoff` queue + recent adviser acks → `/adviser?care=unacked`
 
 ## 0.1.4 — 13 Aug 2026 (Adviser care UX pack)
 

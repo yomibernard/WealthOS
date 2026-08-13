@@ -572,3 +572,10 @@ Privacy care-ack cues:
 
 - `/admin/privacy` shows customer identity + Care acked / No care ack
 - Care desk deep-link mirrors escalations queue
+
+## Phase 12.3 delivered (13 Aug 2026)
+
+Ops care handoff freeze pack **v0.1.5**:
+
+- `npm run pilot:freeze` checks 12.x handoff + escalation/privacy care cues
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
