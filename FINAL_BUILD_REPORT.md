@@ -301,3 +301,15 @@ MVP freeze close-out:
 - UTF-8 BOM stripped from `migration_lock.toml` / `migration.sql`
 
 Migrate `20260813000000_init` applied; demo seed completed; SQLite MVP provider restored. Container `wealthos-postgres` left running (`npm run db:down` to stop).
+
+## Phase 5.0 delivered (13 Aug 2026)
+
+Pilot / CI package after GitHub publish:
+
+- Remote: `https://github.com/yomibernard/WealthOS.git` (`main`)
+- `.github/workflows/ci.yml` — npm ci → db:setup → test → build → release:check
+- `.env.example` — documented local + pilot env surface
+- `DEPLOY.md` — Vercel/Postgres and Compose deploy path; tagging notes
+- `MVP_STATUS.md` updated (Postgres rehearsal + CI marked done)
+
+Next human gates: production secrets, hosted deploy smoke, `LAUNCH_REVIEW.md` sign-off.

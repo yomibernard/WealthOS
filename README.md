@@ -15,12 +15,15 @@ Nigeria-first, mobile-first **AI Personal Wealth Operating System**.
 ## Quick start
 
 ```bash
+cp .env.example .env   # Windows: copy .env.example .env
 npm install
 npm run db:setup
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+Repo: [github.com/yomibernard/WealthOS](https://github.com/yomibernard/WealthOS). CI runs on every push to `main`.
 
 ### Demo accounts
 
@@ -87,6 +90,13 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - **Health** — `GET /api/health` for uptime probes
 - **Admin** — `/admin/ops` launch gate summary
 
+## CI, deploy, pilot (Phase 5.0)
+
+- **CI** — `.github/workflows/ci.yml` (install → SQLite setup → test → build → `release:check`)
+- **Env template** — [`.env.example`](./.env.example)
+- **Deploy / pilot** — [DEPLOY.md](./DEPLOY.md)
+- Status freeze: [MVP_STATUS.md](./MVP_STATUS.md)
+
 ## Scripts
 
 - `npm run dev` — local app
@@ -96,7 +106,6 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - `npm run launch:check` — env/policy launch gate
 - `npm run release:check` — umbrella gate (launch + postgres-ready + perf if built)
 - `npm run smoke` — HTTP journey smoke (requires `npm run dev`)
-- Status freeze: [MVP_STATUS.md](./MVP_STATUS.md)
 - `npm run perf:check` — post-build bundle budgets
 - `npm run db:postgres-ready` — static Postgres cutover readiness
 - `npm run db:rehearse-postgres` — Docker migrate+seed rehearsal (requires Docker Desktop)

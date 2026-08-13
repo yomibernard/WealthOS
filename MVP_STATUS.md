@@ -2,7 +2,7 @@
 
 **Version:** 0.1.0  
 **Date:** 13 August 2026  
-**Verdict:** Feature-complete for local/pilot demo. Not public-launch ready until Postgres rehearsal, secrets hardening, and legal sign-off.
+**Verdict:** Feature-complete for local/pilot demo. Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
 
 ## Promise
 
@@ -24,15 +24,19 @@
 | Open banking | Demo only | consent-gated sync, no real bank login |
 | Partner execution | Demo only | `fundsMoved: false` |
 | Crypto / lending | Boundary ready | awareness + explicit deferral |
-| Postgres production | Scaffolded | migrations-postgres; Docker rehearsal pending daemon |
+| Postgres production | Rehearsed locally | `db:rehearse-postgres` succeeded (host port 5434) |
+| CI / deploy package | Ready | GitHub Actions + [DEPLOY.md](./DEPLOY.md) |
 
 ## Quality gates (this machine)
 
-- [x] `npm run test` (62+)
+- [x] `npm run test` (65+)
 - [x] `npm run build`
 - [x] `npm run release:check`
-- [ ] `npm run db:rehearse-postgres` (blocked: start Docker Desktop)
-- [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets)
+- [x] `npm run db:rehearse-postgres` (Docker; port 5434)
+- [x] GitHub remote + initial push (`main`)
+- [x] GitHub Actions CI workflow
+- [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets + Postgres URL)
+- [ ] Hosted deploy smoke (see [DEPLOY.md](./DEPLOY.md))
 - [ ] Human sign-off on `LAUNCH_REVIEW.md`
 
 ## Demo entry points

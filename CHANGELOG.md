@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.0 — 13 Aug 2026 (MVP freeze + pilot package)
+
+### Phase 5.0 — CI / deploy package
+
+- GitHub Actions CI: test, build, `release:check` on SQLite
+- `.env.example` for clone-and-run
+- `DEPLOY.md` pilot hosting checklist (Vercel + Postgres, Docker Compose)
+- Repo published at github.com/yomibernard/WealthOS
+
 ## 0.1.0 — 13 Aug 2026 (MVP freeze candidate)
 
 Nigeria-first AI Personal Wealth Operating System MVP.

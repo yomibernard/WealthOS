@@ -9,8 +9,10 @@ Use this before any public or regulated pilot. Tick in order; freeze code when s
 - [ ] `npm run perf:check` green
 - [ ] `npm run launch:check` green (prod profile)
 - [ ] `npm run db:postgres-ready` green; `prisma/migrations-postgres` reviewed
-- [ ] Local Postgres rehearsal done once (`db:up` → `db:use-postgres` → `migrate deploy`) or waived with owner sign-off
-- [ ] No secrets in git (`.env` local only)
+- [x] Local Postgres rehearsal done once (`db:rehearse-postgres` / migrate deploy) or waived with owner sign-off
+- [ ] No secrets in git (`.env` local only; use `.env.example`)
+- [ ] GitHub Actions CI green on `main`
+- [ ] Hosted pilot env documented per [DEPLOY.md](./DEPLOY.md)
 - [ ] `SESSION_SECRET` is not the MVP default
 - [ ] `DEMO_MODE` is not `true` in production
 - [ ] Partner execution remains non-moving funds unless contracted rail is live

@@ -64,6 +64,16 @@ describe("MVP freeze inventory", () => {
     expect(status).toContain("WealthOSdemo1!");
   });
 
+  it("keeps CI and deploy pilot package", () => {
+    expect(existsSync(join(process.cwd(), ".github", "workflows", "ci.yml"))).toBe(true);
+    expect(existsSync(join(process.cwd(), ".env.example"))).toBe(true);
+    expect(existsSync(join(process.cwd(), "DEPLOY.md"))).toBe(true);
+    const envExample = readFileSync(join(process.cwd(), ".env.example"), "utf8");
+    expect(envExample).toContain("DATABASE_URL");
+    expect(envExample).toContain("SESSION_SECRET");
+    expect(envExample).not.toMatch(/sk-[a-zA-Z0-9]{10,}/);
+  });
+
   it("seed still includes core demo personas", () => {
     const seed = readFileSync(join(process.cwd(), "prisma", "seed.ts"), "utf8");
     for (const email of [
