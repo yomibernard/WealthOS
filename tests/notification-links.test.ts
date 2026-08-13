@@ -52,7 +52,7 @@ describe("notification deep links", () => {
       resolveNotificationLink({
         title: "Yomi marked your care update as seen",
         body: "Yomi sent a care receipt: Thanks. This does not close the ops queue. Path: /adviser/customers/cust1",
-      })?.href,
-    ).toBe("/adviser/customers/cust1");
+      }),
+    ).toEqual({ href: "/adviser/customers/cust1", label: "Open Care desk" });
   });
 });

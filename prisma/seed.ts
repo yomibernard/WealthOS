@@ -954,6 +954,17 @@ async function main() {
     },
   });
 
+  await prisma.notification.create({
+    data: {
+      userId: adviser.id,
+      category: "important",
+      title: `${amaka.name} marked your care update as seen`,
+      body: `${amaka.name} sent a care receipt: Thanks — noted. This does not close the ops queue. Path: /adviser/customers/${amaka.id}`,
+      read: false,
+      createdAt: new Date(amakaSeenAt),
+    },
+  });
+
   console.log("Seed complete.");
   console.log("Demo logins (password: WealthOSdemo1!):");
   console.log("  yomi@demo.wealthos.ng — Persona A executive");

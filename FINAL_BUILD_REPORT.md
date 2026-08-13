@@ -681,3 +681,11 @@ Care receipt close-loop freeze pack **v0.1.9**:
 
 - `npm run pilot:freeze` checks adviser notify, awaiting radar, ops receipts, close-loop smoke
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 17.0 delivered (13 Aug 2026)
+
+Adviser notification centre:
+
+- `/adviser/notifications` lists care receipts / shares with mark-as-read and Care desk links
+- Adviser portal unread pulse; seed leaves Ada an unread Amaka receipt notify
+- Share notifies include `Path: /adviser/customers/{id}`; smoke hits the new route

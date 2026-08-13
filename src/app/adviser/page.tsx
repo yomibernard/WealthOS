@@ -4,6 +4,7 @@ import { Badge, PageHeader, Panel } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
 import { SignOutButton } from "@/components/SignOutButton";
 import { loadAdviserPortfolioCareRadar } from "@/services/adviser-portfolio";
+import { loadAdviserNotificationPulse } from "@/services/notifications";
 import {
   filterPortfolioCareRadar,
   parsePortfolioCareFilter,
@@ -36,6 +37,7 @@ export default async function AdviserHomePage({
     role: user.role,
   });
   const radar = filterPortfolioCareRadar(full, filter);
+  const notifyPulse = await loadAdviserNotificationPulse(user.id);
 
   return (
     <main className="page-wide">
@@ -43,6 +45,21 @@ export default async function AdviserHomePage({
         title="Adviser portal"
         subtitle={`Welcome, ${user.name}. Care first — then insights and nudges.`}
       />
+
+      {notifyPulse.headline ? (
+        <Link
+          href={notifyPulse.primaryHref}
+          className="btn btn-soft mb-4 w-full sm:w-auto"
+        >
+          {notifyPulse.unreadCount === 1
+            ? notifyPulse.headline
+            : `${notifyPulse.unreadCount} unread notifications`}
+        </Link>
+      ) : (
+        <Link href="/adviser/notifications" className="btn btn-ghost mb-4 w-full sm:w-auto">
+          Adviser notifications
+        </Link>
+      )}
 
       <Panel className="mb-4">
         <div className="flex flex-wrap items-center gap-2">

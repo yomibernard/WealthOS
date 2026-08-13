@@ -133,7 +133,7 @@ try {
     console.log(`  [FAIL] sign-in adviser → ${adviserLogin.res.status}`);
   } else {
     console.log("  [OK] sign-in adviser");
-    for (const path of ["/adviser", "/adviser?care=awaiting", "/adviser?care=unacked"]) {
+    for (const path of ["/adviser", "/adviser?care=awaiting", "/adviser?care=unacked", "/adviser/notifications"]) {
       const res = await authedGet(path, adviserLogin.cookie);
       const ok = res.status === 200 || res.status === 307 || res.status === 308;
       console.log(`  [${ok ? "OK" : "FAIL"}] GET ${path} → ${res.status}`);

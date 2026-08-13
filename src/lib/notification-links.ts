@@ -100,7 +100,12 @@ export function resolveNotificationLink(input: NotificationLinkInput): {
 } | null {
   const fromBody = extractPathFromBody(input.body);
   if (fromBody) {
-    return { href: fromBody, label: "Open" };
+    const label = /^\/adviser\/customers\//i.test(fromBody)
+      ? "Open Care desk"
+      : /^\/adviser/i.test(fromBody)
+        ? "Open adviser portal"
+        : "Open";
+    return { href: fromBody, label };
   }
 
   const hay = `${input.title ?? ""}\n${input.body ?? ""}`;

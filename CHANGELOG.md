@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 17.0
+
+- Adviser notification centre at `/adviser/notifications` with unread pulse, mark-as-read, and Care desk deep-links
+
 ## 0.1.9 — 13 Aug 2026 (Care receipt close-loop pack)
 
 Adviser notify + ops receipts + awaiting radar on top of the 0.1.8 care receipts pack.

@@ -82,7 +82,7 @@ export async function sharePackWithAdviser(input: {
     userId: link.adviserId,
     category: "important",
     title: pack.title,
-    body: `${dash.name} shared a briefing. Open their customer 360 to review.`,
+    body: `${dash.name} shared a briefing. Open their customer 360 to review. Path: /adviser/customers/${input.customerId}`,
   });
 
   await createUserNotification({
