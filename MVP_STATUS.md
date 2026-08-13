@@ -36,6 +36,7 @@
 | Notification prefs | Ready (demo) | channel gating for digests/reports/nudges |
 | Privacy export (cadence) | Ready (demo) | digests, shares, nudges in JSON pack |
 | Support & complaints | Ready (demo) | `/app/support` L2 cases + admin resolve loop |
+| Daily ops board | Ready (demo) | `/admin/ops` attention queues + `/admin` strip |
 
 ## Quality gates (this machine)
 

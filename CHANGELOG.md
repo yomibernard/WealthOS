@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 8.4
+
+- Admin daily ops board (`/admin/ops`, summary on `/admin`, `GET /api/admin/ops-daily`)
+- Attention score across complaints, escalations, privacy, maker-checker, launch gate
+
 ## Unreleased — Phase 8.3
 
 - Admin escalation/complaint resolution queue (`PATCH /api/admin/escalations`)

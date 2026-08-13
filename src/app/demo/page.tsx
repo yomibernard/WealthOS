@@ -47,7 +47,8 @@ const acts = [
       "Consent Centre — pause AI, show gate, restore",
       "Customer shares briefing → Adviser 360 insights pack",
       "Adviser sends nudge → customer Inbox deep link",
-      "Admin ops / maker-checker / flags",
+      "Admin daily ops board — escalations / privacy / checker",
+      "Optional: Support case → admin resolve",
     ],
   },
 ];
@@ -60,7 +61,9 @@ const quickLinks = [
   { href: "/app/wealth/confidence", label: "Data confidence" },
   { href: "/app/adviser-collab", label: "Adviser collab" },
   { href: "/adviser", label: "Adviser portal" },
-  { href: "/admin/ops", label: "Admin ops" },
+  { href: "/app/support", label: "Support" },
+  { href: "/admin/ops", label: "Admin ops board" },
+  { href: "/admin/escalations", label: "Escalations" },
 ];
 
 const accounts = [

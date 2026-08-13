@@ -432,3 +432,10 @@ Escalation ops loop:
 
 - Admin `/admin/escalations` resolve/reject with notes; `ESCALATION_UPDATED` audit
 - Customer notification + resolution visible on `/app/support`
+
+## Phase 8.4 delivered (13 Aug 2026)
+
+Daily ops board:
+
+- Attention-scored queues on `/admin/ops` + summary strip on `/admin`
+- `GET /api/admin/ops-daily`; demo Act 5 + OPS_RUNBOOK on-call start at the board

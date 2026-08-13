@@ -1,21 +1,22 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { PageHeader, Panel } from "@/components/ui";
+import { Badge, PageHeader, Panel } from "@/components/ui";
 import { SignOutButton } from "@/components/SignOutButton";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
+import { loadOpsDailyBoard } from "@/services/ops-daily";
 
 export default async function AdminPage() {
   const user = await getSessionUser();
   if (!user) redirect("/auth/sign-in");
   if (user.role !== "ADMIN") redirect("/app");
 
-  const [customers, products, escalations, audits, providers] = await Promise.all([
+  const [customers, products, audits, providers, daily] = await Promise.all([
     prisma.user.count({ where: { role: "CUSTOMER" } }),
     prisma.product.count(),
-    prisma.escalation.count({ where: { status: "open" } }),
     prisma.auditEvent.count(),
     prisma.provider.count(),
+    loadOpsDailyBoard(),
   ]);
 
   return (
@@ -24,7 +25,23 @@ export default async function AdminPage() {
         title="Admin portal"
         subtitle="Operations with dual-control maker-checker for high-risk changes."
       />
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <Panel className="mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="font-semibold">Daily ops</p>
+            <p className="muted text-sm">{daily.summary}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Badge tone={daily.attentionScore === 0 ? "default" : "warn"}>
+              attention {daily.attentionScore}
+            </Badge>
+            <Link href="/admin/ops" className="btn btn-soft text-sm">
+              Open ops board
+            </Link>
+          </div>
+        </div>
+      </Panel>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Panel>
           <p className="eyebrow">Customers</p>
           <p className="font-display text-3xl">{customers}</p>
@@ -37,10 +54,27 @@ export default async function AdminPage() {
           <p className="eyebrow">Providers</p>
           <p className="font-display text-3xl">{providers}</p>
         </Panel>
-        <Panel>
-          <p className="eyebrow">Open escalations</p>
-          <p className="font-display text-3xl">{escalations}</p>
-        </Panel>
+        <Link href="/admin/escalations">
+          <Panel className="h-full transition hover:border-accent">
+            <p className="eyebrow">Open escalations</p>
+            <p className="font-display text-3xl">{daily.counts.openEscalations}</p>
+            {daily.counts.openComplaints > 0 ? (
+              <p className="muted mt-1 text-xs">{daily.counts.openComplaints} complaint(s)</p>
+            ) : null}
+          </Panel>
+        </Link>
+        <Link href="/admin/privacy">
+          <Panel className="h-full transition hover:border-accent">
+            <p className="eyebrow">Privacy open</p>
+            <p className="font-display text-3xl">{daily.counts.openPrivacy}</p>
+          </Panel>
+        </Link>
+        <Link href="/admin/change-requests">
+          <Panel className="h-full transition hover:border-accent">
+            <p className="eyebrow">Checker pending</p>
+            <p className="font-display text-3xl">{daily.counts.pendingChangeRequests}</p>
+          </Panel>
+        </Link>
         <Panel>
           <p className="eyebrow">Audit events</p>
           <p className="font-display text-3xl">{audits}</p>

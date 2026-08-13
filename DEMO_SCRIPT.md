@@ -53,7 +53,8 @@ Presenter checklist UI: `/demo`
 3. As Yomi — **Adviser collaboration** → **Share a briefing** (full or digest)
 4. **Adviser** portal — customer 360 **Insights pack** talking points; send a **nudge** (e.g. refresh data)
 5. Back as Yomi — **Inbox** shows nudge deep link; open target page
-6. **Admin** — flags, monitoring, maker-checker; `/admin/ops` launch gate
+6. **Admin** — daily ops board on `/admin` / `/admin/ops` (escalations, privacy, maker-checker)
+7. Optional: as Yomi open `/app/support` → submit support case; as admin resolve on `/admin/escalations`
 
 ## Closing lines
 
@@ -61,6 +62,7 @@ Presenter checklist UI: `/demo`
 - Execution partner rail is demo-only (`fundsMoved: false`)
 - Cadence tools (report / digest / funding / profile) never move money
 - Adviser share + nudge are human collaboration, not auto-advice
+- Support/complaints close in-product; hosted smoke via `npm run smoke:hosted`
 - Postgres cutover, CI, and Vercel `build:vercel` exist for hosted pilots
 
 ## Recovery

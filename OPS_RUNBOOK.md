@@ -60,8 +60,11 @@ Step-up demo code for material accepts: `123456` (demo only).
 
 ## 4. On-call checklist (daily)
 
-- [ ] `/api/health` returns `ok`
-- [ ] Open escalations reviewed (`/admin/escalations`)
+Start at **`/admin/ops`** (daily ops board) or the summary strip on `/admin`.
+
+- [ ] `/api/health` returns `ok` (`databaseKind: postgres` on hosted)
+- [ ] Attention score / open complaints cleared (`/admin/escalations`)
 - [ ] Maker-checker queue not stuck (`/admin/change-requests`)
 - [ ] Privacy queue SLA (`/admin/privacy`)
 - [ ] Feature flags match intended prod profile (`/admin/flags`)
+- [ ] Launch gate blockers understood for the current profile

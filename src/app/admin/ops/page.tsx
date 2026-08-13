@@ -4,6 +4,7 @@ import { Badge, PageHeader, Panel } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
 import { evaluateLaunchGate } from "@/lib/launch-gate";
 import { getFeatureFlags } from "@/lib/feature-flags";
+import { loadOpsDailyBoard } from "@/services/ops-daily";
 
 const moduleIndex = [
   { href: "/app/reports", label: "Monthly reports", flag: "monthlyReports" as const },
@@ -25,13 +26,62 @@ export default async function AdminOpsPage() {
 
   const launch = evaluateLaunchGate();
   const flags = getFeatureFlags();
+  const daily = await loadOpsDailyBoard();
 
   return (
     <main className="page-wide">
       <PageHeader
         title="Ops & launch"
-        subtitle="Runbooks, launch gate, cadence modules, and presenter tools — freeze before public traffic."
+        subtitle="Daily ops board, runbooks, launch gate, and presenter tools — freeze before public traffic."
       />
+
+      <Panel className="mb-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="font-semibold">Daily ops board</p>
+          <Badge tone={daily.attentionScore === 0 ? "default" : "warn"}>
+            attention {daily.attentionScore}
+          </Badge>
+        </div>
+        <p className="muted mt-1 text-sm">{daily.summary}</p>
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {daily.queues.map((q) => (
+            <li key={q.id}>
+              <Link
+                href={q.href}
+                className="block rounded-xl border border-line px-3 py-2 hover:bg-accent-soft/40"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium">{q.label}</span>
+                  <Badge
+                    tone={
+                      q.tone === "danger" ? "danger" : q.tone === "warn" ? "warn" : "default"
+                    }
+                  >
+                    {q.count}
+                  </Badge>
+                </div>
+                <p className="muted mt-1 text-xs">{q.detail}</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        {daily.topComplaints.length ? (
+          <div className="mt-3">
+            <p className="eyebrow">Top open complaints</p>
+            <ul className="mt-1 space-y-1 text-sm">
+              {daily.topComplaints.map((c) => (
+                <li key={c.id}>
+                  <Link href="/admin/escalations" className="text-accent hover:underline">
+                    {c.customerName}
+                  </Link>
+                  {" — "}
+                  {c.reason}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </Panel>
 
       <Panel>
         <div className="flex flex-wrap items-center gap-2">
