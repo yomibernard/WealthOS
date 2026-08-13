@@ -17,7 +17,8 @@ Use this before any public or regulated pilot. Tick in order; freeze code when s
 - [ ] `SESSION_SECRET` is not the MVP default
 - [ ] `DEMO_MODE` is not `true` in production
 - [ ] Partner execution remains non-moving funds unless contracted rail is live
-- [ ] Feature flags documented for launch (AI, WealthGuard uploads, household, etc.)
+- [ ] Feature flags documented for launch; shared pilot matches **safe pilot** on `/admin/flags`
+- [ ] `npm run pilot:freeze` green (0.1.1 ops pack)
 
 ## B. Product / compliance freeze
 
@@ -49,4 +50,4 @@ Use this before any public or regulated pilot. Tick in order; freeze code when s
 
 **Launch decision:** Go / No-go / Go with flags off: _______________
 
-**Freeze tag / commit:** `v0.1.0` @ `9a2b5a4`
+**Freeze tag / commit:** `v0.1.1` (pilot ops pack; MVP baseline `v0.1.0` @ `9a2b5a4`)

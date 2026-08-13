@@ -99,6 +99,7 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - Daily ops board: `/admin/ops` (attention queues)
 - Audit export: `/admin/audit` (filter + Download JSON)
 - Flag profiles: `/admin/flags` (safe pilot / incident lockdown)
+- Pilot freeze: `npm run pilot:freeze` (v0.1.1 ops pack)
 - Admin module index: `/admin/ops`
 
 ## Notification preferences (Phase 7.4)
@@ -153,7 +154,7 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - **CI** — `.github/workflows/ci.yml` (install → SQLite setup → test → build → `release:check`)
 - **Env template** — [`.env.example`](./.env.example)
 - **Deploy / pilot** — [DEPLOY.md](./DEPLOY.md) · `vercel.json` / `npm run build:vercel`
-- **Release** — git tag `v0.1.0`
+- **Release** — git tags `v0.1.0` (MVP), `v0.1.1` (pilot ops); `npm run pilot:freeze`
 - Status freeze: [MVP_STATUS.md](./MVP_STATUS.md)
 
 ## Scripts

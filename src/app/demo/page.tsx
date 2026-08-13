@@ -64,6 +64,8 @@ const quickLinks = [
   { href: "/app/support", label: "Support" },
   { href: "/admin/ops", label: "Admin ops board" },
   { href: "/admin/escalations", label: "Escalations" },
+  { href: "/admin/flags", label: "Flag profiles" },
+  { href: "/admin/audit", label: "Audit export" },
 ];
 
 const accounts = [

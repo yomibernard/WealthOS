@@ -453,3 +453,10 @@ Flag profiles:
 
 - `/admin/flags` compares env to full demo / safe pilot / incident lockdown with copy-paste snippets
 - Ops daily board includes high-risk flag attention; `GET /api/admin/flags`
+
+## Phase 8.7 delivered (13 Aug 2026)
+
+Pilot freeze pack **v0.1.1**:
+
+- `npm run pilot:freeze` — versions, 8.x scripts/docs, smoke + safe-pilot guidance
+- Changelog rolled; LAUNCH_REVIEW / MVP_STATUS / demo Act 5 updated

@@ -90,7 +90,7 @@ export default async function AdminOpsPage() {
             {launch.ok ? "gate ok" : "gate blocked"}
           </Badge>
           <Badge>{launch.profile}</Badge>
-          <Badge>v0.1.0</Badge>
+          <Badge>v0.1.1</Badge>
         </div>
         <p className="muted mt-2 text-sm">
           Checked {new Date(launch.checkedAt).toLocaleString("en-GB")}
@@ -163,6 +163,7 @@ export default async function AdminOpsPage() {
             <li>npm run db:rehearse-postgres</li>
             <li>npm run smoke</li>
             <li>SMOKE_BASE_URL=https://… npm run smoke:hosted</li>
+            <li>npm run pilot:freeze</li>
             <li>npm run perf:check</li>
             <li>npm run build:vercel</li>
           </ul>

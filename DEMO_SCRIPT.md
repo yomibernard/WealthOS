@@ -53,8 +53,9 @@ Presenter checklist UI: `/demo`
 3. As Yomi — **Adviser collaboration** → **Share a briefing** (full or digest)
 4. **Adviser** portal — customer 360 **Insights pack** talking points; send a **nudge** (e.g. refresh data)
 5. Back as Yomi — **Inbox** shows nudge deep link; open target page
-6. **Admin** — daily ops board on `/admin` / `/admin/ops` (escalations, privacy, maker-checker)
-7. Optional: as Yomi open `/app/support` → submit support case; as admin resolve on `/admin/escalations`
+6. **Admin** — daily ops board on `/admin` / `/admin/ops` (escalations, privacy, maker-checker, flag risk)
+7. Optional: `/admin/flags` safe pilot snippet; `/admin/audit` filter + download
+8. Optional: as Yomi open `/app/support` → submit support case; as admin resolve on `/admin/escalations`
 
 ## Closing lines
 
