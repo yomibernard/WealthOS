@@ -90,6 +90,11 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - **Health** — `GET /api/health` for uptime probes
 - **Admin** — `/admin/ops` launch gate summary
 
+## Notification preferences (Phase 7.4)
+
+- `/app/notifications` controls Critical / Important / Advisory / Informational
+- Digests and monthly reports require Informational; adviser nudge alerts require Important
+
 ## Adviser nudges (Phase 7.3)
 
 - Advisers can request customers to refresh data, complete profile, generate digest, review funding/actions

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { projectGoal } from "@/engines/goals";
+import { createUserNotification } from "@/services/notifications";
 
 const schema = z.object({
   monthlyContribution: z.number().min(0).max(1_000_000_000),
@@ -49,13 +50,11 @@ export async function POST(
       },
     });
 
-    await prisma.notification.create({
-      data: {
-        userId: user.id,
-        category: "Advisory",
-        title: `Funding updated · ${updated.name}`,
-        body: `Monthly contribution set to ₦${Math.round(updated.monthlyContribution).toLocaleString("en-NG")}. Projections remain illustrative.`,
-      },
+    await createUserNotification({
+      userId: user.id,
+      category: "advisory",
+      title: `Funding updated · ${updated.name}`,
+      body: `Monthly contribution set to ₦${Math.round(updated.monthlyContribution).toLocaleString("en-NG")}. Projections remain illustrative.`,
     });
 
     return NextResponse.json({

@@ -3,6 +3,8 @@ import { buildHomeDashboard } from "@/services/wealth";
 import { formatNaira } from "@/lib/format";
 import { createInboxFromDrafts } from "@/services/inbox";
 import { buildReportInsights, type ReportInsights } from "@/engines/report-insights";
+import { createUserNotification } from "@/services/notifications";
+import { canDeliver } from "@/lib/notification-prefs";
 
 export type MonthlyReportSection = {
   id: string;
@@ -74,7 +76,7 @@ export async function generateMonthlyWealthReport(userId: string) {
   if (!dash) throw new Error("Customer wealth context unavailable");
 
   const prefs = await prisma.notificationPreference.findUnique({ where: { userId } });
-  if (prefs && !prefs.informational) {
+  if (!canDeliver(prefs, "informational")) {
     return { skipped: true as const, reason: "Informational notifications disabled" };
   }
 
@@ -103,13 +105,11 @@ export async function generateMonthlyWealthReport(userId: string) {
     disclaimer,
   };
 
-  const note = await prisma.notification.create({
-    data: {
-      userId,
-      category: "Informational",
-      title: "Monthly wealth report",
-      body: body.slice(0, 1800),
-    },
+  const notify = await createUserNotification({
+    userId,
+    category: "informational",
+    title: "Monthly wealth report",
+    body,
   });
 
   const snapshot = await prisma.wealthSnapshot.create({
@@ -124,7 +124,7 @@ export async function generateMonthlyWealthReport(userId: string) {
         topActions,
         sections,
         disclaimer,
-        notificationId: note.id,
+        notificationId: notify.created ? notify.notification.id : null,
       }),
     },
   });
@@ -138,7 +138,7 @@ export async function generateMonthlyWealthReport(userId: string) {
       payloadJson: JSON.stringify({
         netWorthNgn: dash.netWorth.netWorthNgn,
         health: dash.health.overall,
-        notificationId: note.id,
+        notificationId: notify.created ? notify.notification.id : null,
       }),
     },
   });
@@ -157,10 +157,14 @@ export async function generateMonthlyWealthReport(userId: string) {
 
   return {
     skipped: false as const,
-    notificationId: note.id,
+    notificationId: notify.created ? notify.notification.id : null,
     snapshotId: snapshot.id,
     body,
-    report: { ...report, notificationId: note.id, snapshotId: snapshot.id },
+    report: {
+      ...report,
+      notificationId: notify.created ? notify.notification.id : undefined,
+      snapshotId: snapshot.id,
+    },
   };
 }
 

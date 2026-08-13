@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
+import { canDeliver } from "@/lib/notification-prefs";
 
 export async function GET() {
   const user = await getSessionUser();
@@ -13,14 +14,7 @@ export async function GET() {
     take: 50,
   });
 
-  const filtered = notes.filter((n) => {
-    if (!prefs) return true;
-    if (n.category === "Critical") return prefs.critical;
-    if (n.category === "Important") return prefs.important;
-    if (n.category === "Advisory") return prefs.advisory;
-    if (n.category === "Informational") return prefs.informational;
-    return true;
-  });
+  const filtered = notes.filter((n) => canDeliver(prefs, n.category));
 
   return NextResponse.json(filtered);
 }

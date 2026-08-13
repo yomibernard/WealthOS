@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 7.4
+
+- Notification preference policy helper + `createUserNotification` gating
+- Notifications centre UX: channel cards, weekly/monthly generate, preference-aware delivery
+
 ## Unreleased — Phase 7.3
 
 - Adviser → customer nudges (data, profile, digest, funding, actions)

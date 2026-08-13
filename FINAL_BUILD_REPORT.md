@@ -394,3 +394,11 @@ Adviser nudges:
 - `adviser-nudge` templates with deep links into customer remediation flows
 - Adviser 360 panel + `POST /api/adviser/nudge`
 - Shared note + inbox item + audit (`ADVISER_NUDGE_SENT`)
+
+## Phase 7.4 delivered (13 Aug 2026)
+
+Notification preferences:
+
+- `notification-prefs` policy + `createUserNotification` (suppress by channel; critical always on)
+- Wired into reports, digests, adviser share/notes, funding updates
+- `/app/notifications` channel cards + generate monthly/weekly actions

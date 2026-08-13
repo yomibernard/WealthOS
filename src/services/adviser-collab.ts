@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { createUserNotification } from "@/services/notifications";
 
 export async function assertAdviserAccess(adviserId: string, customerId: string, role: string) {
   if (role === "ADMIN") return true;
@@ -55,13 +56,11 @@ export async function createAdviserNote(input: {
   });
 
   if (input.sharedWithCustomer) {
-    await prisma.notification.create({
-      data: {
-        userId: input.customerId,
-        category: "important",
-        title: `Adviser shared: ${input.title}`,
-        body: input.body.slice(0, 280),
-      },
+    await createUserNotification({
+      userId: input.customerId,
+      category: "important",
+      title: `Adviser shared: ${input.title}`,
+      body: input.body.slice(0, 280),
     });
     await prisma.inboxItem
       .upsert({

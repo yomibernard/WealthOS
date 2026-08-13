@@ -5,6 +5,8 @@ import { buildFundingPulse } from "@/engines/goal-funding";
 import { buildWeeklyDigest, type WeeklyDigest } from "@/engines/weekly-digest";
 import { refreshInbox } from "@/services/inbox";
 import { formatNaira } from "@/lib/format";
+import { createUserNotification } from "@/services/notifications";
+import { canDeliver } from "@/lib/notification-prefs";
 
 export async function composeWeeklyDigest(userId: string): Promise<{
   digest: WeeklyDigest;
@@ -92,7 +94,7 @@ export async function composeWeeklyDigest(userId: string): Promise<{
 
 export async function generateWeeklyDigest(userId: string) {
   const prefs = await prisma.notificationPreference.findUnique({ where: { userId } });
-  if (prefs && !prefs.informational) {
+  if (!canDeliver(prefs, "informational")) {
     return { skipped: true as const, reason: "Informational notifications disabled" };
   }
 
@@ -107,13 +109,11 @@ export async function generateWeeklyDigest(userId: string) {
     digest.disclaimer,
   ].join(" ");
 
-  const note = await prisma.notification.create({
-    data: {
-      userId,
-      category: "Informational",
-      title: "Weekly wealth digest",
-      body: body.slice(0, 1800),
-    },
+  const notify = await createUserNotification({
+    userId,
+    category: "informational",
+    title: "Weekly wealth digest",
+    body,
   });
 
   const snapshot = await prisma.wealthSnapshot.create({
@@ -125,7 +125,7 @@ export async function generateWeeklyDigest(userId: string) {
       payloadJson: JSON.stringify({
         type: "weekly_digest",
         digest,
-        notificationId: note.id,
+        notificationId: notify.created ? notify.notification.id : null,
       }),
     },
   });
@@ -137,7 +137,7 @@ export async function generateWeeklyDigest(userId: string) {
       entityType: "WealthSnapshot",
       entityId: snapshot.id,
       payloadJson: JSON.stringify({
-        notificationId: note.id,
+        notificationId: notify.created ? notify.notification.id : null,
         headline: digest.headline,
         watchSections: digest.sections.filter((s) => s.tone === "watch").map((s) => s.id),
       }),
@@ -146,7 +146,7 @@ export async function generateWeeklyDigest(userId: string) {
 
   return {
     skipped: false as const,
-    notificationId: note.id,
+    notificationId: notify.created ? notify.notification.id : null,
     snapshotId: snapshot.id,
     digest,
     summaryLine: `${digest.headline} Net worth ${formatNaira(netWorthNgn, true)}.`,

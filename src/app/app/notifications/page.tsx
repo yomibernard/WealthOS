@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Badge, Button, PageHeader, Panel } from "@/components/ui";
+import { CHANNEL_COPY, type NotificationPrefs } from "@/lib/notification-prefs";
 
 type Note = {
   id: string;
@@ -11,17 +13,11 @@ type Note = {
   createdAt: string;
 };
 
-type Prefs = {
-  critical: boolean;
-  important: boolean;
-  advisory: boolean;
-  informational: boolean;
-};
-
 export default function NotificationsPage() {
   const [notes, setNotes] = useState<Note[]>([]);
-  const [prefs, setPrefs] = useState<Prefs | null>(null);
+  const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
 
   async function load() {
     const [nRes, pRes] = await Promise.all([
@@ -29,92 +25,161 @@ export default function NotificationsPage() {
       fetch("/api/notifications/preferences"),
     ]);
     if (nRes.ok) setNotes(await nRes.json());
-    if (pRes.ok) setPrefs(await pRes.json());
+    if (pRes.ok) {
+      const p = await pRes.json();
+      setPrefs({
+        critical: true,
+        important: Boolean(p.important),
+        advisory: Boolean(p.advisory),
+        informational: Boolean(p.informational),
+      });
+    }
   }
 
   useEffect(() => {
     void load();
   }, []);
 
-  async function savePrefs(next: Prefs) {
-    setPrefs(next);
+  async function savePrefs(next: NotificationPrefs) {
+    const locked = { ...next, critical: true };
+    setPrefs(locked);
     await fetch("/api/notifications/preferences", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(next),
+      body: JSON.stringify(locked),
     });
-    setMessage("Preferences saved. Critical security alerts stay on.");
+    setMessage("Preferences saved. Critical alerts stay on.");
+    await load();
   }
 
-  async function generateReport() {
+  async function runGenerate(kind: "monthly" | "weekly") {
+    setBusy(kind);
     setMessage(null);
-    const res = await fetch("/api/reports/monthly", { method: "POST" });
-    const data = await res.json();
-    if (!res.ok) {
-      setMessage(data.error ?? "Report failed.");
-      return;
+    try {
+      const res = await fetch(
+        kind === "monthly" ? "/api/reports/monthly" : "/api/digest/weekly",
+        { method: "POST" },
+      );
+      const data = (await res.json()) as { error?: string; skipped?: boolean; reason?: string };
+      if (!res.ok) {
+        setMessage(data.error ?? "Could not generate.");
+        return;
+      }
+      if (data.skipped) {
+        setMessage(data.reason ?? "Skipped by your preferences.");
+        return;
+      }
+      setMessage(kind === "monthly" ? "Monthly wealth report added." : "Weekly digest added.");
+      await load();
+    } finally {
+      setBusy(null);
     }
-    if (data.skipped) {
-      setMessage("Report skipped — informational notifications are off.");
-      return;
-    }
-    setMessage("Monthly wealth report added.");
-    await load();
   }
 
   return (
     <main>
       <PageHeader
         title="Notifications"
-        subtitle="Critical, Important, Advisory, Informational — configure without overload."
-        action={
-          <Button type="button" variant="soft" onClick={() => void generateReport()}>
-            Monthly report
-          </Button>
-        }
+        subtitle="Control channels without missing security alerts. Digests and reports respect Informational."
       />
 
-      {message ? <p className="mb-3 text-sm">{message}</p> : null}
+      {message ? (
+        <p className="mb-3 text-sm" role="status">
+          {message}
+        </p>
+      ) : null}
 
       {prefs ? (
-        <Panel className="mb-4 space-y-2">
-          <p className="eyebrow">Preferences</p>
-          {(
-            [
-              ["critical", "Critical (security, fraud) — always on"],
-              ["important", "Important (liquidity, concentration, maturity)"],
-              ["advisory", "Advisory (rebalance, idle cash, plan tips)"],
-              ["informational", "Informational (monthly report, market context)"],
-            ] as const
-          ).map(([key, label]) => (
-            <label key={key} className="flex items-center gap-2 text-sm">
+        <Panel className="mb-4 space-y-3">
+          <p className="eyebrow">Channels</p>
+          {CHANNEL_COPY.map((ch) => (
+            <label
+              key={ch.key}
+              className="flex cursor-pointer items-start gap-3 rounded-xl border border-line p-3"
+            >
               <input
                 type="checkbox"
-                checked={prefs[key]}
-                disabled={key === "critical"}
+                className="mt-1"
+                checked={prefs[ch.key]}
+                disabled={ch.locked}
                 onChange={(e) =>
-                  void savePrefs({ ...prefs, [key]: e.target.checked, critical: true })
+                  void savePrefs({ ...prefs, [ch.key]: e.target.checked, critical: true })
                 }
               />
-              <span>{label}</span>
+              <span>
+                <span className="font-semibold">{ch.label}</span>
+                <span className="muted mt-1 block text-sm">{ch.detail}</span>
+              </span>
             </label>
           ))}
+          {!prefs.informational ? (
+            <p className="text-sm font-medium text-danger">
+              Informational is off — monthly reports and weekly digests will not notify until you
+              turn it back on.
+            </p>
+          ) : null}
+          {!prefs.important ? (
+            <p className="muted text-sm">
+              Important is off — adviser nudge notifications are hidden (shared notes still appear in
+              Adviser collaboration / Inbox).
+            </p>
+          ) : null}
         </Panel>
       ) : null}
+
+      <Panel className="mb-4 space-y-3">
+        <p className="eyebrow">Generate now</p>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="soft"
+            disabled={busy != null}
+            onClick={() => void runGenerate("monthly")}
+          >
+            {busy === "monthly" ? "Working…" : "Monthly report"}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            disabled={busy != null}
+            onClick={() => void runGenerate("weekly")}
+          >
+            {busy === "weekly" ? "Working…" : "Weekly digest"}
+          </Button>
+          <Link href="/app/digest" className="btn btn-ghost">
+            Open digest
+          </Link>
+          <Link href="/app/reports" className="btn btn-ghost">
+            Open reports
+          </Link>
+        </div>
+      </Panel>
 
       <div className="space-y-3">
         {notes.map((n) => (
           <Panel key={n.id}>
-            <Badge tone={n.category === "Important" || n.category === "Critical" ? "warn" : "default"}>
+            <Badge
+              tone={
+                n.category.toLowerCase() === "important" ||
+                n.category.toLowerCase() === "critical"
+                  ? "warn"
+                  : "default"
+              }
+            >
               {n.category}
             </Badge>
             <p className="mt-2 font-semibold">{n.title}</p>
-            <p className="muted mt-1 text-sm">{n.body}</p>
+            <p className="muted mt-1 whitespace-pre-wrap text-sm">{n.body}</p>
+            <p className="muted mt-2 text-xs">
+              {new Date(n.createdAt).toLocaleString("en-NG")}
+            </p>
           </Panel>
         ))}
         {!notes.length ? (
           <Panel>
-            <p className="muted">No notifications yet.</p>
+            <p className="muted text-sm">
+              No notifications in your enabled channels yet. Generate a report or digest above.
+            </p>
           </Panel>
         ) : null}
       </div>

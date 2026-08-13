@@ -7,6 +7,7 @@ import {
   buildAdviserSharePack,
   type SharePackType,
 } from "@/engines/adviser-share";
+import { createUserNotification } from "@/services/notifications";
 
 export async function sharePackWithAdviser(input: {
   customerId: string;
@@ -77,22 +78,18 @@ export async function sharePackWithAdviser(input: {
     },
   });
 
-  await prisma.notification.create({
-    data: {
-      userId: link.adviserId,
-      category: "important",
-      title: pack.title,
-      body: `${dash.name} shared a briefing. Open their customer 360 to review.`,
-    },
+  await createUserNotification({
+    userId: link.adviserId,
+    category: "important",
+    title: pack.title,
+    body: `${dash.name} shared a briefing. Open their customer 360 to review.`,
   });
 
-  await prisma.notification.create({
-    data: {
-      userId: input.customerId,
-      category: "Informational",
-      title: "Shared with your adviser",
-      body: `Sent to ${link.adviser.name}: ${pack.title}`,
-    },
+  await createUserNotification({
+    userId: input.customerId,
+    category: "informational",
+    title: "Shared with your adviser",
+    body: `Sent to ${link.adviser.name}: ${pack.title}`,
   });
 
   await prisma.auditEvent.create({
