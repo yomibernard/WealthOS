@@ -8,6 +8,7 @@ import {
   type SnapshotExportRow,
 } from "@/engines/privacy-export";
 import { buildPrivacyInboxDraft, buildPrivacyRequestsPulse } from "@/engines/privacy-requests";
+import { buildCaseCareAckCue } from "@/engines/escalation-ops";
 import { createUserNotification } from "@/services/notifications";
 import { createInboxFromDrafts } from "@/services/inbox";
 
@@ -215,6 +216,62 @@ export async function loadPrivacyRequestsPulse(userId: string) {
     take: 20,
   });
   return buildPrivacyRequestsPulse(rows);
+}
+
+export async function listPrivacyRequestsForAdmin(take = 100) {
+  const rows = await prisma.privacyRequest.findMany({
+    orderBy: { createdAt: "desc" },
+    take,
+  });
+
+  const customerIds = [...new Set(rows.map((r) => r.userId))];
+  const [customers, careAcks] = await Promise.all([
+    customerIds.length === 0
+      ? Promise.resolve([])
+      : prisma.user.findMany({
+          where: { id: { in: customerIds } },
+          select: { id: true, name: true, email: true },
+        }),
+    customerIds.length === 0
+      ? Promise.resolve([])
+      : prisma.adviserNote.findMany({
+          where: { customerId: { in: customerIds }, kind: "care_ack" },
+          select: { customerId: true, createdAt: true },
+          orderBy: { createdAt: "desc" },
+        }),
+  ]);
+
+  const customerById = new Map(customers.map((c) => [c.id, c]));
+  const lastAckByCustomer = new Map<string, string>();
+  for (const n of careAcks) {
+    if (!lastAckByCustomer.has(n.customerId)) {
+      lastAckByCustomer.set(n.customerId, n.createdAt.toISOString());
+    }
+  }
+
+  return rows.map((r) => {
+    const careAck = buildCaseCareAckCue({
+      status: r.status,
+      lastCareAckAt: lastAckByCustomer.get(r.userId) ?? null,
+    });
+    const customer = customerById.get(r.userId) ?? {
+      id: r.userId,
+      name: "Unknown customer",
+      email: "",
+    };
+    return {
+      id: r.id,
+      userId: r.userId,
+      type: r.type,
+      status: r.status,
+      details: r.details,
+      resolution: r.resolution,
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
+      customer,
+      careAck,
+    };
+  });
 }
 
 export async function createPrivacyRequest(

@@ -2,7 +2,21 @@
  * Customer privacy-request pulse + inbox drafts (NDPR-oriented).
  */
 
+import { buildCaseCareAckCue, type CaseCareAckCue } from "@/engines/escalation-ops";
+
 export type PrivacyRequestStatus = "open" | "in_progress" | "completed" | "rejected";
+
+export type PrivacyAdminCareView = {
+  careAck: CaseCareAckCue;
+};
+
+/** Admin privacy queue helper — same care-ack cue shape as escalations. */
+export function buildPrivacyAdminCareView(input: {
+  status: string;
+  lastCareAckAt?: string | null;
+}): PrivacyAdminCareView {
+  return { careAck: buildCaseCareAckCue(input) };
+}
 
 export type PrivacyInboxDraft = {
   category: string;

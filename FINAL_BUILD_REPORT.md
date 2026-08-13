@@ -565,3 +565,10 @@ Escalation care-ack cues:
 
 - `/admin/escalations` badges Care acked / No care ack per case
 - Deep-link to customer Care desk for adviser follow-up
+
+## Phase 12.2 delivered (13 Aug 2026)
+
+Privacy care-ack cues:
+
+- `/admin/privacy` shows customer identity + Care acked / No care ack
+- Care desk deep-link mirrors escalations queue

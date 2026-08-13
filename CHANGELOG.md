@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 12.2
+
+- Admin privacy queue shows care-ack badge + customer name + Care desk deep-link
+
 ## Unreleased — Phase 12.1
 
 - Admin escalations queue shows care-ack badge + Care desk deep-link per customer

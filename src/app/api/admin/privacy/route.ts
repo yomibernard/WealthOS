@@ -3,18 +3,18 @@ import { z } from "zod";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { applyErasure } from "@/services/erasure";
-import { notifyPrivacyRequestUpdate } from "@/services/privacy";
+import {
+  listPrivacyRequestsForAdmin,
+  notifyPrivacyRequestUpdate,
+} from "@/services/privacy";
 
 export async function GET() {
   const user = await getSessionUser();
   if (!user || user.role !== "ADMIN") {
     return NextResponse.json({ error: "Admin only." }, { status: 403 });
   }
-  const rows = await prisma.privacyRequest.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 100,
-  });
-  return NextResponse.json({ requests: rows });
+  const requests = await listPrivacyRequestsForAdmin();
+  return NextResponse.json({ requests });
 }
 
 const patchSchema = z.object({

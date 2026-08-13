@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildPrivacyAdminCareView,
   buildPrivacyInboxDraft,
   buildPrivacyRequestsPulse,
 } from "@/engines/privacy-requests";
@@ -62,5 +63,16 @@ describe("privacy requests pulse", () => {
     });
     expect(done.sourceId).toBe("p1:completed");
     expect(done.body).toContain("Export attached.");
+  });
+
+  it("surfaces care-ack cues for the admin privacy queue", () => {
+    expect(buildPrivacyAdminCareView({ status: "open" }).careAck.label).toBe("No care ack");
+    expect(buildPrivacyAdminCareView({ status: "open" }).careAck.tone).toBe("warn");
+    expect(
+      buildPrivacyAdminCareView({
+        status: "in_progress",
+        lastCareAckAt: "2026-08-13T10:00:00.000Z",
+      }).careAck.label,
+    ).toBe("Care acked");
   });
 });
