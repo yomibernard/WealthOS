@@ -474,3 +474,10 @@ Case inbox loop:
 
 - Create/resolve escalations write Wealth Inbox cards deep-linked to `/app/support`
 - `refreshInbox` covers open + in_progress; complaint titles; closes stale open cards on resolve
+
+## Phase 9.2 delivered (13 Aug 2026)
+
+Privacy request loop:
+
+- Home pulse for open/recent privacy requests; Inbox deep-links to `/app/privacy`
+- Create + admin update notify via prefs; erasure completion skips customer inbox resurface

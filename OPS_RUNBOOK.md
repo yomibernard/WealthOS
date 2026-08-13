@@ -49,6 +49,7 @@ Never run `npm run db:setup` in production (wipes and reseeds).
 1. Queue lives at `/admin/privacy`
 2. Erasure anonymises the customer and blocks sign-in — irreversible for that identity
 3. Keep audit events per compliance policy
+4. Customers see open/recent privacy requests on Home and Wealth Inbox (`/app/privacy`)
 
 ## 3. Support triage
 

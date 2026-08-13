@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { analyseEstate } from "@/engines/estate";
 import { getFeatureFlags } from "@/lib/feature-flags";
 import { buildCaseInboxDraft } from "@/engines/customer-cases";
+import { buildPrivacyInboxDraft } from "@/engines/privacy-requests";
 
 type Draft = {
   category: string;
@@ -66,22 +67,28 @@ export async function refreshInbox(userId: string) {
   const flags = getFeatureFlags();
   if (!flags.wealthInbox) return { created: 0, unread: 0 };
 
-  const [recs, connections, assets, estateItems, household, escalations] = await Promise.all([
-    prisma.recommendation.findMany({
-      where: { userId, status: "PROPOSED" },
-      take: 8,
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.connection.findMany({ where: { userId } }),
-    prisma.asset.findMany({ where: { userId } }),
-    prisma.estateItem.findMany({ where: { userId } }),
-    prisma.householdMember.findMany({ where: { userId } }),
-    prisma.escalation.findMany({
-      where: { userId, status: { in: ["open", "in_progress"] } },
-      take: 8,
-      orderBy: { updatedAt: "desc" },
-    }),
-  ]);
+  const [recs, connections, assets, estateItems, household, escalations, privacyRequests] =
+    await Promise.all([
+      prisma.recommendation.findMany({
+        where: { userId, status: "PROPOSED" },
+        take: 8,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.connection.findMany({ where: { userId } }),
+      prisma.asset.findMany({ where: { userId } }),
+      prisma.estateItem.findMany({ where: { userId } }),
+      prisma.householdMember.findMany({ where: { userId } }),
+      prisma.escalation.findMany({
+        where: { userId, status: { in: ["open", "in_progress"] } },
+        take: 8,
+        orderBy: { updatedAt: "desc" },
+      }),
+      prisma.privacyRequest.findMany({
+        where: { userId, status: { in: ["open", "in_progress"] } },
+        take: 8,
+        orderBy: { updatedAt: "desc" },
+      }),
+    ]);
 
   let created = 0;
 
@@ -137,6 +144,19 @@ export async function refreshInbox(userId: string) {
       status: e.status,
     });
     await upsertInbox(userId, draft);
+    created += 1;
+  }
+
+  for (const p of privacyRequests) {
+    await upsertInbox(
+      userId,
+      buildPrivacyInboxDraft({
+        id: p.id,
+        type: p.type,
+        status: p.status,
+        details: p.details,
+      }),
+    );
     created += 1;
   }
 

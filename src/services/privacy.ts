@@ -7,6 +7,9 @@ import {
   type NoteExportRow,
   type SnapshotExportRow,
 } from "@/engines/privacy-export";
+import { buildPrivacyInboxDraft, buildPrivacyRequestsPulse } from "@/engines/privacy-requests";
+import { createUserNotification } from "@/services/notifications";
+import { createInboxFromDrafts } from "@/services/inbox";
 
 /** Portable customer data package for access requests (NDPR-oriented MVP). */
 export async function exportCustomerData(userId: string) {
@@ -205,6 +208,15 @@ export async function exportCustomerData(userId: string) {
   return pack;
 }
 
+export async function loadPrivacyRequestsPulse(userId: string) {
+  const rows = await prisma.privacyRequest.findMany({
+    where: { userId },
+    orderBy: { updatedAt: "desc" },
+    take: 20,
+  });
+  return buildPrivacyRequestsPulse(rows);
+}
+
 export async function createPrivacyRequest(
   userId: string,
   type: "access" | "erasure" | "rectification" | "objection",
@@ -224,14 +236,62 @@ export async function createPrivacyRequest(
     },
   });
 
-  await prisma.notification.create({
-    data: {
-      userId,
-      category: "Important",
-      title: "Privacy request received",
-      body: `Your ${type} request is logged. Operations will review it under our retention policy.`,
-    },
+  await createUserNotification({
+    userId,
+    category: "important",
+    title: "Privacy request received",
+    body: `Your ${type} request is logged. Operations will review it under our retention policy.`,
   });
 
+  await createInboxFromDrafts(userId, [
+    buildPrivacyInboxDraft({
+      id: req.id,
+      type: req.type,
+      status: req.status,
+      details: req.details,
+    }),
+  ]);
+
   return req;
+}
+
+export async function notifyPrivacyRequestUpdate(input: {
+  userId: string;
+  id: string;
+  type: string;
+  status: string;
+  resolution: string;
+  erasureApplied?: boolean;
+}) {
+  if (!input.erasureApplied) {
+    await createUserNotification({
+      userId: input.userId,
+      category: "important",
+      title: "Privacy request update",
+      body: `Your ${input.type} request is now ${input.status}. ${input.resolution}`,
+    });
+  }
+
+  if (input.status === "completed" || input.status === "rejected") {
+    await prisma.inboxItem.updateMany({
+      where: {
+        userId: input.userId,
+        sourceType: "privacy_request",
+        sourceId: input.id,
+        status: { in: ["unread", "read"] },
+      },
+      data: { status: "acted" },
+    });
+  }
+
+  if (!input.erasureApplied) {
+    await createInboxFromDrafts(input.userId, [
+      buildPrivacyInboxDraft({
+        id: input.id,
+        type: input.type,
+        status: input.status,
+        resolution: input.resolution,
+      }),
+    ]);
+  }
 }

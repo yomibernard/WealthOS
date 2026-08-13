@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { applyErasure } from "@/services/erasure";
+import { notifyPrivacyRequestUpdate } from "@/services/privacy";
 
 export async function GET() {
   const user = await getSessionUser();
@@ -62,16 +63,14 @@ export async function PATCH(req: Request) {
     },
   });
 
-  if (!erasureApplied) {
-    await prisma.notification.create({
-      data: {
-        userId: updated.userId,
-        category: "Important",
-        title: "Privacy request update",
-        body: `Your ${updated.type} request is now ${body.status}. ${body.resolution}`,
-      },
-    });
-  }
+  await notifyPrivacyRequestUpdate({
+    userId: updated.userId,
+    id: updated.id,
+    type: updated.type,
+    status: body.status,
+    resolution: body.resolution,
+    erasureApplied,
+  });
 
   return NextResponse.json({ ...updated, erasureApplied });
 }

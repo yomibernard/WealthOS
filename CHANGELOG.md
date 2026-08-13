@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 9.2
+
+- Home privacy-request pulse; Inbox cards on create/update → `/app/privacy`
+- Pref-aware notifications for privacy requests; refreshInbox covers open privacy queue
+
 ## Unreleased — Phase 9.1
 
 - Wealth Inbox deep-links for support/complaint create + resolve (→ `/app/support`)
