@@ -8,6 +8,7 @@ import { calculateNetWorth } from "@/engines/net-worth";
 import { calculateWealthHealth, DEFAULT_HEALTH_WEIGHTS } from "@/engines/wealth-health";
 import { topActions } from "@/engines/nbfa";
 import { projectGoal, runDigitalTwinLite, comparePropertyDecision } from "@/engines/goals";
+import { buildFundingPulse } from "@/engines/goal-funding";
 import { assessSuitability } from "@/engines/suitability";
 import { analyseOffer } from "@/engines/wealthguard";
 import { analyseProperty } from "@/engines/property";
@@ -52,6 +53,7 @@ export type Intent =
   | "actions"
   | "monthly_report"
   | "data_quality"
+  | "goal_funding"
   | "escalation"
   | "general";
 
@@ -92,6 +94,7 @@ export type CustomerContext = {
   hasDependants?: boolean;
   expenses: { amount: number; currency: string; frequency: string; category: string }[];
   goals: {
+    id?: string;
     type: string;
     name: string;
     targetAmount: number;
@@ -99,6 +102,7 @@ export type CustomerContext = {
     existingAllocation: number;
     monthlyContribution: number;
     currency: string;
+    priority?: number;
   }[];
   riskProfile?: {
     riskTolerance: string;
@@ -159,6 +163,12 @@ export function classifyIntent(message: string): Intent {
   if (/compare|product a|why product|mutual fund|money market|treasury/.test(m))
     return "product_compare";
   if (/afford|what should i do with|₦|ngn\s*\d/.test(m)) return "affordability";
+  if (
+    /funding (pulse|gap|plan)|underfunded|increase (my )?contribution|monthly contribution|am i on track.*(goal|saving)/.test(
+      m,
+    )
+  )
+    return "goal_funding";
   if (/goal|saving enough/.test(m)) return "goals";
   if (/top three|what should i do|next best|priority/.test(m)) return "actions";
   if (/monthly (wealth )?report|wealth report|month.over.month|mom (change|report)/.test(m))
@@ -202,6 +212,7 @@ export function routeAgent(intent: Intent): AgentName {
     case "actions":
     case "monthly_report":
     case "data_quality":
+    case "goal_funding":
       return "CoachAI";
     case "net_worth":
     case "general":
@@ -765,6 +776,31 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
           : "No heavily stale valuations were flagged, but estimated private holdings should still be reviewed quarterly.",
         "Open Data confidence to work the remediation queue. WealthOS will not invent balances.",
         "Path: /app/wealth/confidence",
+      ].join(" ");
+      confidence = Math.min(confidence, 0.8);
+      break;
+    }
+    case "goal_funding": {
+      toolsUsed.push("goalFundingPulse");
+      const pulse = buildFundingPulse(
+        ctx.goals.map((g, index) => ({
+          id: g.id ?? `goal-${index}`,
+          name: g.name,
+          type: g.type,
+          currency: g.currency,
+          priority: g.priority ?? index + 1,
+          targetAmount: g.targetAmount,
+          targetDate: g.targetDate,
+          existingAllocation: g.existingAllocation,
+          monthlyContribution: g.monthlyContribution,
+        })),
+      );
+      content = [
+        pulse.summary,
+        pulse.behindCount
+          ? "You can apply a suggested monthly contribution per goal in Goal funding pulse — still illustrative, not an instruction to buy a product."
+          : "Keep contributions steady and revisit after life events or income changes.",
+        "Path: /app/plan/funding",
       ].join(" ");
       confidence = Math.min(confidence, 0.8);
       break;

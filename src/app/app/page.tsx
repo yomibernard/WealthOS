@@ -106,6 +106,11 @@ export default async function HomePage() {
             <li className="muted text-sm">No goals yet — create one in Plan.</li>
           )}
         </ul>
+        {dash.goals.some((g) => g.progress < 85) ? (
+          <Link href="/app/plan/funding" className="btn btn-ghost mt-3 w-full">
+            Review goal funding
+          </Link>
+        ) : null}
       </Panel>
 
       <Panel className="mt-3">

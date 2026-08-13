@@ -346,3 +346,11 @@ Data confidence remediation:
 - `/app/wealth/confidence` remediation queue with confirm or update value
 - `POST /api/wealth/refresh`; Home CTA when confidence low or stale assets exist
 - WealthAI `data_quality` intent
+
+## Phase 6.3 delivered (13 Aug 2026)
+
+Goal funding pulse:
+
+- `goal-funding` engine ranks ahead / on track / behind / critical
+- `/app/plan/funding` with apply suggested or custom monthly contribution
+- API `POST /api/goals/[id]/funding`; WealthAI `goal_funding` intent

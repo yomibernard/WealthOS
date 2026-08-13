@@ -90,6 +90,11 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - **Health** — `GET /api/health` for uptime probes
 - **Admin** — `/admin/ops` launch gate summary
 
+## Goal funding pulse (Phase 6.3)
+
+- **Funding** — `/app/plan/funding` shows illustrative monthly gaps and lets you apply suggested contributions
+- Does not execute investments — plan choice only
+
 ## Data confidence (Phase 6.2)
 
 - **Remediation** — `/app/wealth/confidence` lists stale/estimated holdings with confirm or update actions

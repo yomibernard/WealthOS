@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 6.3
+
+- Goal funding pulse engine + `/app/plan/funding` with apply-suggested / custom monthly
+- `POST /api/goals/[id]/funding`; Home/Plan entry points; WealthAI `goal_funding` intent
+
 ## Unreleased — Phase 6.2
 
 - Data quality remediation engine + actionable `/app/wealth/confidence` queue

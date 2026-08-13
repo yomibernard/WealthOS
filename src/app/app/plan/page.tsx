@@ -53,6 +53,9 @@ export default async function PlanPage() {
         })}
       </div>
       <div className="mt-4 grid gap-3">
+        <Link href="/app/plan/funding" className="btn btn-soft w-full">
+          Goal funding pulse
+        </Link>
         <Link href="/app/plan/scenarios" className="btn btn-ghost w-full">
           Scenario comparison
         </Link>

@@ -7,6 +7,7 @@ import { getSessionUser } from "@/lib/session";
 const links = [
   { href: "/app/inbox", label: "Wealth Inbox" },
   { href: "/app/reports", label: "Monthly wealth reports" },
+  { href: "/app/plan/funding", label: "Goal funding pulse" },
   { href: "/app/health", label: "Wealth Health" },
   { href: "/app/actions", label: "Recommendations" },
   { href: "/app/wealthguard", label: "WealthGuard" },

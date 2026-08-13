@@ -28,6 +28,7 @@
 | CI / deploy package | Ready | GitHub Actions + [DEPLOY.md](./DEPLOY.md) |
 | Monthly reports | Ready (demo) | `/app/reports`, MoM insights, print |
 | Data confidence | Ready (demo) | `/app/wealth/confidence` remediation queue |
+| Goal funding pulse | Ready (demo) | `/app/plan/funding` |
 
 ## Quality gates (this machine)
 
