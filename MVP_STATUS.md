@@ -46,6 +46,7 @@
 | Adviser care desk | Ready (demo) | 360 open support/privacy before product talk |
 | Adviser care radar | Ready (demo) | `/adviser` portfolio sorted by care load |
 | Adviser care ack | Ready (demo) | 360 acknowledgment → customer Inbox |
+| Adviser care filters | Ready (demo) | `/adviser?care=` book slices |
 
 ## Quality gates (this machine)
 

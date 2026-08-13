@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 11.0
+
+- Adviser portfolio care filters on `/adviser` (`?care=` all / care / complaints / privacy / support)
+
 ## 0.1.3 — 13 Aug 2026 (Adviser care pack)
 
 Adviser-facing care desk, portfolio radar, and customer acknowledgments on top of the 0.1.2 trust loop.

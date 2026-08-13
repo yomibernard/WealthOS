@@ -523,3 +523,10 @@ Adviser care freeze pack **v0.1.3**:
 
 - `npm run pilot:freeze` checks 10.x engines/pages + Care radar / Care desk demo cues
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 11.0 delivered (13 Aug 2026)
+
+Portfolio care filters:
+
+- `/adviser?care=` slices the book (needs care / complaints / privacy / support)
+- Book badges keep full totals; list + summary reflect the active filter
