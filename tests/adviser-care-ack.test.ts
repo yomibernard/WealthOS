@@ -3,6 +3,7 @@ import {
   buildCareAckDraft,
   buildCareAckHistory,
   buildCareUpdatePulse,
+  formatCareUpdateAiContent,
 } from "@/engines/adviser-care-ack";
 import { resolveNotificationLink } from "@/lib/notification-links";
 
@@ -108,5 +109,29 @@ describe("adviser care acknowledgment", () => {
     );
     expect(privacyPulse.primaryHref).toBe("/app/privacy");
     expect(privacyPulse.items[0]?.href).toBe("/app/privacy");
+  });
+
+  it("formats WealthAI care-update copy from the live pulse", () => {
+    const empty = formatCareUpdateAiContent(null);
+    expect(empty).toMatch(/does not close/i);
+    expect(empty).toMatch(/do not see a recent/i);
+
+    const withPulse = formatCareUpdateAiContent(
+      buildCareUpdatePulse(
+        [
+          {
+            id: "n1",
+            title: "Adviser acknowledged your complaint",
+            body: "Ada: I've seen this.",
+            createdAt: "2026-08-13T10:00:00.000Z",
+            adviserName: "Ada",
+          },
+        ],
+        new Date("2026-08-13T12:00:00.000Z"),
+      ),
+    );
+    expect(withPulse).toMatch(/Ada sent a care update/i);
+    expect(withPulse).toContain("/app/support");
+    expect(withPulse).toMatch(/does not close/i);
   });
 });

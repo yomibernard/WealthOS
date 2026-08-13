@@ -65,8 +65,30 @@ describe("WealthAI orchestration", () => {
     expect(res.agent).toBe("ComplianceAI");
     expect(res.toolsUsed).toContain("careUpdatePulse");
     expect(res.content).toMatch(/does not close/i);
-    expect(res.content).toContain("/app/support");
+    expect(res.content).toMatch(/do not see a recent|Paths:/i);
     expect(res.escalate).toBe(false);
+
+    const grounded = runWealthAI("Where do I see my adviser care update?", {
+      ...ctx,
+      careUpdate: {
+        count: 1,
+        headline: "Ada sent a care update",
+        primaryHref: "/app/support",
+        latestAt: "2026-08-13T10:00:00.000Z",
+        items: [
+          {
+            id: "n1",
+            title: "Adviser acknowledged your complaint",
+            preview: "I've seen this.",
+            adviserName: "Ada",
+            createdAt: "2026-08-13T10:00:00.000Z",
+            href: "/app/support",
+          },
+        ],
+      },
+    });
+    expect(grounded.content).toMatch(/Ada sent a care update/i);
+    expect(grounded.content).toContain("/app/support");
   });
 
   it("grounds net worth in engine output", () => {

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 14.1
+
+- WealthAI `care_update` answers grounded in the live care-update pulse (count/headline/path)
+
 ## Unreleased — Phase 14.0
 
 - WealthAI `care_update` intent routes adviser-acknowledgment questions to Support/Privacy Home paths (ops still authoritative)

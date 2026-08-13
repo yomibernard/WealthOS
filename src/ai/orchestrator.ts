@@ -18,6 +18,7 @@ import { analysePension } from "@/engines/pension";
 import { analyseTaxLite } from "@/engines/tax";
 import { analyseCrypto } from "@/engines/crypto";
 import { analyseLending } from "@/engines/lending";
+import { formatCareUpdateAiContent } from "@/engines/adviser-care-ack";
 import type { FxRateRow } from "@/engines/fx";
 
 export type AgentName =
@@ -128,6 +129,20 @@ export type CustomerContext = {
     feesJson: string;
     providerName: string;
   }[];
+  careUpdate?: {
+    count: number;
+    headline: string | null;
+    primaryHref: string;
+    latestAt: string | null;
+    items: Array<{
+      id: string;
+      title: string;
+      preview: string;
+      adviserName: string;
+      createdAt: string;
+      href: string;
+    }>;
+  } | null;
 };
 
 export type AiResponse = {
@@ -813,12 +828,7 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
     }
     case "care_update": {
       toolsUsed.push("careUpdatePulse");
-      content = [
-        "When your adviser acknowledges an open care item, WealthOS shows a calm care update on Home and lists it on Support or Privacy Centre.",
-        "That reassurance does not close the ops queue — admin resolution still applies where needed.",
-        "Open Home for the latest pulse, Support for case care updates, or Privacy Centre for privacy-related acks.",
-        "Paths: /app · /app/support · /app/privacy",
-      ].join(" ");
+      content = formatCareUpdateAiContent(ctx.careUpdate);
       confidence = 0.95;
       break;
     }

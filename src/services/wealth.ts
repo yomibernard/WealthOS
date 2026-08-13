@@ -5,6 +5,7 @@ import { topActions, type ScoredAction } from "@/engines/nbfa";
 import { projectGoal } from "@/engines/goals";
 import type { FxRateRow } from "@/engines/fx";
 import type { CustomerContext } from "@/ai/orchestrator";
+import { loadCareUpdatePulse } from "@/services/adviser-care-ack";
 
 export async function loadFxRates(): Promise<FxRateRow[]> {
   const rows = await prisma.fxRate.findMany({ orderBy: { asOf: "desc" } });
@@ -41,6 +42,7 @@ export async function loadCustomerContext(userId: string): Promise<CustomerConte
   });
 
   const fxRates = await loadFxRates();
+  const careUpdate = await loadCareUpdatePulse(userId);
 
   return {
     userId: user.id,
@@ -103,6 +105,7 @@ export async function loadCustomerContext(userId: string): Promise<CustomerConte
       feesJson: p.feesJson,
       providerName: p.provider.name,
     })),
+    careUpdate,
   };
 }
 

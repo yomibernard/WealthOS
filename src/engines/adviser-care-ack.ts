@@ -181,3 +181,30 @@ export function buildCareUpdatePulse(
     items: recent,
   };
 }
+
+/** WealthAI grounded copy for care-update questions (ops still authoritative). */
+export function formatCareUpdateAiContent(pulse?: CareUpdatePulse | null): string {
+  const base = [
+    "When your adviser acknowledges an open care item, WealthOS shows a calm care update on Home and lists it on Support or Privacy Centre.",
+    "That reassurance does not close the ops queue — admin resolution still applies where needed.",
+  ];
+
+  if (pulse && pulse.count > 0 && pulse.headline) {
+    const latest = pulse.items[0];
+    return [
+      `You have ${pulse.count} recent care update(s): ${pulse.headline}.`,
+      latest?.preview ? `Latest note: ${latest.preview}` : null,
+      ...base,
+      `Open ${pulse.primaryHref} for the details (Home also surfaces the pulse).`,
+      "Paths: /app · /app/support · /app/privacy",
+    ]
+      .filter(Boolean)
+      .join(" ");
+  }
+
+  return [
+    ...base,
+    "I do not see a recent shared care acknowledgment in the last 14 days — check Inbox, or ask your adviser to acknowledge an open item from the Care desk.",
+    "Paths: /app · /app/support · /app/privacy · /app/inbox",
+  ].join(" ");
+}

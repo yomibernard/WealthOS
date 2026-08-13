@@ -614,3 +614,10 @@ WealthAI care-update intent:
 
 - Classifies adviser acknowledgment / care update questions
 - ComplianceAI response points to Home, Support, and Privacy without claiming ops closure
+
+## Phase 14.1 delivered (13 Aug 2026)
+
+Grounded care-update answers:
+
+- CustomerContext loads care-update pulse for WealthAI
+- Responses cite recent ack headline/path when present; otherwise guide to Inbox/Care desk
