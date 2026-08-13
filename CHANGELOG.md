@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 7.2
+
+- Customer → adviser share packs (full / digest / profile / funding)
+- `POST /api/adviser/share`; UI on digest, profile, adviser-collab
+
 ## Unreleased — Phase 7.1
 
 - Profile completeness checklist engine + actionable `/app/profile`

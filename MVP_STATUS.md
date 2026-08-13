@@ -31,6 +31,7 @@
 | Goal funding pulse | Ready (demo) | `/app/plan/funding` |
 | Weekly digest | Ready (demo) | `/app/digest` |
 | Profile completeness | Ready (demo) | `/app/profile` checklist |
+| Share with adviser | Ready (demo) | digest / profile / collab share packs |
 
 ## Quality gates (this machine)
 

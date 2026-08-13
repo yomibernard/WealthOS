@@ -378,3 +378,11 @@ Profile completeness:
 - Weighted checklist engine (risk, cashflow, graph, goals, consent, household)
 - `/app/profile` with Fix / Continue next gap; `syncProfileCompleteness` persists score
 - Home CTA when score < 80%; WealthAI `profile_completeness` intent
+
+## Phase 7.2 delivered (13 Aug 2026)
+
+Share with adviser:
+
+- `adviser-share` pack builder + `sharePackWithAdviser` service
+- Customer UI on `/app/digest`, `/app/profile`, `/app/adviser-collab`
+- Creates `customer_share` note, notifies adviser + customer, audits share

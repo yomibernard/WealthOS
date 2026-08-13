@@ -2,14 +2,21 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Badge, PageHeader, Panel, ProgressBar } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
+import { getFeatureFlags } from "@/lib/feature-flags";
 import { syncProfileCompleteness } from "@/services/profile-completeness";
+import { listLinkedAdviser } from "@/services/adviser-share";
+import { ShareWithAdviser } from "@/components/ShareWithAdviser";
 
 export default async function ProfilePage() {
   const user = await getSessionUser();
   if (!user) redirect("/auth/sign-in");
 
-  const report = await syncProfileCompleteness(user.id);
+  const [report, link] = await Promise.all([
+    syncProfileCompleteness(user.id),
+    listLinkedAdviser(user.id),
+  ]);
   if (!report) redirect("/auth/sign-in");
+  const flags = getFeatureFlags();
 
   return (
     <main>
@@ -71,6 +78,13 @@ export default async function ProfilePage() {
           Update fact-find
         </Link>
       </Panel>
+
+      {flags.adviserCollab ? (
+        <Panel className="mt-4 space-y-2">
+          <p className="eyebrow">Share with adviser</p>
+          <ShareWithAdviser defaultPack="profile" adviserName={link?.adviser.name ?? null} />
+        </Panel>
+      ) : null}
     </main>
   );
 }

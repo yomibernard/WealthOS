@@ -2,9 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Badge, PageHeader, Panel } from "@/components/ui";
 import { GenerateWeeklyDigestButton } from "@/components/WeeklyDigestClient";
+import { ShareWithAdviser } from "@/components/ShareWithAdviser";
 import { getSessionUser } from "@/lib/session";
 import { getFeatureFlags } from "@/lib/feature-flags";
 import { loadLatestWeeklyDigest } from "@/services/weekly-digest";
+import { listLinkedAdviser } from "@/services/adviser-share";
 
 export default async function WeeklyDigestPage() {
   const user = await getSessionUser();
@@ -19,7 +21,10 @@ export default async function WeeklyDigestPage() {
     );
   }
 
-  const { stored, generatedAt, live } = await loadLatestWeeklyDigest(user.id);
+  const [{ stored, generatedAt, live }, link] = await Promise.all([
+    loadLatestWeeklyDigest(user.id),
+    listLinkedAdviser(user.id),
+  ]);
   const view = stored ?? live;
 
   return (
@@ -85,6 +90,16 @@ export default async function WeeklyDigestPage() {
           <p className="muted text-sm">Unable to compose a live digest right now.</p>
         </Panel>
       )}
+
+      {flags.adviserCollab ? (
+        <Panel className="mt-4 space-y-2">
+          <p className="eyebrow">Share</p>
+          <ShareWithAdviser
+            defaultPack="weekly_digest"
+            adviserName={link?.adviser.name ?? null}
+          />
+        </Panel>
+      ) : null}
 
       <p className="muted mt-4 text-sm">
         Related: <Link href="/app/reports">Monthly reports</Link> ·{" "}

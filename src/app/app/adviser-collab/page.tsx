@@ -4,6 +4,8 @@ import { Badge, PageHeader, Panel } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
 import { getFeatureFlags } from "@/lib/feature-flags";
 import { listAdviserNotes, buildCustomerTimeline } from "@/services/adviser-collab";
+import { listLinkedAdviser } from "@/services/adviser-share";
+import { ShareWithAdviser } from "@/components/ShareWithAdviser";
 
 export default async function AdviserCollabPage() {
   const user = await getSessionUser();
@@ -16,9 +18,10 @@ export default async function AdviserCollabPage() {
     );
   }
 
-  const [notes, timeline] = await Promise.all([
+  const [notes, timeline, link] = await Promise.all([
     listAdviserNotes(user.id, { sharedOnly: true }),
     buildCustomerTimeline(user.id),
+    listLinkedAdviser(user.id),
   ]);
 
   const visibleTimeline = timeline.filter(
@@ -37,16 +40,21 @@ export default async function AdviserCollabPage() {
         }
       />
 
+      <Panel className="mb-6 space-y-2">
+        <p className="eyebrow">Share a briefing</p>
+        <ShareWithAdviser defaultPack="full" adviserName={link?.adviser.name ?? null} />
+      </Panel>
+
       <section aria-labelledby="shared-notes">
         <h2 id="shared-notes" className="font-display text-xl">
-          Shared with you
+          Shared thread
         </h2>
         <div className="mt-3 space-y-3">
           {notes.length === 0 ? (
             <Panel>
               <p className="muted text-sm">
-                No shared adviser notes yet. When your adviser shares a plan action, it appears here
-                and in Wealth Inbox.
+                No shared notes yet. Share a briefing above, or wait for your adviser to share a plan
+                action.
               </p>
             </Panel>
           ) : (
@@ -54,10 +62,12 @@ export default async function AdviserCollabPage() {
               <Panel key={n.id}>
                 <div className="flex flex-wrap gap-2">
                   <Badge>{n.kind.replaceAll("_", " ")}</Badge>
-                  <Badge>from {n.adviser.name}</Badge>
+                  <Badge>
+                    {n.kind === "customer_share" ? "you shared" : `from ${n.adviser.name}`}
+                  </Badge>
                 </div>
                 <p className="mt-2 font-semibold">{n.title}</p>
-                <p className="mt-1 text-sm leading-relaxed">{n.body}</p>
+                <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed">{n.body}</p>
                 <p className="muted mt-2 text-xs">
                   {n.createdAt.toLocaleString("en-GB")}
                 </p>

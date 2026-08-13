@@ -126,12 +126,16 @@ export function AdviserNotesPanel({ customerId }: { customerId: string }) {
           <li key={n.id} className="rounded-xl border border-line p-3">
             <div className="flex flex-wrap gap-2">
               <Badge>{n.kind.replaceAll("_", " ")}</Badge>
-              <Badge tone={n.sharedWithCustomer ? "default" : "warn"}>
-                {n.sharedWithCustomer ? "shared" : "internal"}
-              </Badge>
+              {n.kind === "customer_share" ? (
+                <Badge tone="warn">from customer</Badge>
+              ) : (
+                <Badge tone={n.sharedWithCustomer ? "default" : "warn"}>
+                  {n.sharedWithCustomer ? "shared" : "internal"}
+                </Badge>
+              )}
             </div>
             <p className="mt-2 font-semibold">{n.title}</p>
-            <p className="mt-1 text-sm">{n.body}</p>
+            <p className="mt-1 whitespace-pre-wrap text-sm">{n.body}</p>
             <p className="muted mt-1 text-xs">
               {new Date(n.createdAt).toLocaleString("en-GB")}
             </p>
