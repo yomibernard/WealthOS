@@ -66,7 +66,7 @@ Never run `npm run db:setup` in production (wipes and reseeds).
 
 1. Queue: `/admin/escalations` (open + in-progress first)
 2. Add a resolution note → **In progress** / **Resolve** / **Reject**
-3. Customer is notified in-product; they see the update on `/app/support`
+3. Customer is notified in-product; Wealth Inbox + `/app/support` show the update
 4. Complaints are prefixed `COMPLAINT:` — keep resolution factual; no fund movement from this queue
 
 Step-up demo code for material accepts: `123456` (demo only).
