@@ -54,7 +54,8 @@ export default function PrivacyPage() {
       <Panel className="space-y-3">
         <p className="font-semibold">Data portability</p>
         <p className="muted text-sm">
-          Export a JSON package of your Wealth Graph, goals, consents, memories and related records.
+          Export a JSON package of your Wealth Graph, goals, consents, inbox, monthly reports, weekly
+          digests, adviser shares/nudges, notification preferences, and privacy/escalation history.
           Password hashes are never included.
         </p>
         <a href="/api/privacy/export" className="btn btn-accent">

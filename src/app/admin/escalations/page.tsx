@@ -21,6 +21,8 @@ export default async function AdminEscalationsPage() {
             <div className="flex flex-wrap gap-2">
               <Badge>{e.level}</Badge>
               <Badge tone={e.status === "open" ? "warn" : "default"}>{e.status}</Badge>
+              {e.reason.startsWith("COMPLAINT:") ? <Badge tone="warn">Complaint</Badge> : null}
+              {e.reason.startsWith("SUPPORT:") ? <Badge>Support</Badge> : null}
             </div>
             <p className="mt-2 font-semibold">
               {e.user.name} — {e.reason}

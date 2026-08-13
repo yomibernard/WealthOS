@@ -409,3 +409,11 @@ Demo & ops sync:
 
 - `DEMO_SCRIPT.md` expanded to ~20–25 min with cadence tools + adviser share/nudge loop
 - `/demo` presenter checklist updated; `/admin/ops` lists cadence/collab modules + `DEPLOY.md`
+
+## Phase 8.1 delivered (13 Aug 2026)
+
+Privacy & support polish:
+
+- `exportCustomerData` portability pack now includes cadence snapshots, shares/nudges, prefs, inbox, privacy requests
+- `/app/support` L2 support/complaint intake + case history; admin escalations show complaint badges
+- `GET /api/escalations` for the customer’s own cases

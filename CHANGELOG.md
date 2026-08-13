@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 8.1
+
+- Privacy export includes monthly reports, weekly digests, adviser shares/nudges, prefs, inbox
+- Support & complaints: L2 case form, case list, complaint labelling; admin queue badges
+
 ## Unreleased — Phase 8.0
 
 - Demo script Acts 3–5 for cadence + adviser loop; `/demo` jump links

@@ -1,27 +1,140 @@
-import { PageHeader, Panel } from "@/components/ui";
+"use client";
+
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
+import { Badge, Button, Field, PageHeader, Panel, TextInput } from "@/components/ui";
+
+type CaseRow = {
+  id: string;
+  level: string;
+  reason: string;
+  status: string;
+  createdAt: string;
+};
 
 export default function SupportPage() {
+  const [category, setCategory] = useState<"support" | "complaint">("support");
+  const [reason, setReason] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
+  const [cases, setCases] = useState<CaseRow[]>([]);
+
+  async function load() {
+    const res = await fetch("/api/escalations");
+    if (res.ok) setCases(await res.json());
+  }
+
+  useEffect(() => {
+    void load();
+  }, []);
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    setMessage(null);
+    const res = await fetch("/api/escalations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        reason,
+        category,
+        level: "L2_SUPPORT",
+      }),
+    });
+    if (!res.ok) {
+      setMessage("We could not submit that right now. Please try again.");
+      return;
+    }
+    setReason("");
+    setMessage(
+      category === "complaint"
+        ? "Complaint logged. Operations will review under our complaints process."
+        : "Support request received. A specialist can pick this up from the queue.",
+    );
+    await load();
+  }
+
   return (
     <main>
       <PageHeader
         title="Support & complaints"
-        subtitle="Human escalation when AI confidence is low, complexity rises, or you simply want a person."
+        subtitle="Human help when AI confidence is low, something went wrong, or you want a person on the case."
       />
+
       <Panel className="space-y-3">
-        <p>Escalation levels:</p>
+        <p className="font-semibold">Escalation ladder</p>
         <ul className="list-disc space-y-1 pl-5 text-sm">
-          <li>L0 Self-service</li>
-          <li>L1 WealthAI</li>
-          <li>L2 Support specialist</li>
+          <li>L0 Self-service — Privacy Centre, digests, confidence fixes</li>
+          <li>L1 WealthAI — in-product guidance with deterministic tools</li>
+          <li>L2 Support specialist — this page</li>
           <li>L3 Regulated financial adviser</li>
           <li>L4 Specialist professional</li>
           <li>L5 Private wealth adviser</li>
         </ul>
-        <Link href="/app/adviser-request" className="btn btn-accent mt-2 w-full">
-          Escalate to an adviser
-        </Link>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Link href="/app/adviser-request" className="btn btn-soft flex-1 text-center">
+            Escalate to an adviser (L3)
+          </Link>
+          <Link href="/app/privacy" className="btn btn-soft flex-1 text-center">
+            Privacy & data export
+          </Link>
+        </div>
       </Panel>
+
+      <Panel className="mt-3">
+        <p className="font-semibold">Open a case</p>
+        <p className="muted mt-1 text-sm">
+          Complaints are labelled for the ops queue. Support covers product help that is not a formal
+          complaint.
+        </p>
+        <form className="mt-3 space-y-3" onSubmit={onSubmit}>
+          <Field label="Type" id="category">
+            <select
+              id="category"
+              className="min-h-12 w-full rounded-xl border border-line bg-white px-3"
+              value={category}
+              onChange={(e) => setCategory(e.target.value as "support" | "complaint")}
+            >
+              <option value="support">Support request</option>
+              <option value="complaint">Formal complaint</option>
+            </select>
+          </Field>
+          <Field label="What happened?" id="reason">
+            <TextInput
+              id="reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Short description — we attach your Wealth Graph summary"
+              required
+            />
+          </Field>
+          <Button type="submit" variant="accent" className="w-full">
+            Submit to L2 support
+          </Button>
+        </form>
+        {message ? <p className="mt-2 text-sm">{message}</p> : null}
+      </Panel>
+
+      <div className="mt-4 space-y-3">
+        <p className="eyebrow">Your cases</p>
+        {cases.length === 0 ? (
+          <Panel>
+            <p className="muted text-sm">No open or recent cases yet.</p>
+          </Panel>
+        ) : (
+          cases.map((c) => (
+            <Panel key={c.id}>
+              <div className="flex flex-wrap gap-2">
+                <Badge>{c.level}</Badge>
+                <Badge tone={c.status === "open" ? "warn" : "default"}>{c.status}</Badge>
+                {c.reason.startsWith("COMPLAINT:") ? <Badge tone="warn">Complaint</Badge> : null}
+              </div>
+              <p className="mt-2 text-sm font-medium">{c.reason}</p>
+              <p className="muted mt-1 text-xs">
+                {new Date(c.createdAt).toLocaleString("en-GB")} · {c.id.slice(0, 8)}
+              </p>
+            </Panel>
+          ))
+        )}
+      </div>
     </main>
   );
 }

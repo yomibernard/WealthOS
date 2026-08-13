@@ -14,6 +14,9 @@ const moduleIndex = [
   { href: "/app/notifications", label: "Notification prefs", flag: null },
   { href: "/app/adviser-collab", label: "Adviser collab / share", flag: "adviserCollab" as const },
   { href: "/adviser", label: "Adviser portal + nudges", flag: "adviserCollab" as const },
+  { href: "/app/privacy", label: "Privacy export", flag: null },
+  { href: "/app/support", label: "Support & complaints", flag: null },
+  { href: "/admin/escalations", label: "Admin escalations queue", flag: null },
 ];
 
 export default async function AdminOpsPage() {

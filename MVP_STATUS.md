@@ -34,6 +34,8 @@
 | Share with adviser | Ready (demo) | digest / profile / collab share packs |
 | Adviser nudges | Ready (demo) | customer 360 → inbox deep links |
 | Notification prefs | Ready (demo) | channel gating for digests/reports/nudges |
+| Privacy export (cadence) | Ready (demo) | digests, shares, nudges in JSON pack |
+| Support & complaints | Ready (demo) | `/app/support` L2 cases + admin queue |
 
 ## Quality gates (this machine)
 

@@ -90,9 +90,11 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - **Health** — `GET /api/health` for uptime probes
 - **Admin** — `/admin/ops` launch gate summary
 
-## Demo & ops (Phase 8.0)
+## Demo & ops (Phase 8.x)
 
 - Presenter script: [DEMO_SCRIPT.md](./DEMO_SCRIPT.md) + `/demo` (Acts 1–5)
+- Privacy export: `/app/privacy` (includes digests, shares, nudges)
+- Support & complaints: `/app/support` → admin `/admin/escalations`
 - Admin module index: `/admin/ops`
 
 ## Notification preferences (Phase 7.4)
