@@ -44,6 +44,7 @@ describe("WealthAI orchestration", () => {
     expect(classifyIntent("How is my RSA pension looking?")).toBe("pension");
     expect(classifyIntent("I want to open a support case")).toBe("support_case");
     expect(classifyIntent("How do I export my data for NDPR?")).toBe("privacy");
+    expect(classifyIntent("Did my adviser acknowledge my complaint?")).toBe("care_update");
   });
 
   it("routes support and privacy without inventing balances", () => {
@@ -56,6 +57,16 @@ describe("WealthAI orchestration", () => {
     expect(privacy.intent).toBe("privacy");
     expect(privacy.content).toContain("/app/privacy");
     expect(privacy.agent).toBe("ComplianceAI");
+  });
+
+  it("routes care-update questions to ComplianceAI without claiming case closure", () => {
+    const res = runWealthAI("Where do I see my adviser care update?", ctx);
+    expect(res.intent).toBe("care_update");
+    expect(res.agent).toBe("ComplianceAI");
+    expect(res.toolsUsed).toContain("careUpdatePulse");
+    expect(res.content).toMatch(/does not close/i);
+    expect(res.content).toContain("/app/support");
+    expect(res.escalate).toBe(false);
   });
 
   it("grounds net worth in engine output", () => {

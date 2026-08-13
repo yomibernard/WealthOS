@@ -58,6 +58,7 @@ export type Intent =
   | "profile_completeness"
   | "support_case"
   | "privacy"
+  | "care_update"
   | "escalation"
   | "general";
 
@@ -151,6 +152,12 @@ export function classifyIntent(message: string): Intent {
   )
     return "privacy";
   if (
+    /care update|care acknowledgement|care acknowledgment|adviser acknowledged|advisor acknowledged|did my adviser (see|ack)|has my adviser (seen|acked)|acknowledg(e|ed|ement|ment).*(complaint|support|privacy|case)/.test(
+      m,
+    )
+  )
+    return "care_update";
+  if (
     /\bcomplaint\b|support (case|ticket|team)|open a (support )?case|customer support|help desk|something went wrong/.test(
       m,
     )
@@ -232,6 +239,7 @@ export function routeAgent(intent: Intent): AgentName {
     case "escalation":
     case "support_case":
     case "privacy":
+    case "care_update":
       return "ComplianceAI";
     case "actions":
     case "monthly_report":
@@ -799,6 +807,17 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
         "Privacy Centre lets you download a JSON data pack (Wealth Graph, digests, shares, prefs) or submit access, rectification, objection, or erasure requests.",
         "Password hashes are never included. Erasure still respects lawful retention where required.",
         "Path: /app/privacy",
+      ].join(" ");
+      confidence = 0.95;
+      break;
+    }
+    case "care_update": {
+      toolsUsed.push("careUpdatePulse");
+      content = [
+        "When your adviser acknowledges an open care item, WealthOS shows a calm care update on Home and lists it on Support or Privacy Centre.",
+        "That reassurance does not close the ops queue — admin resolution still applies where needed.",
+        "Open Home for the latest pulse, Support for case care updates, or Privacy Centre for privacy-related acks.",
+        "Paths: /app · /app/support · /app/privacy",
       ].join(" ");
       confidence = 0.95;
       break;

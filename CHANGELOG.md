@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 14.0
+
+- WealthAI `care_update` intent routes adviser-acknowledgment questions to Support/Privacy Home paths (ops still authoritative)
+
 ## 0.1.6 — 13 Aug 2026 (Customer care loop pack)
 
 Customer-visible care acknowledgments on Home, Support, and Privacy on top of the 0.1.5 ops care pack.
