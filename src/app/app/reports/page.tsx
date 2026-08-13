@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Badge, PageHeader, Panel } from "@/components/ui";
 import { GenerateMonthlyReportButton } from "@/components/MonthlyReportClient";
+import { NetWorthSparkline } from "@/components/NetWorthSparkline";
 import { getSessionUser } from "@/lib/session";
 import { getFeatureFlags } from "@/lib/feature-flags";
 import { listMonthlyReportHistory } from "@/services/wealth-report";
@@ -20,7 +21,7 @@ export default async function MonthlyReportsPage() {
     );
   }
 
-  const { latest, history } = await listMonthlyReportHistory(user.id);
+  const { latest, history, insights } = await listMonthlyReportHistory(user.id);
 
   return (
     <main>
@@ -29,12 +30,39 @@ export default async function MonthlyReportsPage() {
         subtitle="A calm snapshot of position, attention items, and next steps — informational only."
       />
 
-      <Panel className="space-y-4">
+      <Panel className="space-y-4 print:hidden">
         <p className="muted text-sm">
           Reports store a Wealth Snapshot you can revisit. They never move money and are not a product
           solicitation.
         </p>
         <GenerateMonthlyReportButton />
+      </Panel>
+
+      <Panel className="mt-4 space-y-3">
+        <p className="eyebrow">Trend</p>
+        <NetWorthSparkline values={insights.points.map((p) => p.netWorthNgn)} />
+        {insights.netWorthDeltaNgn != null ? (
+          <p className="text-sm">
+            Latest vs prior:{" "}
+            <span className="font-semibold">
+              {insights.netWorthDeltaNgn >= 0 ? "+" : ""}
+              {formatNaira(insights.netWorthDeltaNgn, true)}
+            </span>
+            {insights.healthDelta != null
+              ? ` · health ${insights.healthDelta >= 0 ? "+" : ""}${insights.healthDelta}`
+              : ""}
+          </p>
+        ) : (
+          <p className="muted text-sm">{insights.narrative}</p>
+        )}
+        <ul className="mt-2 space-y-2">
+          {insights.insights.slice(0, 3).map((i) => (
+            <li key={i.id}>
+              <p className="font-medium">{i.title}</p>
+              <p className="muted text-sm">{i.body}</p>
+            </li>
+          ))}
+        </ul>
       </Panel>
 
       {latest ? (
@@ -86,7 +114,7 @@ export default async function MonthlyReportsPage() {
         )}
       </Panel>
 
-      <p className="muted mt-4 text-sm">
+      <p className="muted mt-4 text-sm print:hidden">
         <Link href="/app/notifications">Notification preferences</Link> control whether informational
         report notices are created.
       </p>

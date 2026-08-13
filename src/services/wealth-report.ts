@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { buildHomeDashboard } from "@/services/wealth";
 import { formatNaira } from "@/lib/format";
+import { createInboxFromDrafts } from "@/services/inbox";
+import { buildReportInsights, type ReportInsights } from "@/engines/report-insights";
 
 export type MonthlyReportSection = {
   id: string;
@@ -141,6 +143,18 @@ export async function generateMonthlyWealthReport(userId: string) {
     },
   });
 
+  await createInboxFromDrafts(userId, [
+    {
+      category: "informational",
+      priority: "low",
+      title: "Monthly wealth report ready",
+      body: `Estimated net worth ${formatNaira(dash.netWorth.netWorthNgn, true)}. Open the report for attention items and next steps.`,
+      href: `/app/reports/${snapshot.id}`,
+      sourceType: "monthly_report",
+      sourceId: snapshot.id,
+    },
+  ]);
+
   return {
     skipped: false as const,
     notificationId: note.id,
@@ -184,7 +198,11 @@ export function historyFromSnapshots(
 export async function listMonthlyReportHistory(
   userId: string,
   limit = 12,
-): Promise<{ latest: MonthlyReportView | null; history: SnapshotHistoryItem[] }> {
+): Promise<{
+  latest: MonthlyReportView | null;
+  history: SnapshotHistoryItem[];
+  insights: ReportInsights;
+}> {
   const rows = await prisma.wealthSnapshot.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
@@ -192,6 +210,15 @@ export async function listMonthlyReportHistory(
   });
 
   const history = historyFromSnapshots(rows);
+  const insights = buildReportInsights(
+    rows.map((r) => ({
+      id: r.id,
+      createdAt: r.createdAt,
+      netWorthNgn: r.netWorthNgn,
+      healthScore: r.healthScore,
+      confidence: r.confidence,
+    })),
+  );
 
   let latest: MonthlyReportView | null = null;
   const first = rows[0];
@@ -232,7 +259,7 @@ export async function listMonthlyReportHistory(
     }
   }
 
-  return { latest, history };
+  return { latest, history, insights };
 }
 
 export async function getMonthlyReportSnapshot(

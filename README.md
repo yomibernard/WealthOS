@@ -90,9 +90,10 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - **Health** — `GET /api/health` for uptime probes
 - **Admin** — `/admin/ops` launch gate summary
 
-## Monthly reports (Phase 6.0)
+## Monthly reports (Phase 6.0–6.1)
 
 - **Reports** — `/app/reports` generates an informational monthly snapshot (net worth, health, attention, next steps)
+- MoM insights + sparkline; print/save PDF on detail; inbox notice on generate
 - History stored as `WealthSnapshot`; flag `FF_MONTHLY_REPORTS`
 - Respects informational notification preferences
 

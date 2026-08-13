@@ -50,6 +50,7 @@ export type Intent =
   | "affordability"
   | "goals"
   | "actions"
+  | "monthly_report"
   | "escalation"
   | "general";
 
@@ -159,6 +160,8 @@ export function classifyIntent(message: string): Intent {
   if (/afford|what should i do with|₦|ngn\s*\d/.test(m)) return "affordability";
   if (/goal|saving enough/.test(m)) return "goals";
   if (/top three|what should i do|next best|priority/.test(m)) return "actions";
+  if (/monthly (wealth )?report|wealth report|month.over.month|mom (change|report)/.test(m))
+    return "monthly_report";
   return "general";
 }
 
@@ -190,6 +193,7 @@ export function routeAgent(intent: Intent): AgentName {
     case "escalation":
       return "ComplianceAI";
     case "actions":
+    case "monthly_report":
       return "CoachAI";
     case "net_worth":
     case "general":
@@ -733,6 +737,17 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
       confidence = 1;
       break;
     }
+    case "monthly_report": {
+      toolsUsed.push("wealthSnapshotHistory");
+      content = [
+        `Your latest estimated net worth is ₦${Math.round(nw.netWorthNgn).toLocaleString("en-NG")} (confidence ~${Math.round(nw.confidence * 100)}%).`,
+        "Open Monthly wealth reports to generate a calm snapshot, see month-over-month movement, and print or save a PDF.",
+        "Reports are informational only — not a product solicitation. Doing nothing can be a valid recommendation.",
+        "Path: /app/reports",
+      ].join(" ");
+      confidence = Math.min(confidence, 0.85);
+      break;
+    }
     case "affordability":
     default: {
       if (confidence < 0.45) {
@@ -744,7 +759,7 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
         content = [
           `Estimated net worth is ₦${Math.round(nw.netWorthNgn).toLocaleString("en-NG")} (confidence ~${Math.round(nw.confidence * 100)}%).`,
           `Emergency liquidity ≈ ${emergencyMonths.toFixed(1)} months.`,
-          "Ask me about retirement, debt vs investing, allocation, product comparison, or paste an investment offer for WealthGuard.",
+          "Ask me about retirement, debt vs investing, allocation, product comparison, monthly reports, or paste an investment offer for WealthGuard.",
           "I will not invent balances, returns, fees or regulatory status.",
         ].join(" ");
       }

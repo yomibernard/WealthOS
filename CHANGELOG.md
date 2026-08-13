@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Phase 6.1
+
+- Month-over-month insights engine + net-worth sparkline on `/app/reports`
+- Print / save PDF on report detail; inbox item when a report is generated
+- WealthAI `monthly_report` intent
+
 ## Unreleased — Phase 6.0
 
 - Monthly wealth report centre at `/app/reports` with snapshot history and detail views

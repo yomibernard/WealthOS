@@ -329,3 +329,11 @@ Monthly report centre (independent of hosting):
 - API GET/POST `/api/reports/monthly`, GET `/api/reports/monthly/[id]`
 - Richer snapshot payload; home + More entry points
 - Flag: `FF_MONTHLY_REPORTS` (existing)
+
+## Phase 6.1 delivered (13 Aug 2026)
+
+Report intelligence layer:
+
+- `report-insights` engine — MoM net worth / health / confidence narratives
+- Sparkline on report list + detail; print CSS + Print/save PDF control
+- Inbox draft on generate; WealthAI monthly report intent

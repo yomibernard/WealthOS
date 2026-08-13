@@ -343,3 +343,31 @@ textarea {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+@media print {
+  body {
+    background: white !important;
+    color: #0b1f2a !important;
+  }
+
+  .bottom-nav,
+  .skip-link,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .panel {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #d7dee4 !important;
+  }
+
+  .report-print {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .report-sparkline svg {
+    max-width: 280px;
+  }
+}

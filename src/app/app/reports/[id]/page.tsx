@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { Badge, PageHeader, Panel } from "@/components/ui";
+import { PrintReportButton } from "@/components/PrintReportButton";
+import { NetWorthSparkline } from "@/components/NetWorthSparkline";
 import { getSessionUser } from "@/lib/session";
 import { getFeatureFlags } from "@/lib/feature-flags";
-import { getMonthlyReportSnapshot } from "@/services/wealth-report";
+import { getMonthlyReportSnapshot, listMonthlyReportHistory } from "@/services/wealth-report";
+import { buildReportInsights } from "@/engines/report-insights";
 import { formatNaira } from "@/lib/format";
 
 export default async function MonthlyReportDetailPage({
@@ -21,12 +24,28 @@ export default async function MonthlyReportDetailPage({
   const report = await getMonthlyReportSnapshot(user.id, id);
   if (!report) notFound();
 
+  const { history } = await listMonthlyReportHistory(user.id, 12);
+  const idx = history.findIndex((h) => h.id === id);
+  const window = history.slice(idx >= 0 ? idx : 0).slice(0, 6);
+  const insights = buildReportInsights(
+    window.map((h) => ({
+      id: h.id,
+      createdAt: h.createdAt,
+      netWorthNgn: h.netWorthNgn,
+      healthScore: h.healthScore,
+      confidence: h.confidence,
+    })),
+  );
+
   return (
-    <main>
-      <PageHeader
-        title="Wealth report"
-        subtitle={new Date(report.generatedAt).toLocaleString("en-NG")}
-      />
+    <main className="report-print">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <PageHeader
+          title="Wealth report"
+          subtitle={new Date(report.generatedAt).toLocaleString("en-NG")}
+        />
+        <PrintReportButton />
+      </div>
 
       <Panel className="space-y-2">
         <p className="eyebrow">Estimated net worth</p>
@@ -34,8 +53,29 @@ export default async function MonthlyReportDetailPage({
         <div className="flex flex-wrap gap-2">
           <Badge>Health {report.healthScore}/100</Badge>
           <Badge>Confidence {Math.round(report.confidence * 100)}%</Badge>
+          {insights.netWorthDeltaNgn != null ? (
+            <Badge tone={insights.netWorthDeltaNgn >= 0 ? "default" : "warn"}>
+              {insights.netWorthDeltaNgn >= 0 ? "+" : ""}
+              {formatNaira(insights.netWorthDeltaNgn, true)} vs prior
+            </Badge>
+          ) : null}
         </div>
+        <NetWorthSparkline values={insights.points.map((p) => p.netWorthNgn)} />
       </Panel>
+
+      {insights.insights.length ? (
+        <Panel className="mt-4 space-y-3">
+          <h2 className="font-display text-xl">Month-over-month</h2>
+          <ul className="space-y-3">
+            {insights.insights.map((i) => (
+              <li key={i.id}>
+                <p className="font-medium">{i.title}</p>
+                <p className="muted text-sm">{i.body}</p>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      ) : null}
 
       <div className="mt-4 space-y-3">
         {report.sections.map((s) => (
@@ -57,7 +97,7 @@ export default async function MonthlyReportDetailPage({
               </li>
             ))}
           </ul>
-          <Link href="/app/actions" className="btn btn-soft inline-flex">
+          <Link href="/app/actions" className="btn btn-soft inline-flex print:hidden">
             Review recommendations
           </Link>
         </Panel>
@@ -67,7 +107,7 @@ export default async function MonthlyReportDetailPage({
         <p className="muted text-sm">{report.disclaimer}</p>
       </Panel>
 
-      <p className="mt-4">
+      <p className="mt-4 print:hidden">
         <Link href="/app/reports" className="text-sm font-medium underline-offset-2 hover:underline">
           ← All reports
         </Link>

@@ -47,6 +47,7 @@ const engines = [
   "src/engines/lending.ts",
   "src/engines/estate.ts",
   "src/engines/life-events.ts",
+  "src/engines/report-insights.ts",
 ];
 
 describe("MVP freeze inventory", () => {
