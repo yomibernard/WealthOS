@@ -551,3 +551,10 @@ Adviser care UX freeze pack **v0.1.4**:
 
 - `npm run pilot:freeze` checks 11.x filters, unacked cues, and care history surface
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 12.0 delivered (13 Aug 2026)
+
+Ops care handoff:
+
+- Daily ops board queue for customers with open care and no care acknowledgment
+- Recent adviser acks listed on `/admin/ops`; deep-link to unacked care radar

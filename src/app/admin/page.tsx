@@ -35,6 +35,9 @@ export default async function AdminPage() {
             <Badge tone={daily.attentionScore === 0 ? "default" : "warn"}>
               attention {daily.attentionScore}
             </Badge>
+            {daily.counts.unackedCareCustomers > 0 ? (
+              <Badge tone="warn">{daily.counts.unackedCareCustomers} care unacked</Badge>
+            ) : null}
             <Link href="/admin/ops" className="btn btn-soft text-sm">
               Open ops board
             </Link>

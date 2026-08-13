@@ -1,10 +1,9 @@
 import { prisma } from "@/lib/db";
 import { evaluateLaunchGate } from "@/lib/launch-gate";
 import { getFeatureFlags } from "@/lib/feature-flags";
-import { buildOpsDailyBoard } from "@/engines/ops-daily";
+import { buildOpsCareHandoff, buildOpsDailyBoard } from "@/engines/ops-daily";
 import { classifyEscalationReason } from "@/engines/escalation-ops";
 import { riskyFlagsOn } from "@/engines/flag-profiles";
-import { getFeatureFlags } from "@/lib/feature-flags";
 
 export async function loadOpsDailyBoard() {
   const [
@@ -13,6 +12,10 @@ export async function loadOpsDailyBoard() {
     openPrivacy,
     pendingChangeRequests,
     recentComplaints,
+    openEscByUser,
+    openPrivacyByUser,
+    careAcks,
+    recentCareAcks,
   ] = await Promise.all([
     prisma.escalation.count({
       where: { status: { in: ["open", "in_progress"] } },
@@ -35,10 +38,40 @@ export async function loadOpsDailyBoard() {
       orderBy: { createdAt: "desc" },
       take: 5,
     }),
+    prisma.escalation.findMany({
+      where: { status: { in: ["open", "in_progress"] } },
+      select: { userId: true },
+    }),
+    prisma.privacyRequest.findMany({
+      where: { status: { in: ["open", "in_progress"] } },
+      select: { userId: true },
+    }),
+    prisma.adviserNote.findMany({
+      where: { kind: "care_ack" },
+      select: { customerId: true },
+      distinct: ["customerId"],
+    }),
+    prisma.adviserNote.findMany({
+      where: { kind: "care_ack" },
+      include: {
+        customer: { select: { name: true } },
+        adviser: { select: { name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
   ]);
 
   const openComplaints = openEscalationRows.filter(
     (e) => classifyEscalationReason(e.reason) === "complaint",
+  ).length;
+
+  const openCareCustomerIds = new Set<string>();
+  for (const e of openEscByUser) openCareCustomerIds.add(e.userId);
+  for (const p of openPrivacyByUser) openCareCustomerIds.add(p.userId);
+  const ackedCustomerIds = new Set(careAcks.map((n) => n.customerId));
+  const unackedCareCustomers = [...openCareCustomerIds].filter(
+    (id) => !ackedCustomerIds.has(id),
   ).length;
 
   const launch = evaluateLaunchGate();
@@ -56,6 +89,18 @@ export async function loadOpsDailyBoard() {
     launchBlocked: !launch.ok,
     launchBlockers: blockers,
     riskyFlagsOn: risky.length,
+    unackedCareCustomers,
+  });
+
+  const careHandoff = buildOpsCareHandoff({
+    unackedCareCustomers,
+    recentAcks: recentCareAcks.map((n) => ({
+      id: n.id,
+      customerName: n.customer.name,
+      adviserName: n.adviser.name,
+      title: n.title,
+      createdAt: n.createdAt.toISOString(),
+    })),
   });
 
   const flagEntries = Object.entries(flags).map(([key, on]) => ({ key, on }));
@@ -63,6 +108,7 @@ export async function loadOpsDailyBoard() {
   return {
     generatedAt: new Date().toISOString(),
     ...board,
+    careHandoff,
     launch: {
       ok: launch.ok,
       profile: launch.profile,
@@ -81,6 +127,7 @@ export async function loadOpsDailyBoard() {
       openComplaints,
       openPrivacy,
       pendingChangeRequests,
+      unackedCareCustomers,
     },
     flags: flagEntries,
   };

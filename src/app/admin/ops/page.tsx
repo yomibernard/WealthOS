@@ -82,6 +82,36 @@ export default async function AdminOpsPage() {
             </ul>
           </div>
         ) : null}
+        <div className="mt-3 border-t border-line pt-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="eyebrow">Care handoff</p>
+            <Badge tone={daily.careHandoff.unackedCareCustomers > 0 ? "warn" : "default"}>
+              {daily.careHandoff.unackedCareCustomers} unacked
+            </Badge>
+          </div>
+          <p className="muted mt-1 text-sm">{daily.careHandoff.summary}</p>
+          {daily.careHandoff.recentAcks.length ? (
+            <ul className="mt-2 space-y-1 text-sm">
+              {daily.careHandoff.recentAcks.map((a) => (
+                <li key={a.id}>
+                  <span className="font-medium">{a.customerName}</span>
+                  {" — "}
+                  {a.adviserName}: {a.title}
+                  <span className="muted">
+                    {" · "}
+                    {new Date(a.createdAt).toLocaleString("en-GB")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <Link
+            href="/adviser?care=unacked"
+            className="mt-2 inline-block text-sm font-semibold text-accent"
+          >
+            Open unacked care radar
+          </Link>
+        </div>
       </Panel>
 
       <Panel>
@@ -90,7 +120,7 @@ export default async function AdminOpsPage() {
             {launch.ok ? "gate ok" : "gate blocked"}
           </Badge>
           <Badge>{launch.profile}</Badge>
-          <Badge>v0.1.2</Badge>
+          <Badge>v{process.env.npm_package_version ?? "0.1.4"}</Badge>
         </div>
         <p className="muted mt-2 text-sm">
           Checked {new Date(launch.checkedAt).toLocaleString("en-GB")}

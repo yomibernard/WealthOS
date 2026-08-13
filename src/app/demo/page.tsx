@@ -47,7 +47,7 @@ const acts = [
       "Consent Centre — pause AI, show gate, restore",
       "Adviser care radar (unacked cues) → 360 care desk + history/ack + insights",
       "Adviser sends nudge → customer Inbox deep link",
-      "Admin daily ops board — escalations / privacy / checker",
+      "Admin daily ops board — escalations / privacy / care handoff / checker",
       "Support case → resolve → Home / Inbox / Notifications link",
       "Optional: Privacy request → admin queue → deep-link back",
     ],

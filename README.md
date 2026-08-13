@@ -96,7 +96,7 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - Privacy export: `/app/privacy` (includes digests, shares, nudges)
 - Support & complaints: `/app/support` → admin `/admin/escalations`
 - Hosted smoke: `SMOKE_BASE_URL=https://… npm run smoke:hosted`
-- Daily ops board: `/admin/ops` (attention queues)
+- Daily ops board: `/admin/ops` (attention queues + care handoff)
 - Audit export: `/admin/audit` (filter + Download JSON)
 - Flag profiles: `/admin/flags` (safe pilot / incident lockdown)
 - Pilot freeze: `npm run pilot:freeze` (v0.1.4 adviser care UX pack)

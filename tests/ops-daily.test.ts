@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildOpsDailyBoard } from "@/engines/ops-daily";
+import { buildOpsCareHandoff, buildOpsDailyBoard } from "@/engines/ops-daily";
 
 describe("ops daily board", () => {
   it("reports clear queues with zero attention", () => {
@@ -11,6 +11,7 @@ describe("ops daily board", () => {
       launchBlocked: false,
       launchBlockers: [],
       riskyFlagsOn: 0,
+      unackedCareCustomers: 0,
     });
     expect(board.attentionScore).toBe(0);
     expect(board.summary).toMatch(/clear/i);
@@ -43,5 +44,38 @@ describe("ops daily board", () => {
     });
     expect(board.summary).toMatch(/Routine/i);
     expect(board.queues.find((q) => q.id === "privacy")?.count).toBe(2);
+  });
+
+  it("surfaces care handoff unacked customers", () => {
+    const board = buildOpsDailyBoard({
+      openEscalations: 0,
+      openComplaints: 0,
+      openPrivacy: 0,
+      pendingChangeRequests: 0,
+      launchBlocked: false,
+      launchBlockers: [],
+      unackedCareCustomers: 2,
+    });
+    const handoff = board.queues.find((q) => q.id === "care_handoff");
+    expect(handoff?.count).toBe(2);
+    expect(handoff?.href).toBe("/adviser?care=unacked");
+    expect(handoff?.tone).toBe("warn");
+    expect(board.attentionScore).toBe(2);
+    expect(board.summary).toMatch(/Care handoff/i);
+
+    const strip = buildOpsCareHandoff({
+      unackedCareCustomers: 2,
+      recentAcks: [
+        {
+          id: "n1",
+          customerName: "Yomi",
+          adviserName: "Ada",
+          title: "Adviser acknowledged your complaint",
+          createdAt: "2026-08-13T10:00:00.000Z",
+        },
+      ],
+    });
+    expect(strip.summary).toMatch(/first care acknowledgment/i);
+    expect(strip.recentAcks).toHaveLength(1);
   });
 });

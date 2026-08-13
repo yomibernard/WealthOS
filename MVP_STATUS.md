@@ -49,6 +49,7 @@
 | Adviser care filters | Ready (demo) | `/adviser?care=` book slices |
 | Adviser care history | Ready (demo) | 360 recent care acknowledgments |
 | Adviser unacked radar | Ready (demo) | `/adviser?care=unacked` + ack age cues |
+| Ops care handoff | Ready (demo) | `/admin/ops` unacked queue + recent acks |
 
 ## Quality gates (this machine)
 

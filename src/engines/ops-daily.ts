@@ -8,7 +8,8 @@ export type OpsQueueId =
   | "privacy"
   | "change_requests"
   | "launch_gate"
-  | "flag_risk";
+  | "flag_risk"
+  | "care_handoff";
 
 export type OpsQueueInput = {
   openEscalations: number;
@@ -18,6 +19,23 @@ export type OpsQueueInput = {
   launchBlocked: boolean;
   launchBlockers: string[];
   riskyFlagsOn?: number;
+  /** Customers with open care and no care_ack yet */
+  unackedCareCustomers?: number;
+};
+
+export type OpsCareHandoffAck = {
+  id: string;
+  customerName: string;
+  adviserName: string;
+  title: string;
+  createdAt: string;
+};
+
+export type OpsCareHandoff = {
+  unackedCareCustomers: number;
+  recentAckCount: number;
+  summary: string;
+  recentAcks: OpsCareHandoffAck[];
 };
 
 export type OpsQueueItem = {
@@ -100,6 +118,17 @@ export function buildOpsDailyBoard(input: OpsQueueInput): {
           ? "Partner execution and/or LLM polish are on — confirm intended for this host."
           : "Partner execution and LLM polish are off (or unset as off).",
     },
+    {
+      id: "care_handoff",
+      label: "Care handoff (unacked)",
+      count: input.unackedCareCustomers ?? 0,
+      href: "/adviser?care=unacked",
+      tone: (input.unackedCareCustomers ?? 0) > 0 ? "warn" : "ok",
+      detail:
+        (input.unackedCareCustomers ?? 0) > 0
+          ? "Open care without an adviser acknowledgment — check Care radar."
+          : "Every open-care customer has at least one care acknowledgment.",
+    },
   ];
 
   // Weighted attention: complaints & launch heavier than routine queues
@@ -109,16 +138,40 @@ export function buildOpsDailyBoard(input: OpsQueueInput): {
     input.openEscalations * 2 +
     input.openPrivacy * 2 +
     input.pendingChangeRequests +
-    (input.riskyFlagsOn ?? 0);
+    (input.riskyFlagsOn ?? 0) +
+    (input.unackedCareCustomers ?? 0);
 
   let summary: string;
   if (attentionScore === 0) {
     summary = "Queues look clear for today. Still spot-check /api/health and flags.";
   } else if (input.openComplaints > 0 || input.launchBlocked) {
     summary = "Priority: complaints and/or launch blockers before routine queues.";
+  } else if ((input.unackedCareCustomers ?? 0) > 0 && input.openEscalations + input.openPrivacy === 0) {
+    summary = "Care handoff gap — ask advisers to acknowledge open care items.";
   } else {
     summary = "Routine backlog — work escalations, privacy, then maker-checker.";
   }
 
   return { attentionScore, summary, queues };
+}
+
+export function buildOpsCareHandoff(input: {
+  unackedCareCustomers: number;
+  recentAcks: OpsCareHandoffAck[];
+}): OpsCareHandoff {
+  const recentAcks = input.recentAcks.slice(0, 5);
+  let summary: string;
+  if (input.unackedCareCustomers === 0 && recentAcks.length === 0) {
+    summary = "No open care handoff gaps and no recent adviser acknowledgments.";
+  } else if (input.unackedCareCustomers > 0) {
+    summary = `${input.unackedCareCustomers} customer(s) still need a first care acknowledgment.`;
+  } else {
+    summary = `Care handoff clear — ${recentAcks.length} recent acknowledgment(s) on file.`;
+  }
+  return {
+    unackedCareCustomers: input.unackedCareCustomers,
+    recentAckCount: recentAcks.length,
+    summary,
+    recentAcks,
+  };
 }

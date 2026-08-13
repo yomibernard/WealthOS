@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 12.0
+
+- Ops care handoff on daily board (`care_handoff` queue + recent adviser acks → `/adviser?care=unacked`)
+
 ## 0.1.4 — 13 Aug 2026 (Adviser care UX pack)
 
 Care radar filters, acknowledgment history, and unacked cues on top of the 0.1.3 care pack.
