@@ -42,6 +42,20 @@ describe("WealthAI orchestration", () => {
     expect(classifyIntent("Show my property equity and LTV")).toBe("property_intel");
     expect(classifyIntent("Do I have enough life cover?")).toBe("insurance");
     expect(classifyIntent("How is my RSA pension looking?")).toBe("pension");
+    expect(classifyIntent("I want to open a support case")).toBe("support_case");
+    expect(classifyIntent("How do I export my data for NDPR?")).toBe("privacy");
+  });
+
+  it("routes support and privacy without inventing balances", () => {
+    const support = runWealthAI("Something went wrong — open a support case", ctx);
+    expect(support.intent).toBe("support_case");
+    expect(support.content).toContain("/app/support");
+    expect(support.escalate).toBe(false);
+
+    const privacy = runWealthAI("Please export my data", ctx);
+    expect(privacy.intent).toBe("privacy");
+    expect(privacy.content).toContain("/app/privacy");
+    expect(privacy.agent).toBe("ComplianceAI");
   });
 
   it("grounds net worth in engine output", () => {

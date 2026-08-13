@@ -5,6 +5,7 @@ import { getSessionUser } from "@/lib/session";
 import { buildHomeDashboard, ensureRecommendations } from "@/services/wealth";
 import { refreshInbox } from "@/services/inbox";
 import { syncProfileCompleteness } from "@/services/profile-completeness";
+import { loadCustomerCasesPulse } from "@/services/customer-cases";
 import { formatNaira, greetingForHour } from "@/lib/format";
 import { getFeatureFlags } from "@/lib/feature-flags";
 
@@ -18,7 +19,10 @@ export default async function HomePage() {
 
   const flags = getFeatureFlags();
   const inbox = flags.wealthInbox ? await refreshInbox(user.id) : { unread: 0 };
-  const profile = await syncProfileCompleteness(user.id);
+  const [profile, cases] = await Promise.all([
+    syncProfileCompleteness(user.id),
+    loadCustomerCasesPulse(user.id),
+  ]);
 
   const hour = new Date().getHours();
   const change = dash.monthChange;
@@ -130,6 +134,15 @@ export default async function HomePage() {
       {profile && profile.score < 80 ? (
         <Link href="/app/profile" className="btn btn-soft mt-3 w-full">
           Complete your profile · {profile.score}%
+        </Link>
+      ) : null}
+
+      {cases.headline ? (
+        <Link
+          href={cases.primaryHref}
+          className={`btn mt-3 w-full ${cases.complaintCount > 0 ? "btn-soft" : "btn-ghost"}`}
+        >
+          {cases.headline}
         </Link>
       ) : null}
 

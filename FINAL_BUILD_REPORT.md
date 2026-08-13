@@ -460,3 +460,10 @@ Pilot freeze pack **v0.1.1**:
 
 - `npm run pilot:freeze` — versions, 8.x scripts/docs, smoke + safe-pilot guidance
 - Changelog rolled; LAUNCH_REVIEW / MVP_STATUS / demo Act 5 updated
+
+## Phase 9.0 delivered (13 Aug 2026)
+
+Customer case awareness:
+
+- Home pulse for open complaints/support + recent resolutions → `/app/support`
+- WealthAI intents `support_case` / `privacy` with ComplianceAI routing

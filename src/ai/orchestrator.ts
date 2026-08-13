@@ -56,6 +56,8 @@ export type Intent =
   | "goal_funding"
   | "weekly_digest"
   | "profile_completeness"
+  | "support_case"
+  | "privacy"
   | "escalation"
   | "general";
 
@@ -142,6 +144,18 @@ export type AiResponse = {
 
 export function classifyIntent(message: string): Intent {
   const m = message.toLowerCase();
+  if (
+    /privacy|export (my )?data|download (my )?data|erase (my )?data|delete (my )?data|ndpr|data portability/.test(
+      m,
+    )
+  )
+    return "privacy";
+  if (
+    /\bcomplaint\b|support (case|ticket|team)|open a (support )?case|customer support|help desk|something went wrong/.test(
+      m,
+    )
+  )
+    return "support_case";
   if (/escalat|human|adviser|advisor|speak to|talk to someone/.test(m)) return "escalation";
   if (/wealthguard|scam|this offer|whatsapp|guaranteed return|verify.*(invest|offer)/.test(m))
     return "wealthguard";
@@ -216,6 +230,8 @@ export function routeAgent(intent: Intent): AgentName {
     case "wealthguard":
       return "WealthGuardAI";
     case "escalation":
+    case "support_case":
+    case "privacy":
       return "ComplianceAI";
     case "actions":
     case "monthly_report":
@@ -762,8 +778,29 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
       escalate = true;
       escalationReason = "Customer requested human help";
       content =
-        "I can connect you with a support specialist or a regulated financial adviser. I will package your Wealth Graph summary, recent goals and open recommendations so you do not have to repeat everything.";
+        "I can connect you with a support specialist or a regulated financial adviser. I will package your Wealth Graph summary, recent goals and open recommendations so you do not have to repeat everything. For product help or a formal complaint use Support & complaints (/app/support); for an adviser use Request an adviser (/app/adviser-request).";
       confidence = 1;
+      break;
+    }
+    case "support_case": {
+      toolsUsed.push("customerCasesPulse");
+      content = [
+        "You can open a Level 2 support request or a formal complaint in Support & complaints.",
+        "Ops will add a resolution note you can see on that page and in your notifications — no money moves from this queue.",
+        "If you need a regulated financial adviser instead, use Request an adviser.",
+        "Path: /app/support",
+      ].join(" ");
+      confidence = 0.95;
+      break;
+    }
+    case "privacy": {
+      toolsUsed.push("privacyCentre");
+      content = [
+        "Privacy Centre lets you download a JSON data pack (Wealth Graph, digests, shares, prefs) or submit access, rectification, objection, or erasure requests.",
+        "Password hashes are never included. Erasure still respects lawful retention where required.",
+        "Path: /app/privacy",
+      ].join(" ");
+      confidence = 0.95;
       break;
     }
     case "monthly_report": {

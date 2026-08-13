@@ -100,6 +100,7 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - Audit export: `/admin/audit` (filter + Download JSON)
 - Flag profiles: `/admin/flags` (safe pilot / incident lockdown)
 - Pilot freeze: `npm run pilot:freeze` (v0.1.1 ops pack)
+- Home shows open/recent support cases; ask WealthAI about support or privacy export
 - Admin module index: `/admin/ops`
 
 ## Notification preferences (Phase 7.4)

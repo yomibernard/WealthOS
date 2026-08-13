@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## Unreleased — Phase 9.0
 
-- (none — next product slice after pilot ops freeze)
+- Home CTAs for open/recent support & complaint cases
+- WealthAI `support_case` and `privacy` intents (paths to `/app/support`, `/app/privacy`)
 
 ## 0.1.1 — 13 Aug 2026 (Pilot ops pack)
 
