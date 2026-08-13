@@ -644,3 +644,10 @@ Care receipts (customer mark-as-seen):
 - Home / default `GET /api/care-updates` pulse is unseen-only; `?list=1` includes seen history
 - Adviser 360 Care desk shows Seen/Unseen + thanks; WealthAI copy mentions mark-as-seen
 - Local smoke probes list + mark-seen when an unseen ack exists
+
+## Phase 15.1 delivered (13 Aug 2026)
+
+Care receipt smoke + seed:
+
+- Seed includes a shared Yomi `care_ack` + Inbox/notification so Home pulse and mark-as-seen work after `db:setup`
+- Hosted smoke covers `/api/care-updates?list=1`; local smoke asserts `/seen` path

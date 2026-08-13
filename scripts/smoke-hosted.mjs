@@ -79,6 +79,7 @@ const appPaths = [
   "/app/digest",
   "/app/ai",
   "/api/care-updates",
+  "/api/care-updates?list=1",
 ];
 
 if (!base) {

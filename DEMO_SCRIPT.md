@@ -52,7 +52,7 @@ Presenter checklist UI: `/demo`
 2. **Connections** — sync demo bank (consent-gated)
 3. As Yomi — **Adviser collaboration** → **Share a briefing** (full or digest)
 4. **Adviser** portal — **Care radar** filters (`Needs care` / **Unacked** / Complaints / Privacy / Support) → 360 **Care desk** (see **recent acks**, optional **acknowledge**) + **Insights**; send a **nudge**
-5. Back as Yomi — **Home** may show **care update** CTA → **Support** or **Privacy** lists the acknowledgment → **Mark as seen** (optional thanks); **Inbox** shows nudge deep link
+5. Back as Yomi — **Home** may show **care update** CTA (seeded after `db:setup`) → **Support** or **Privacy** lists the acknowledgment → **Mark as seen** (optional thanks); **Inbox** shows care/nudge deep links
 5b. Optional: **WealthAI** (`/app/ai`) — ask “Where do I see my adviser care update?” (grounded unseen pulse; ops still authoritative)
 5c. Back as Ada — 360 Care desk history shows **Seen** / **Unseen** (+ thanks when present)
 6. **Admin** — daily ops board on `/admin` / `/admin/ops` (escalations, privacy, **care handoff**, maker-checker, flag risk)

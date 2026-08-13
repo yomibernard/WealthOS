@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 15.1
+
+- Seeded Yomi care_ack for demo/smoke receipts; hosted smoke hits `/api/care-updates?list=1`
+
 ## Unreleased — Phase 15.0
 
 - Care receipts: customers mark adviser care updates as seen (optional thanks); Home pulse is unseen-only; Care desk shows Seen/Unseen

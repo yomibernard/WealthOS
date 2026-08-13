@@ -894,6 +894,46 @@ async function main() {
     ],
   });
 
+  const yomiCareAck = await prisma.adviserNote.create({
+    data: {
+      adviserId: adviser.id,
+      customerId: yomi.id,
+      kind: "care_ack",
+      title: "Adviser acknowledged your support case",
+      body: [
+        `${adviser.name} acknowledged an open support case for ${yomi.name}.`,
+        "Item: Open support case",
+        "I've seen your support note — thank you for raising it. Ops still owns formal resolution.",
+        "This does not close the ops queue — admin resolution still applies where needed.",
+      ].join("\n\n"),
+      sharedWithCustomer: true,
+      status: "open",
+    },
+  });
+
+  await prisma.inboxItem.create({
+    data: {
+      userId: yomi.id,
+      category: "adviser",
+      priority: "important",
+      title: "Care update · support case",
+      body: `${adviser.name}: I've seen your support note — thank you for raising it.`,
+      href: "/app/support",
+      sourceType: "care_ack",
+      sourceId: yomiCareAck.id,
+      status: "unread",
+    },
+  });
+
+  await prisma.notification.create({
+    data: {
+      userId: yomi.id,
+      category: "important",
+      title: yomiCareAck.title,
+      body: `${adviser.name}: I've seen your support note — thank you for raising it.`,
+    },
+  });
+
   console.log("Seed complete.");
   console.log("Demo logins (password: WealthOSdemo1!):");
   console.log("  yomi@demo.wealthos.ng — Persona A executive");
