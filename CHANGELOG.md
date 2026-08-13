@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 10.1
+
+- Adviser portfolio care radar on `/adviser` (sort by complaints → privacy → cases)
+- Book-level care summary badges
+
 ## Unreleased — Phase 10.0
 
 - Adviser care desk on customer 360 (open support/complaints + privacy requests)

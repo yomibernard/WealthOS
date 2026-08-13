@@ -502,3 +502,10 @@ Adviser care desk:
 
 - Customer 360 panel lists open support/complaints and privacy requests
 - Insights pack prioritises complaint + privacy talking points
+
+## Phase 10.1 delivered (13 Aug 2026)
+
+Portfolio care radar:
+
+- `/adviser` lists customers ranked by care load with complaint/privacy badges
+- Summary strip for the book; deep-link into each Care desk

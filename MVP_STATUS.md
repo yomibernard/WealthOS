@@ -44,6 +44,7 @@
 | Privacy request loop | Ready (demo) | Home + Inbox → `/app/privacy` |
 | Notification deep-links | Ready (demo) | `/app/notifications` → support/privacy/cadence |
 | Adviser care desk | Ready (demo) | 360 open support/privacy before product talk |
+| Adviser care radar | Ready (demo) | `/adviser` portfolio sorted by care load |
 
 ## Quality gates (this machine)
 
