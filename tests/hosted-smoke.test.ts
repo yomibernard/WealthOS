@@ -64,9 +64,13 @@ describe("hosted smoke rules", () => {
     expect(hosted).toContain("/app/ai");
     expect(hosted).toContain("/api/care-updates");
     expect(hosted).toContain("list=1");
+    expect(hosted).toContain("care=awaiting");
+    expect(hosted).toContain("/admin/ops");
     const local = readFileSync(join(root, "scripts", "smoke-journeys.mjs"), "utf8");
     expect(local).toContain("/app/ai");
     expect(local).toContain("care update");
     expect(local).toContain("/seen");
+    expect(local).toContain("care=awaiting");
+    expect(local).toContain("/admin/ops");
   });
 });

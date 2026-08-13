@@ -126,6 +126,32 @@ try {
       );
     }
   }
+
+  const adviserLogin = await signIn("adviser@demo.wealthos.ng", "WealthOSdemo1!");
+  if (!adviserLogin.res.ok) {
+    failures.push(`adviser sign-in failed: ${adviserLogin.res.status}`);
+    console.log(`  [FAIL] sign-in adviser → ${adviserLogin.res.status}`);
+  } else {
+    console.log("  [OK] sign-in adviser");
+    for (const path of ["/adviser", "/adviser?care=awaiting", "/adviser?care=unacked"]) {
+      const res = await authedGet(path, adviserLogin.cookie);
+      const ok = res.status === 200 || res.status === 307 || res.status === 308;
+      console.log(`  [${ok ? "OK" : "FAIL"}] GET ${path} → ${res.status}`);
+      if (!ok) failures.push(`${path} status ${res.status}`);
+    }
+  }
+
+  const adminLogin = await signIn("admin@demo.wealthos.ng", "WealthOSdemo1!");
+  if (!adminLogin.res.ok) {
+    failures.push(`admin sign-in failed: ${adminLogin.res.status}`);
+    console.log(`  [FAIL] sign-in admin → ${adminLogin.res.status}`);
+  } else {
+    console.log("  [OK] sign-in admin");
+    const opsRes = await authedGet("/admin/ops", adminLogin.cookie);
+    const opsOk = opsRes.status === 200 || opsRes.status === 307 || opsRes.status === 308;
+    console.log(`  [${opsOk ? "OK" : "FAIL"}] GET /admin/ops → ${opsRes.status}`);
+    if (!opsOk) failures.push(`/admin/ops status ${opsRes.status}`);
+  }
 } catch (err) {
   console.error("\nSmoke could not reach the server.");
   console.error("Start the app with `npm run dev`, then re-run `npm run smoke`.");

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 16.1
+
+- Smoke covers adviser `?care=awaiting` + admin `/admin/ops` close-loop paths (local + hosted)
+
 ## Unreleased — Phase 16.0
 
 - Care receipt close-loop: adviser notify on mark-as-seen; ops recent receipts + awaiting count; `/adviser?care=awaiting`

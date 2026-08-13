@@ -144,6 +144,36 @@ try {
         console.log(`  [${ok ? "OK" : "FAIL"}] GET ${path} → ${res.status}`);
         if (!ok) failures.push(`${path} status ${res.status}`);
       }
+
+      const adviserEmail = process.env.SMOKE_ADVISER_EMAIL || "adviser@demo.wealthos.ng";
+      const adminEmail = process.env.SMOKE_ADMIN_EMAIL || "admin@demo.wealthos.ng";
+      for (const [label, roleEmail, paths] of [
+        ["adviser", adviserEmail, ["/adviser", "/adviser?care=awaiting"]],
+        ["admin", adminEmail, ["/admin/ops"]],
+      ]) {
+        const roleLogin = await fetch(`${base}/api/auth/sign-in`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: roleEmail, password }),
+        });
+        if (!roleLogin.ok) {
+          console.log(`  [WARN] ${label} sign-in skipped — ${roleLogin.status}`);
+          if (strict) failures.push(`${label} sign-in failed: ${roleLogin.status}`);
+          continue;
+        }
+        const roleCookies = roleLogin.headers.getSetCookie?.() ?? [];
+        const roleCookie = roleCookies.map((c) => c.split(";")[0]).join("; ");
+        console.log(`  [OK] sign-in ${label}`);
+        for (const path of paths) {
+          const res = await fetch(`${base}${path}`, {
+            headers: roleCookie ? { cookie: roleCookie } : {},
+            redirect: "manual",
+          });
+          const ok = res.status === 200 || res.status === 307 || res.status === 308;
+          console.log(`  [${ok ? "OK" : "FAIL"}] GET ${path} → ${res.status}`);
+          if (!ok) failures.push(`${path} status ${res.status}`);
+        }
+      }
     }
   } else {
     console.log("  [OK] auth checks skipped (SMOKE_SKIP_AUTH)");

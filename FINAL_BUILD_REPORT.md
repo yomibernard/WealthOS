@@ -667,3 +667,10 @@ Care receipt close-loop:
 - `/admin/ops` care handoff shows awaiting-receipt count + recent customer receipts
 - `/adviser?care=awaiting` filters customers with unseen shared care acks
 - Seed includes Amaka seen receipt for ops demo; Yomi remains unseen for mark-as-seen
+
+## Phase 16.1 delivered (13 Aug 2026)
+
+Care receipt close-loop smoke:
+
+- Local smoke signs in adviser/admin and hits `/adviser?care=awaiting` + `/admin/ops`
+- Hosted smoke covers the same close-loop paths when seed users exist
