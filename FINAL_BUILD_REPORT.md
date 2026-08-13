@@ -425,3 +425,10 @@ Hosted pilot smoke:
 - `npm run smoke:hosted` against `SMOKE_BASE_URL` (Postgres + DB probe required; DEMO_MODE warn)
 - `/api/health` exposes non-secret `config.demoMode` / `config.databaseKind`
 - Admin ops post-deploy checklist; LAUNCH_REVIEW / DEPLOY.md updated
+
+## Phase 8.3 delivered (13 Aug 2026)
+
+Escalation ops loop:
+
+- Admin `/admin/escalations` resolve/reject with notes; `ESCALATION_UPDATED` audit
+- Customer notification + resolution visible on `/app/support`

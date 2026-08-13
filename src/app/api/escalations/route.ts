@@ -4,6 +4,7 @@ import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { buildHomeDashboard } from "@/services/wealth";
 import { createUserNotification } from "@/services/notifications";
+import { parseEscalationSummary } from "@/engines/escalation-ops";
 
 const schema = z.object({
   reason: z.string().min(3).max(2000),
@@ -24,14 +25,18 @@ export async function GET() {
   });
 
   return NextResponse.json(
-    rows.map((e) => ({
-      id: e.id,
-      level: e.level,
-      reason: e.reason,
-      status: e.status,
-      createdAt: e.createdAt.toISOString(),
-      summaryPreview: e.summary.slice(0, 180),
-    })),
+    rows.map((e) => {
+      const parsed = parseEscalationSummary(e.summary);
+      return {
+        id: e.id,
+        level: e.level,
+        reason: e.reason,
+        status: e.status,
+        createdAt: e.createdAt.toISOString(),
+        summaryPreview: e.summary.slice(0, 180),
+        resolution: parsed.resolution ?? null,
+      };
+    }),
   );
 }
 

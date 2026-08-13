@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 8.3
+
+- Admin escalation/complaint resolution queue (`PATCH /api/admin/escalations`)
+- Customer notified + resolution shown on `/app/support`
+
 ## Unreleased — Phase 8.2
 
 - Hosted pilot smoke: `npm run smoke:hosted` + health `config.demoMode` / `databaseKind`

@@ -10,6 +10,7 @@ type CaseRow = {
   reason: string;
   status: string;
   createdAt: string;
+  resolution: string | null;
 };
 
 export default function SupportPage() {
@@ -128,6 +129,11 @@ export default function SupportPage() {
                 {c.reason.startsWith("COMPLAINT:") ? <Badge tone="warn">Complaint</Badge> : null}
               </div>
               <p className="mt-2 text-sm font-medium">{c.reason}</p>
+              {c.resolution ? (
+                <p className="mt-1 text-sm">
+                  <span className="font-medium">Update:</span> {c.resolution}
+                </p>
+              ) : null}
               <p className="muted mt-1 text-xs">
                 {new Date(c.createdAt).toLocaleString("en-GB")} · {c.id.slice(0, 8)}
               </p>

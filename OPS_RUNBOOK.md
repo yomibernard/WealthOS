@@ -45,8 +45,16 @@ Never run `npm run db:setup` in production (wipes and reseeds).
 | Want to invest / buy product | Suitability + `/app/actions` + adviser if material |
 | Scam / WhatsApp offer | `/app/wealthguard` — never auto-label guaranteed |
 | Want human help | `/app/adviser-request` (L3) |
+| Support / formal complaint | `/app/support` (L2) → resolve in `/admin/escalations` |
 | Delete my data | Privacy Centre erasure request |
 | Crypto trade / loan offer | Explain deferred capabilities; do not invent products |
+
+### Escalation / complaint resolution
+
+1. Queue: `/admin/escalations` (open + in-progress first)
+2. Add a resolution note → **In progress** / **Resolve** / **Reject**
+3. Customer is notified in-product; they see the update on `/app/support`
+4. Complaints are prefixed `COMPLAINT:` — keep resolution factual; no fund movement from this queue
 
 Step-up demo code for material accepts: `123456` (demo only).
 

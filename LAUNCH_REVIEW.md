@@ -29,7 +29,7 @@ Use this before any public or regulated pilot. Tick in order; freeze code when s
 - [ ] Crypto / lending pages show deferral (no trading / no loan offers)
 - [ ] Tax / estate pages show “not advice / not filing / not legal drafting”
 - [ ] Legal counsel sign-off on disclaimers and data processing notice
-- [ ] Complaints / escalation path staffed (L2–L5)
+- [ ] Complaints / escalation path staffed (L2–L5); ops can resolve in `/admin/escalations`
 
 ## C. Demo readiness (if pilot includes live walkthrough)
 
