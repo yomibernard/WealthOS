@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 16.0
+
+- Care receipt close-loop: adviser notify on mark-as-seen; ops recent receipts + awaiting count; `/adviser?care=awaiting`
+
 ## 0.1.8 — 13 Aug 2026 (Care receipts pack)
 
 Customer mark-as-seen receipts on adviser care updates on top of the 0.1.7 WealthAI care pack.

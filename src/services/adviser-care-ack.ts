@@ -4,6 +4,7 @@ import { createUserNotification } from "@/services/notifications";
 import { createInboxFromDrafts } from "@/services/inbox";
 import {
   appendCareReceipt,
+  buildAdviserCareReceiptNotify,
   buildCareAckDraft,
   buildCareAckHistory,
   buildCareUpdateList,
@@ -159,6 +160,9 @@ export async function markCareUpdateSeen(input: {
       kind: "care_ack",
       sharedWithCustomer: true,
     },
+    include: {
+      customer: { select: { name: true } },
+    },
   });
   if (!note) throw new Error("Care update not found.");
 
@@ -184,6 +188,18 @@ export async function markCareUpdateSeen(input: {
     data: { status: "acted" },
   });
 
+  const notify = buildAdviserCareReceiptNotify({
+    customerId: note.customerId,
+    customerName: note.customer.name,
+    thanks: input.thanks,
+  });
+  await createUserNotification({
+    userId: note.adviserId,
+    category: "important",
+    title: notify.title,
+    body: notify.body,
+  });
+
   await prisma.auditEvent.create({
     data: {
       userId: input.customerId,
@@ -192,6 +208,7 @@ export async function markCareUpdateSeen(input: {
       entityId: note.id,
       payloadJson: JSON.stringify({
         thanks: Boolean((input.thanks ?? "").trim()),
+        adviserId: note.adviserId,
       }),
     },
   });

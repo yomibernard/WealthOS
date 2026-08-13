@@ -57,6 +57,7 @@
 | Privacy care updates | Ready (demo) | `/app/privacy` recent care acknowledgments |
 | WealthAI care update | Ready (demo) | `care_update` intent grounded + smoke/demo |
 | Care receipts | Ready (demo) | Mark-as-seen + thanks; Home unseen pulse; 360 Seen/Unseen |
+| Care receipt close-loop | Ready (demo) | Adviser notify; ops receipts; `?care=awaiting` |
 
 ## Quality gates (this machine)
 

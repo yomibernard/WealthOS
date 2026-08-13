@@ -31,11 +31,23 @@ export type OpsCareHandoffAck = {
   createdAt: string;
 };
 
+export type OpsCareHandoffReceipt = {
+  id: string;
+  customerName: string;
+  adviserName: string;
+  title: string;
+  seenAt: string;
+  thanksPreview: string | null;
+};
+
 export type OpsCareHandoff = {
   unackedCareCustomers: number;
+  awaitingReceiptCount: number;
   recentAckCount: number;
+  recentReceiptCount: number;
   summary: string;
   recentAcks: OpsCareHandoffAck[];
+  recentReceipts: OpsCareHandoffReceipt[];
 };
 
 export type OpsQueueItem = {
@@ -157,21 +169,37 @@ export function buildOpsDailyBoard(input: OpsQueueInput): {
 
 export function buildOpsCareHandoff(input: {
   unackedCareCustomers: number;
+  awaitingReceiptCount?: number;
   recentAcks: OpsCareHandoffAck[];
+  recentReceipts?: OpsCareHandoffReceipt[];
 }): OpsCareHandoff {
   const recentAcks = input.recentAcks.slice(0, 5);
+  const recentReceipts = (input.recentReceipts ?? []).slice(0, 5);
+  const awaitingReceiptCount = input.awaitingReceiptCount ?? 0;
   let summary: string;
-  if (input.unackedCareCustomers === 0 && recentAcks.length === 0) {
+  if (
+    input.unackedCareCustomers === 0 &&
+    awaitingReceiptCount === 0 &&
+    recentAcks.length === 0 &&
+    recentReceipts.length === 0
+  ) {
     summary = "No open care handoff gaps and no recent adviser acknowledgments.";
   } else if (input.unackedCareCustomers > 0) {
     summary = `${input.unackedCareCustomers} customer(s) still need a first care acknowledgment.`;
+  } else if (awaitingReceiptCount > 0) {
+    summary = `${awaitingReceiptCount} care acknowledgment(s) awaiting a customer receipt (seen).`;
+  } else if (recentReceipts.length > 0) {
+    summary = `Care handoff clear — ${recentReceipts.length} recent customer receipt(s).`;
   } else {
     summary = `Care handoff clear — ${recentAcks.length} recent acknowledgment(s) on file.`;
   }
   return {
     unackedCareCustomers: input.unackedCareCustomers,
+    awaitingReceiptCount,
     recentAckCount: recentAcks.length,
+    recentReceiptCount: recentReceipts.length,
     summary,
     recentAcks,
+    recentReceipts,
   };
 }

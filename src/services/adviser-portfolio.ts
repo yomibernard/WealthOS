@@ -61,7 +61,7 @@ export async function loadAdviserPortfolioCareRadar(input: {
         customerId: { in: customerIds },
         kind: "care_ack",
       },
-      select: { customerId: true, createdAt: true },
+      select: { customerId: true, createdAt: true, status: true, sharedWithCustomer: true },
       orderBy: { createdAt: "desc" },
     }),
   ]);
@@ -80,9 +80,13 @@ export async function loadAdviserPortfolioCareRadar(input: {
   }
 
   const lastAckByUser = new Map<string, string>();
+  const unseenByUser = new Map<string, number>();
   for (const n of careAcks) {
     if (!lastAckByUser.has(n.customerId)) {
       lastAckByUser.set(n.customerId, n.createdAt.toISOString());
+    }
+    if (n.sharedWithCustomer && (n.status ?? "open").toLowerCase() !== "seen") {
+      unseenByUser.set(n.customerId, (unseenByUser.get(n.customerId) ?? 0) + 1);
     }
   }
 
@@ -97,6 +101,7 @@ export async function loadAdviserPortfolioCareRadar(input: {
       openComplaints: esc.complaints,
       openPrivacy: privacyByUser.get(c.id) ?? 0,
       lastCareAckAt: lastAckByUser.get(c.id) ?? null,
+      unseenCareAckCount: unseenByUser.get(c.id) ?? 0,
     };
   });
 

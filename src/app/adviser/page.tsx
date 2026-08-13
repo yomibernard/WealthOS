@@ -14,6 +14,7 @@ const FILTER_CHIPS: { id: PortfolioCareFilter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "care", label: "Needs care" },
   { id: "unacked", label: "Unacked" },
+  { id: "awaiting", label: "Awaiting receipt" },
   { id: "complaints", label: "Complaints" },
   { id: "privacy", label: "Privacy" },
   { id: "support", label: "Support" },
@@ -60,6 +61,9 @@ export default async function AdviserHomePage({
           ) : null}
           {full.unackedCareCount > 0 ? (
             <Badge tone="warn">{full.unackedCareCount} unacked</Badge>
+          ) : null}
+          {full.awaitingReceiptCount > 0 ? (
+            <Badge tone="warn">{full.awaitingReceiptCount} awaiting receipt</Badge>
           ) : null}
         </div>
         <p className="muted mt-1 text-sm">{radar.summary}</p>

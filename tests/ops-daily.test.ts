@@ -65,6 +65,7 @@ describe("ops daily board", () => {
 
     const strip = buildOpsCareHandoff({
       unackedCareCustomers: 2,
+      awaitingReceiptCount: 1,
       recentAcks: [
         {
           id: "n1",
@@ -74,8 +75,28 @@ describe("ops daily board", () => {
           createdAt: "2026-08-13T10:00:00.000Z",
         },
       ],
+      recentReceipts: [
+        {
+          id: "r1",
+          customerName: "Amaka",
+          adviserName: "Ada",
+          title: "Adviser acknowledged your support case",
+          seenAt: "2026-08-12T15:00:00.000Z",
+          thanksPreview: "Thanks — noted.",
+        },
+      ],
     });
     expect(strip.summary).toMatch(/first care acknowledgment/i);
     expect(strip.recentAcks).toHaveLength(1);
+    expect(strip.awaitingReceiptCount).toBe(1);
+    expect(strip.recentReceipts[0]?.thanksPreview).toMatch(/Thanks/i);
+
+    const awaitingOnly = buildOpsCareHandoff({
+      unackedCareCustomers: 0,
+      awaitingReceiptCount: 3,
+      recentAcks: [],
+      recentReceipts: [],
+    });
+    expect(awaitingOnly.summary).toMatch(/awaiting a customer receipt/i);
   });
 });

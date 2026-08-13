@@ -47,6 +47,7 @@ const acts = [
       "Consent Centre — pause AI, show gate, restore",
       "Adviser care radar (unacked cues) → 360 care desk + history/ack + insights",
       "Customer Home care-update pulse → Support/Privacy mark as seen",
+      "Adviser notified + ops recent receipts · ?care=awaiting",
       "WealthAI: ask where to see adviser care update",
       "Adviser sends nudge → customer Inbox deep link",
       "Admin ops — care handoff + escalation/privacy care-ack cues",

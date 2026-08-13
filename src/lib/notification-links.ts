@@ -85,12 +85,12 @@ const RULES: Array<{ href: string; label: string; patterns: RegExp[] }> = [
   },
 ];
 
-/** Prefer an explicit Path: /app/... line from WealthAI-style copy. */
+/** Prefer an explicit Path: /app/... or /adviser/... line from WealthAI-style copy. */
 export function extractPathFromBody(body: string | null | undefined): string | null {
   if (!body) return null;
-  const m = body.match(/\bPath:\s*(\/app\/[a-z0-9\-/_]+)/i);
+  const m = body.match(/\bPath:\s*((?:\/app|\/adviser)\/[a-z0-9\-/_]+)/i);
   if (m?.[1]) return m[1];
-  const bare = body.match(/(^|\s)(\/app\/[a-z0-9\-/_]+)(\s|$)/i);
+  const bare = body.match(/(^|\s)((?:\/app|\/adviser)\/[a-z0-9\-/_]+)(\s|$)/i);
   return bare?.[2] ?? null;
 }
 

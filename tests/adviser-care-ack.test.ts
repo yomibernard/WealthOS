@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   appendCareReceipt,
+  buildAdviserCareReceiptNotify,
   buildCareAckDraft,
   buildCareAckHistory,
   buildCareUpdateList,
@@ -158,6 +159,19 @@ describe("adviser care acknowledgment", () => {
     expect(body).toMatch(/Customer receipt/);
     expect(parseCareReceipt(body).thanksPreview).toMatch(/Thank you/i);
     expect(appendCareReceipt(body, "2026-08-14T10:00:00.000Z")).toBe(body);
+  });
+
+  it("builds adviser notify copy for care receipts", () => {
+    const notify = buildAdviserCareReceiptNotify({
+      customerId: "cust1",
+      customerName: "Yomi",
+      thanks: "Thanks Ada",
+    });
+    expect(notify.title).toMatch(/marked your care update as seen/i);
+    expect(notify.body).toMatch(/Thanks Ada/);
+    expect(notify.body).toMatch(/does not close/i);
+    expect(notify.href).toBe("/adviser/customers/cust1");
+    expect(notify.body).toContain(`Path: ${notify.href}`);
   });
 
   it("formats WealthAI care-update copy from the live pulse", () => {

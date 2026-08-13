@@ -337,3 +337,24 @@ export function formatCareUpdateAiContent(pulse?: CareUpdatePulse | null): strin
     "Paths: /app · /app/support · /app/privacy · /app/inbox",
   ].join(" ");
 }
+
+/** Notify the sending adviser when a customer marks a care update seen. */
+export function buildAdviserCareReceiptNotify(input: {
+  customerId: string;
+  customerName: string;
+  thanks?: string | null;
+}): { title: string; body: string; href: string } {
+  const thanks = (input.thanks ?? "").trim().slice(0, 200);
+  const href = `/adviser/customers/${input.customerId}`;
+  return {
+    title: `${input.customerName} marked your care update as seen`,
+    body: [
+      thanks
+        ? `${input.customerName} sent a care receipt${thanks ? `: ${thanks}` : "."}`
+        : `${input.customerName} marked your care acknowledgment as seen.`,
+      "This does not close the ops queue.",
+      `Path: ${href}`,
+    ].join(" "),
+    href,
+  };
+}

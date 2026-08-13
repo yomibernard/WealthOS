@@ -934,6 +934,26 @@ async function main() {
     },
   });
 
+  const amakaSeenAt = "2026-08-12T15:00:00.000Z";
+  await prisma.adviserNote.create({
+    data: {
+      adviserId: adviser.id,
+      customerId: amaka.id,
+      kind: "care_ack",
+      title: "Adviser acknowledged your support case",
+      body: [
+        `${adviser.name} acknowledged an open support case for ${amaka.name}.`,
+        "Following up personally while ops works the queue.",
+        "This does not close the ops queue — admin resolution still applies where needed.",
+        "---",
+        `Customer receipt (seen ${amakaSeenAt}): Thanks — noted.`,
+      ].join("\n\n"),
+      sharedWithCustomer: true,
+      status: "seen",
+      updatedAt: new Date(amakaSeenAt),
+    },
+  });
+
   console.log("Seed complete.");
   console.log("Demo logins (password: WealthOSdemo1!):");
   console.log("  yomi@demo.wealthos.ng — Persona A executive");

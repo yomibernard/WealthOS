@@ -46,4 +46,13 @@ describe("notification deep links", () => {
       })?.href,
     ).toBe("/app/privacy");
   });
+
+  it("resolves adviser care-receipt Path to customer 360", () => {
+    expect(
+      resolveNotificationLink({
+        title: "Yomi marked your care update as seen",
+        body: "Yomi sent a care receipt: Thanks. This does not close the ops queue. Path: /adviser/customers/cust1",
+      })?.href,
+    ).toBe("/adviser/customers/cust1");
+  });
 });

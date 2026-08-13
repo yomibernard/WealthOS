@@ -85,9 +85,14 @@ export default async function AdminOpsPage() {
         <div className="mt-3 border-t border-line pt-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="eyebrow">Care handoff</p>
-            <Badge tone={daily.careHandoff.unackedCareCustomers > 0 ? "warn" : "default"}>
-              {daily.careHandoff.unackedCareCustomers} unacked
-            </Badge>
+            <div className="flex flex-wrap gap-2">
+              <Badge tone={daily.careHandoff.unackedCareCustomers > 0 ? "warn" : "default"}>
+                {daily.careHandoff.unackedCareCustomers} unacked
+              </Badge>
+              <Badge tone={daily.careHandoff.awaitingReceiptCount > 0 ? "warn" : "default"}>
+                {daily.careHandoff.awaitingReceiptCount} awaiting receipt
+              </Badge>
+            </div>
           </div>
           <p className="muted mt-1 text-sm">{daily.careHandoff.summary}</p>
           {daily.careHandoff.recentAcks.length ? (
@@ -105,12 +110,31 @@ export default async function AdminOpsPage() {
               ))}
             </ul>
           ) : null}
-          <Link
-            href="/adviser?care=unacked"
-            className="mt-2 inline-block text-sm font-semibold text-accent"
-          >
-            Open unacked care radar
-          </Link>
+          {daily.careHandoff.recentReceipts.length ? (
+            <div className="mt-2 space-y-1">
+              <p className="muted text-xs font-semibold uppercase tracking-wide">
+                Recent customer receipts
+              </p>
+              <ul className="space-y-1 text-sm">
+                {daily.careHandoff.recentReceipts.map((r) => (
+                  <li key={r.id}>
+                    <span className="font-medium">{r.customerName}</span>
+                    {" seen · "}
+                    {r.adviserName}
+                    {r.thanksPreview ? ` — “${r.thanksPreview}”` : ""}
+                    <span className="muted">
+                      {" · "}
+                      {new Date(r.seenAt).toLocaleString("en-GB")}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          <div className="mt-2 flex flex-wrap gap-3 text-sm font-semibold text-accent">
+            <Link href="/adviser?care=unacked">Open unacked care radar</Link>
+            <Link href="/adviser?care=awaiting">Open awaiting receipt</Link>
+          </div>
         </div>
       </Panel>
 

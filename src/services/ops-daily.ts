@@ -4,6 +4,7 @@ import { getFeatureFlags } from "@/lib/feature-flags";
 import { buildOpsCareHandoff, buildOpsDailyBoard } from "@/engines/ops-daily";
 import { classifyEscalationReason } from "@/engines/escalation-ops";
 import { riskyFlagsOn } from "@/engines/flag-profiles";
+import { parseCareReceipt } from "@/engines/adviser-care-ack";
 
 export async function loadOpsDailyBoard() {
   const [
@@ -16,6 +17,8 @@ export async function loadOpsDailyBoard() {
     openPrivacyByUser,
     careAcks,
     recentCareAcks,
+    recentCareReceipts,
+    awaitingReceiptCount,
   ] = await Promise.all([
     prisma.escalation.count({
       where: { status: { in: ["open", "in_progress"] } },
@@ -60,6 +63,26 @@ export async function loadOpsDailyBoard() {
       orderBy: { createdAt: "desc" },
       take: 5,
     }),
+    prisma.adviserNote.findMany({
+      where: {
+        kind: "care_ack",
+        sharedWithCustomer: true,
+        status: "seen",
+      },
+      include: {
+        customer: { select: { name: true } },
+        adviser: { select: { name: true } },
+      },
+      orderBy: { updatedAt: "desc" },
+      take: 5,
+    }),
+    prisma.adviserNote.count({
+      where: {
+        kind: "care_ack",
+        sharedWithCustomer: true,
+        status: { not: "seen" },
+      },
+    }),
   ]);
 
   const openComplaints = openEscalationRows.filter(
@@ -94,6 +117,7 @@ export async function loadOpsDailyBoard() {
 
   const careHandoff = buildOpsCareHandoff({
     unackedCareCustomers,
+    awaitingReceiptCount,
     recentAcks: recentCareAcks.map((n) => ({
       id: n.id,
       customerName: n.customer.name,
@@ -101,6 +125,17 @@ export async function loadOpsDailyBoard() {
       title: n.title,
       createdAt: n.createdAt.toISOString(),
     })),
+    recentReceipts: recentCareReceipts.map((n) => {
+      const receipt = parseCareReceipt(n.body);
+      return {
+        id: n.id,
+        customerName: n.customer.name,
+        adviserName: n.adviser.name,
+        title: n.title,
+        seenAt: receipt.seenAt ?? n.updatedAt.toISOString(),
+        thanksPreview: receipt.thanksPreview,
+      };
+    }),
   });
 
   const flagEntries = Object.entries(flags).map(([key, on]) => ({ key, on }));
@@ -128,6 +163,7 @@ export async function loadOpsDailyBoard() {
       openPrivacy,
       pendingChangeRequests,
       unackedCareCustomers,
+      awaitingReceiptCount,
     },
     flags: flagEntries,
   };

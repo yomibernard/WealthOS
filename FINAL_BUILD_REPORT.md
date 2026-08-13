@@ -658,3 +658,12 @@ Care receipts freeze pack **v0.1.8**:
 
 - `npm run pilot:freeze` checks mark-as-seen API/UI, unseen pulse, seed care_ack, list/seen smoke
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 16.0 delivered (13 Aug 2026)
+
+Care receipt close-loop:
+
+- Mark-as-seen notifies the sending adviser (Important) with Care desk deep-link
+- `/admin/ops` care handoff shows awaiting-receipt count + recent customer receipts
+- `/adviser?care=awaiting` filters customers with unseen shared care acks
+- Seed includes Amaka seen receipt for ops demo; Yomi remains unseen for mark-as-seen

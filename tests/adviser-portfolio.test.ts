@@ -57,8 +57,21 @@ describe("adviser portfolio care radar", () => {
     expect(radar.customers[0]?.careLabel).toBe("Clear");
   });
 
-  it("filters the book by care slice including unacked", () => {
-    const radar = buildPortfolioCareRadar(sample);
+  it("filters the book by care slice including unacked and awaiting", () => {
+    const radar = buildPortfolioCareRadar([
+      ...sample,
+      {
+        id: "r",
+        name: "Receipt",
+        email: "r@demo.wealthos.ng",
+        profileCompleteness: 75,
+        openEscalations: 0,
+        openComplaints: 0,
+        openPrivacy: 0,
+        lastCareAckAt: "2026-08-12T10:00:00.000Z",
+        unseenCareAckCount: 1,
+      },
+    ]);
     expect(filterPortfolioCareRadar(radar, "care").customers.map((c) => c.name)).toEqual([
       "Yomi",
       "Chioma",
@@ -66,18 +79,26 @@ describe("adviser portfolio care radar", () => {
     expect(filterPortfolioCareRadar(radar, "unacked").customers.map((c) => c.name)).toEqual([
       "Chioma",
     ]);
+    expect(filterPortfolioCareRadar(radar, "awaiting").customers.map((c) => c.name)).toEqual([
+      "Receipt",
+    ]);
     expect(filterPortfolioCareRadar(radar, "complaints").customers.map((c) => c.name)).toEqual([
       "Yomi",
     ]);
+    expect(radar.awaitingReceiptCount).toBe(1);
+    expect(parsePortfolioCareFilter("awaiting")).toBe("awaiting");
     expect(parsePortfolioCareFilter("unacked")).toBe("unacked");
     expect(parsePortfolioCareFilter("bogus")).toBe("all");
   });
 
-  it("formats care ack cues", () => {
+  it("formats care ack cues with awaiting receipt", () => {
     const now = new Date("2026-08-13T12:00:00.000Z");
     expect(formatCareAckCue(null, now)).toBe("No care ack yet");
     expect(formatCareAckCue("2026-08-13T08:00:00.000Z", now)).toBe("Acked today");
     expect(formatCareAckCue("2026-08-12T08:00:00.000Z", now)).toBe("Acked yesterday");
     expect(formatCareAckCue("2026-08-10T08:00:00.000Z", now)).toBe("Acked 3d ago");
+    expect(formatCareAckCue("2026-08-13T08:00:00.000Z", now, true)).toBe(
+      "Acked today · awaiting receipt",
+    );
   });
 });
