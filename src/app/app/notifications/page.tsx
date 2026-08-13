@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Badge, Button, PageHeader, Panel } from "@/components/ui";
 import { CHANNEL_COPY, type NotificationPrefs } from "@/lib/notification-prefs";
+import { resolveNotificationLink } from "@/lib/notification-links";
 
 type Note = {
   id: string;
@@ -156,25 +157,35 @@ export default function NotificationsPage() {
       </Panel>
 
       <div className="space-y-3">
-        {notes.map((n) => (
-          <Panel key={n.id}>
-            <Badge
-              tone={
-                n.category.toLowerCase() === "important" ||
-                n.category.toLowerCase() === "critical"
-                  ? "warn"
-                  : "default"
-              }
-            >
-              {n.category}
-            </Badge>
-            <p className="mt-2 font-semibold">{n.title}</p>
-            <p className="muted mt-1 whitespace-pre-wrap text-sm">{n.body}</p>
-            <p className="muted mt-2 text-xs">
-              {new Date(n.createdAt).toLocaleString("en-NG")}
-            </p>
-          </Panel>
-        ))}
+        {notes.map((n) => {
+          const link = resolveNotificationLink(n);
+          return (
+            <Panel key={n.id}>
+              <Badge
+                tone={
+                  n.category.toLowerCase() === "important" ||
+                  n.category.toLowerCase() === "critical"
+                    ? "warn"
+                    : "default"
+                }
+              >
+                {n.category}
+              </Badge>
+              <p className="mt-2 font-semibold">{n.title}</p>
+              <p className="muted mt-1 whitespace-pre-wrap text-sm">{n.body}</p>
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                <p className="muted text-xs">
+                  {new Date(n.createdAt).toLocaleString("en-NG")}
+                </p>
+                {link ? (
+                  <Link href={link.href} className="text-sm font-semibold text-accent">
+                    {link.label}
+                  </Link>
+                ) : null}
+              </div>
+            </Panel>
+          );
+        })}
         {!notes.length ? (
           <Panel>
             <p className="muted text-sm">

@@ -42,6 +42,7 @@
 | Customer case pulse | Ready (demo) | Home CTAs + WealthAI support/privacy intents |
 | Case inbox deep-links | Ready (demo) | Support/complaint lifecycle → `/app/support` |
 | Privacy request loop | Ready (demo) | Home + Inbox → `/app/privacy` |
+| Notification deep-links | Ready (demo) | `/app/notifications` → support/privacy/cadence |
 
 ## Quality gates (this machine)
 

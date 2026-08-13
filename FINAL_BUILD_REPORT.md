@@ -481,3 +481,10 @@ Privacy request loop:
 
 - Home pulse for open/recent privacy requests; Inbox deep-links to `/app/privacy`
 - Create + admin update notify via prefs; erasure completion skips customer inbox resurface
+
+## Phase 9.3 delivered (13 Aug 2026)
+
+Notification deep-links + demo sync:
+
+- `resolveNotificationLink` on `/app/notifications` (title/body/Path heuristics)
+- DEMO_SCRIPT / `/demo` Act 5 covers support + privacy trust loops

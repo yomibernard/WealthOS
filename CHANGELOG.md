@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 9.3
+
+- Notification centre deep-links (support, privacy, digest, reports, inbox…)
+- Demo Act 5 trust/privacy loop steps + `/demo` jump links
+
 ## Unreleased — Phase 9.2
 
 - Home privacy-request pulse; Inbox cards on create/update → `/app/privacy`

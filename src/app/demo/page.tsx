@@ -48,7 +48,8 @@ const acts = [
       "Customer shares briefing → Adviser 360 insights pack",
       "Adviser sends nudge → customer Inbox deep link",
       "Admin daily ops board — escalations / privacy / checker",
-      "Optional: Support case → admin resolve",
+      "Support case → resolve → Home / Inbox / Notifications link",
+      "Optional: Privacy request → admin queue → deep-link back",
     ],
   },
 ];
@@ -62,8 +63,12 @@ const quickLinks = [
   { href: "/app/adviser-collab", label: "Adviser collab" },
   { href: "/adviser", label: "Adviser portal" },
   { href: "/app/support", label: "Support" },
+  { href: "/app/privacy", label: "Privacy" },
+  { href: "/app/notifications", label: "Notifications" },
+  { href: "/app/inbox", label: "Inbox" },
   { href: "/admin/ops", label: "Admin ops board" },
   { href: "/admin/escalations", label: "Escalations" },
+  { href: "/admin/privacy", label: "Privacy queue" },
   { href: "/admin/flags", label: "Flag profiles" },
   { href: "/admin/audit", label: "Audit export" },
 ];

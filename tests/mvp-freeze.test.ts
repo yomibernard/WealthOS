@@ -79,6 +79,8 @@ describe("MVP freeze inventory", () => {
     expect(demo).toContain("Act 5 — Trust, adviser loop");
     expect(demo).toContain("/app/digest");
     expect(demo).toContain("/app/support");
+    expect(demo).toContain("Trust loop");
+    expect(demo).toContain("Privacy loop");
   });
 
   it("keeps CI and deploy pilot package", () => {
