@@ -488,3 +488,10 @@ Notification deep-links + demo sync:
 
 - `resolveNotificationLink` on `/app/notifications` (title/body/Path heuristics)
 - DEMO_SCRIPT / `/demo` Act 5 covers support + privacy trust loops
+
+## Phase 9.4 delivered (13 Aug 2026)
+
+Trust loop freeze pack **v0.1.2**:
+
+- `npm run pilot:freeze` checks 9.x engines/pages + Trust/Privacy demo loops
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

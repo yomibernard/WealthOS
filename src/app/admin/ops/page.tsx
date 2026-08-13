@@ -90,7 +90,7 @@ export default async function AdminOpsPage() {
             {launch.ok ? "gate ok" : "gate blocked"}
           </Badge>
           <Badge>{launch.profile}</Badge>
-          <Badge>v0.1.1</Badge>
+          <Badge>v0.1.2</Badge>
         </div>
         <p className="muted mt-2 text-sm">
           Checked {new Date(launch.checkedAt).toLocaleString("en-GB")}

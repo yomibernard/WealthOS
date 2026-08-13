@@ -1,24 +1,20 @@
 # Changelog
 
-## Unreleased — Phase 9.3
+## Unreleased
 
-- Notification centre deep-links (support, privacy, digest, reports, inbox…)
-- Demo Act 5 trust/privacy loop steps + `/demo` jump links
+- (none — next product slice after trust-loop freeze)
 
-## Unreleased — Phase 9.2
+## 0.1.2 — 13 Aug 2026 (Customer trust loop)
 
-- Home privacy-request pulse; Inbox cards on create/update → `/app/privacy`
-- Pref-aware notifications for privacy requests; refreshInbox covers open privacy queue
+In-product support, privacy, and notification deep-links on top of the 0.1.1 ops pack.
 
-## Unreleased — Phase 9.1
+### Phase 9.x — Trust loop
 
-- Wealth Inbox deep-links for support/complaint create + resolve (→ `/app/support`)
-- Refresh inbox includes in-progress cases; open cards no longer route to adviser-request
-
-## Unreleased — Phase 9.0
-
-- Home CTAs for open/recent support & complaint cases
-- WealthAI `support_case` and `privacy` intents (paths to `/app/support`, `/app/privacy`)
+- **9.4** Freeze pack `v0.1.2`; `pilot:freeze` covers 9.x surface
+- **9.3** Notification centre deep-links; demo Act 5 trust/privacy loops
+- **9.2** Privacy-request Home pulse + Inbox → `/app/privacy`
+- **9.1** Support/complaint Inbox lifecycle → `/app/support`
+- **9.0** Home case CTAs; WealthAI `support_case` / `privacy` intents
 
 ## 0.1.1 — 13 Aug 2026 (Pilot ops pack)
 

@@ -99,7 +99,7 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - Daily ops board: `/admin/ops` (attention queues)
 - Audit export: `/admin/audit` (filter + Download JSON)
 - Flag profiles: `/admin/flags` (safe pilot / incident lockdown)
-- Pilot freeze: `npm run pilot:freeze` (v0.1.1 ops pack)
+- Pilot freeze: `npm run pilot:freeze` (v0.1.2 trust-loop pack)
 - Home shows open/recent support cases; ask WealthAI about support or privacy export
 - Admin module index: `/admin/ops`
 
@@ -155,7 +155,7 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - **CI** — `.github/workflows/ci.yml` (install → SQLite setup → test → build → `release:check`)
 - **Env template** — [`.env.example`](./.env.example)
 - **Deploy / pilot** — [DEPLOY.md](./DEPLOY.md) · `vercel.json` / `npm run build:vercel`
-- **Release** — git tags `v0.1.0` (MVP), `v0.1.1` (pilot ops); `npm run pilot:freeze`
+- **Release** — git tags `v0.1.0` (MVP), `v0.1.1` (ops), `v0.1.2` (trust loop); `npm run pilot:freeze`
 - Status freeze: [MVP_STATUS.md](./MVP_STATUS.md)
 
 ## Scripts
