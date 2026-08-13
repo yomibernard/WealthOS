@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildCaseCareAckCue,
   classifyEscalationReason,
   customerCaseTitle,
   mergeEscalationResolution,
@@ -36,5 +37,17 @@ describe("escalation ops", () => {
   it("titles customer notifications by category", () => {
     expect(customerCaseTitle("complaint", "resolved")).toBe("Complaint update");
     expect(customerCaseTitle("support", "in_progress")).toBe("Support case in progress");
+  });
+
+  it("flags open cases without a care acknowledgment", () => {
+    expect(buildCaseCareAckCue({ status: "open" }).label).toBe("No care ack");
+    expect(buildCaseCareAckCue({ status: "open" }).tone).toBe("warn");
+    expect(
+      buildCaseCareAckCue({
+        status: "open",
+        lastCareAckAt: "2026-08-13T10:00:00.000Z",
+      }).label,
+    ).toBe("Care acked");
+    expect(buildCaseCareAckCue({ status: "resolved" }).tone).toBe("ok");
   });
 });

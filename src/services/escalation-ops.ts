@@ -3,6 +3,7 @@ import { createUserNotification } from "@/services/notifications";
 import { createInboxFromDrafts } from "@/services/inbox";
 import { buildCaseInboxDraft } from "@/engines/customer-cases";
 import {
+  buildCaseCareAckCue,
   classifyEscalationReason,
   customerCaseTitle,
   mergeEscalationResolution,
@@ -19,8 +20,29 @@ export async function listEscalationsForAdmin(take = 50) {
     take,
   });
 
+  const customerIds = [...new Set(rows.map((e) => e.userId))];
+  const careAcks =
+    customerIds.length === 0
+      ? []
+      : await prisma.adviserNote.findMany({
+          where: { customerId: { in: customerIds }, kind: "care_ack" },
+          select: { customerId: true, createdAt: true },
+          orderBy: { createdAt: "desc" },
+        });
+
+  const lastAckByCustomer = new Map<string, string>();
+  for (const n of careAcks) {
+    if (!lastAckByCustomer.has(n.customerId)) {
+      lastAckByCustomer.set(n.customerId, n.createdAt.toISOString());
+    }
+  }
+
   return rows.map((e) => {
     const parsed = parseEscalationSummary(e.summary);
+    const careAck = buildCaseCareAckCue({
+      status: e.status,
+      lastCareAckAt: lastAckByCustomer.get(e.userId) ?? null,
+    });
     return {
       id: e.id,
       level: e.level,
@@ -33,6 +55,7 @@ export async function listEscalationsForAdmin(take = 50) {
       resolution: parsed.resolution ?? null,
       summaryPreview: e.summary.slice(0, 240),
       customer: e.user,
+      careAck,
     };
   });
 }

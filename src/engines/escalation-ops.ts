@@ -6,6 +6,36 @@ export type EscalationStatus = "open" | "in_progress" | "resolved" | "rejected";
 
 export type EscalationCategory = "support" | "complaint" | "adviser" | "other";
 
+export type CaseCareAckCue = {
+  hasCareAck: boolean;
+  lastCareAckAt: string | null;
+  label: string;
+  tone: "ok" | "warn";
+};
+
+/** Ops cue: whether an adviser already reassured this customer. */
+export function buildCaseCareAckCue(input: {
+  status: string;
+  lastCareAckAt?: string | null;
+}): CaseCareAckCue {
+  const lastCareAckAt = input.lastCareAckAt ?? null;
+  const open = input.status === "open" || input.status === "in_progress";
+  if (lastCareAckAt) {
+    return {
+      hasCareAck: true,
+      lastCareAckAt,
+      label: "Care acked",
+      tone: "ok",
+    };
+  }
+  return {
+    hasCareAck: false,
+    lastCareAckAt: null,
+    label: "No care ack",
+    tone: open ? "warn" : "ok",
+  };
+}
+
 export function classifyEscalationReason(reason: string): EscalationCategory {
   if (reason.startsWith("COMPLAINT:")) return "complaint";
   if (reason.startsWith("SUPPORT:")) return "support";

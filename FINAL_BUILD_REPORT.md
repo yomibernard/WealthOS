@@ -558,3 +558,10 @@ Ops care handoff:
 
 - Daily ops board queue for customers with open care and no care acknowledgment
 - Recent adviser acks listed on `/admin/ops`; deep-link to unacked care radar
+
+## Phase 12.1 delivered (13 Aug 2026)
+
+Escalation care-ack cues:
+
+- `/admin/escalations` badges Care acked / No care ack per case
+- Deep-link to customer Care desk for adviser follow-up

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Badge, Button, Field, PageHeader, Panel, TextInput } from "@/components/ui";
 
 type CaseRow = {
@@ -13,6 +14,12 @@ type CaseRow = {
   summaryPreview: string;
   createdAt: string;
   customer: { id: string; name: string; email: string };
+  careAck?: {
+    hasCareAck: boolean;
+    lastCareAckAt: string | null;
+    label: string;
+    tone: "ok" | "warn";
+  };
 };
 
 export default function AdminEscalationsPage() {
@@ -56,7 +63,7 @@ export default function AdminEscalationsPage() {
     <main className="page-wide">
       <PageHeader
         title="Escalations & complaints"
-        subtitle="L2 support and formal complaints. Resolve with a note — customers get an in-product notification."
+        subtitle="L2 support and formal complaints. Check care-ack status before resolving — customers get an in-product notification."
       />
       {message ? <p className="mb-3 text-sm">{message}</p> : null}
       <div className="space-y-3">
@@ -74,6 +81,11 @@ export default function AdminEscalationsPage() {
                 </Badge>
                 {e.category === "complaint" ? <Badge tone="warn">Complaint</Badge> : null}
                 {e.category === "support" ? <Badge>Support</Badge> : null}
+                {e.careAck ? (
+                  <Badge tone={e.careAck.tone === "warn" ? "warn" : "default"}>
+                    {e.careAck.label}
+                  </Badge>
+                ) : null}
               </div>
               <p className="mt-2 font-semibold">
                 {e.customer.name} — {e.reason}
@@ -81,6 +93,17 @@ export default function AdminEscalationsPage() {
               <p className="muted mt-1 text-sm">
                 {e.customer.email} · {new Date(e.createdAt).toLocaleString("en-GB")} ·{" "}
                 {e.id.slice(0, 8)}
+                {e.careAck?.lastCareAckAt
+                  ? ` · last care ack ${new Date(e.careAck.lastCareAckAt).toLocaleString("en-GB")}`
+                  : ""}
+              </p>
+              <p className="mt-1 text-sm">
+                <Link
+                  href={`/adviser/customers/${e.customer.id}`}
+                  className="font-semibold text-accent"
+                >
+                  Open Care desk
+                </Link>
               </p>
               <p className="muted mt-1 text-sm">{e.summaryPreview}</p>
               {e.resolution ? (

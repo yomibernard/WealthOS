@@ -50,6 +50,7 @@
 | Adviser care history | Ready (demo) | 360 recent care acknowledgments |
 | Adviser unacked radar | Ready (demo) | `/adviser?care=unacked` + ack age cues |
 | Ops care handoff | Ready (demo) | `/admin/ops` unacked queue + recent acks |
+| Escalation care cues | Ready (demo) | `/admin/escalations` care-ack badge + 360 link |
 
 ## Quality gates (this machine)
 

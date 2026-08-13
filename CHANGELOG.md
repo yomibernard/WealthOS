@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 12.1
+
+- Admin escalations queue shows care-ack badge + Care desk deep-link per customer
+
 ## Unreleased — Phase 12.0
 
 - Ops care handoff on daily board (`care_handoff` queue + recent adviser acks → `/adviser?care=unacked`)
