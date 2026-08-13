@@ -110,16 +110,27 @@ export function buildCareAckHistory(
   return { count: notes.length, latestAt, summary, items };
 }
 
+export type CareUpdatePulseItem = {
+  id: string;
+  title: string;
+  preview: string;
+  adviserName: string;
+  createdAt: string;
+  href: string;
+};
+
 export type CareUpdatePulse = {
   count: number;
   headline: string | null;
   primaryHref: string;
   latestAt: string | null;
+  items: CareUpdatePulseItem[];
 };
 
 /** Customer Home CTA when an adviser recently acknowledged open care. */
 export function buildCareUpdatePulse(
   notes: Array<{
+    id?: string;
     title: string;
     body: string;
     createdAt: Date | string;
@@ -130,21 +141,33 @@ export function buildCareUpdatePulse(
 ): CareUpdatePulse {
   const cutoff = now.getTime() - windowDays * 86_400_000;
   const recent = notes
-    .map((n) => ({
-      ...n,
-      createdAt:
-        typeof n.createdAt === "string" ? n.createdAt : n.createdAt.toISOString(),
-    }))
+    .map((n, i) => {
+      const createdAt =
+        typeof n.createdAt === "string" ? n.createdAt : n.createdAt.toISOString();
+      const privacy = /privacy/i.test(n.title);
+      return {
+        id: n.id ?? `care-${i}`,
+        title: n.title,
+        preview: previewCareAckBody(n.body),
+        adviserName: n.adviserName,
+        createdAt,
+        href: privacy ? "/app/privacy" : "/app/support",
+      };
+    })
     .filter((n) => new Date(n.createdAt).getTime() >= cutoff)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   if (recent.length === 0) {
-    return { count: 0, headline: null, primaryHref: "/app/inbox", latestAt: null };
+    return {
+      count: 0,
+      headline: null,
+      primaryHref: "/app/inbox",
+      latestAt: null,
+      items: [],
+    };
   }
 
   const latest = recent[0]!;
-  const privacy = /privacy/i.test(latest.title);
-  const primaryHref = privacy ? "/app/privacy" : "/app/support";
   const headline =
     recent.length === 1
       ? `${latest.adviserName} sent a care update`
@@ -153,7 +176,8 @@ export function buildCareUpdatePulse(
   return {
     count: recent.length,
     headline,
-    primaryHref,
+    primaryHref: latest.href,
     latestAt: latest.createdAt,
+    items: recent,
   };
 }

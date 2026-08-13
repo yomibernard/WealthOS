@@ -586,3 +586,10 @@ Customer care-update pulse:
 
 - Home CTA when a shared care acknowledgment arrived in the last 14 days
 - Deep-links to Support or Privacy Centre from the latest ack topic
+
+## Phase 13.1 delivered (13 Aug 2026)
+
+Support care updates:
+
+- `/app/support` shows recent adviser care acknowledgments
+- `GET /api/care-updates` powers Home + Support from the same pulse builder

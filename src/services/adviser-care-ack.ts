@@ -114,6 +114,7 @@ export async function loadCareUpdatePulse(customerId: string) {
 
   return buildCareUpdatePulse(
     notes.map((n) => ({
+      id: n.id,
       title: n.title,
       body: n.body,
       createdAt: n.createdAt,

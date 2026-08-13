@@ -68,16 +68,19 @@ describe("adviser care acknowledgment", () => {
     const now = new Date("2026-08-13T12:00:00.000Z");
     const empty = buildCareUpdatePulse([], now);
     expect(empty.headline).toBeNull();
+    expect(empty.items).toEqual([]);
 
     const pulse = buildCareUpdatePulse(
       [
         {
+          id: "n1",
           title: "Adviser acknowledged your complaint",
           body: "Ada: I've seen this.",
           createdAt: "2026-08-12T10:00:00.000Z",
           adviserName: "Ada",
         },
         {
+          id: "n0",
           title: "Adviser acknowledged your privacy request",
           body: "Ada: ops has your request.",
           createdAt: "2026-07-01T10:00:00.000Z",
@@ -89,5 +92,6 @@ describe("adviser care acknowledgment", () => {
     expect(pulse.count).toBe(1);
     expect(pulse.headline).toMatch(/Ada sent a care update/i);
     expect(pulse.primaryHref).toBe("/app/support");
+    expect(pulse.items[0]?.preview).toMatch(/I've seen this/i);
   });
 });

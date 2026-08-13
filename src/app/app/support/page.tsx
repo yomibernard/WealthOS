@@ -13,15 +13,36 @@ type CaseRow = {
   resolution: string | null;
 };
 
+type CareUpdate = {
+  id: string;
+  title: string;
+  preview: string;
+  adviserName: string;
+  createdAt: string;
+  href: string;
+};
+
 export default function SupportPage() {
   const [category, setCategory] = useState<"support" | "complaint">("support");
   const [reason, setReason] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [cases, setCases] = useState<CaseRow[]>([]);
+  const [careUpdates, setCareUpdates] = useState<CareUpdate[]>([]);
 
   async function load() {
-    const res = await fetch("/api/escalations");
-    if (res.ok) setCases(await res.json());
+    const [casesRes, careRes] = await Promise.all([
+      fetch("/api/escalations"),
+      fetch("/api/care-updates"),
+    ]);
+    if (casesRes.ok) setCases(await casesRes.json());
+    if (careRes.ok) {
+      const data = (await careRes.json()) as { items?: CareUpdate[] };
+      setCareUpdates(
+        (data.items ?? []).filter(
+          (i) => i.href === "/app/support" || !/privacy/i.test(i.title),
+        ),
+      );
+    }
   }
 
   useEffect(() => {
@@ -59,6 +80,29 @@ export default function SupportPage() {
         title="Support & complaints"
         subtitle="Human help when AI confidence is low, something went wrong, or you want a person on the case."
       />
+
+      {careUpdates.length ? (
+        <Panel className="mb-3 space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-semibold">Recent care updates</p>
+            <Badge>{careUpdates.length}</Badge>
+          </div>
+          <p className="muted text-sm">
+            Your adviser sent these acknowledgments. Formal ops resolution still applies when needed.
+          </p>
+          <ul className="space-y-2">
+            {careUpdates.map((u) => (
+              <li key={u.id} className="rounded-xl border border-line px-3 py-2">
+                <p className="font-semibold text-sm">{u.title}</p>
+                <p className="mt-1 text-sm">{u.preview}</p>
+                <p className="muted mt-1 text-xs">
+                  {u.adviserName} · {new Date(u.createdAt).toLocaleString("en-GB")}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      ) : null}
 
       <Panel className="space-y-3">
         <p className="font-semibold">Escalation ladder</p>

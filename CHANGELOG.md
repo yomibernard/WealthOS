@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 13.1
+
+- Support page lists recent adviser care updates (`GET /api/care-updates`) for the Home pulse destination
+
 ## Unreleased — Phase 13.0
 
 - Customer Home care-update pulse when an adviser recently acknowledged open care
