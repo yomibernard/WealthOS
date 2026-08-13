@@ -90,6 +90,11 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - **Health** — `GET /api/health` for uptime probes
 - **Admin** — `/admin/ops` launch gate summary
 
+## Profile completeness (Phase 7.1)
+
+- **Profile** — `/app/profile` checklist with Fix links; score synced to `profileCompleteness`
+- Home prompts completion when under 80%
+
 ## Adviser insights (Phase 7.0)
 
 - **Customer 360** — insights pack with talking points and guardrails for human review

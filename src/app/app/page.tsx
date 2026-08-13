@@ -4,6 +4,7 @@ import { Badge, Panel } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
 import { buildHomeDashboard, ensureRecommendations } from "@/services/wealth";
 import { refreshInbox } from "@/services/inbox";
+import { syncProfileCompleteness } from "@/services/profile-completeness";
 import { formatNaira, greetingForHour } from "@/lib/format";
 import { getFeatureFlags } from "@/lib/feature-flags";
 
@@ -17,6 +18,7 @@ export default async function HomePage() {
 
   const flags = getFeatureFlags();
   const inbox = flags.wealthInbox ? await refreshInbox(user.id) : { unread: 0 };
+  const profile = await syncProfileCompleteness(user.id);
 
   const hour = new Date().getHours();
   const change = dash.monthChange;
@@ -124,6 +126,12 @@ export default async function HomePage() {
           Review my actions
         </Link>
       </Panel>
+
+      {profile && profile.score < 80 ? (
+        <Link href="/app/profile" className="btn btn-soft mt-3 w-full">
+          Complete your profile · {profile.score}%
+        </Link>
+      ) : null}
 
       {flags.weeklyDigest ? (
         <Link href="/app/digest" className="btn btn-ghost mt-3 w-full">

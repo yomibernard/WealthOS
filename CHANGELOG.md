@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 7.1
+
+- Profile completeness checklist engine + actionable `/app/profile`
+- Syncs `profileCompleteness` score; Home CTA under 80%; WealthAI intent
+
 ## Unreleased — Phase 7.0
 
 - Adviser insights pack on customer 360 (talking points + guardrails)

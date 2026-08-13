@@ -30,6 +30,7 @@
 | Data confidence | Ready (demo) | `/app/wealth/confidence` remediation queue |
 | Goal funding pulse | Ready (demo) | `/app/plan/funding` |
 | Weekly digest | Ready (demo) | `/app/digest` |
+| Profile completeness | Ready (demo) | `/app/profile` checklist |
 
 ## Quality gates (this machine)
 

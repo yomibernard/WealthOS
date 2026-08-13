@@ -55,6 +55,7 @@ export type Intent =
   | "data_quality"
   | "goal_funding"
   | "weekly_digest"
+  | "profile_completeness"
   | "escalation"
   | "general";
 
@@ -172,6 +173,10 @@ export function classifyIntent(message: string): Intent {
     return "goal_funding";
   if (/weekly (wealth )?digest|this week.?s (summary|digest)|week in review/.test(m))
     return "weekly_digest";
+  if (
+    /profile (completeness|complete)|complete my profile|financial profile|fact.?find/.test(m)
+  )
+    return "profile_completeness";
   if (/goal|saving enough/.test(m)) return "goals";
   if (/top three|what should i do|next best|priority/.test(m)) return "actions";
   if (/monthly (wealth )?report|wealth report|month.over.month|mom (change|report)/.test(m))
@@ -217,6 +222,7 @@ export function routeAgent(intent: Intent): AgentName {
     case "data_quality":
     case "goal_funding":
     case "weekly_digest":
+    case "profile_completeness":
       return "CoachAI";
     case "net_worth":
     case "general":
@@ -820,6 +826,18 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
         "Path: /app/digest",
       ].join(" ");
       confidence = Math.min(confidence, 0.85);
+      break;
+    }
+    case "profile_completeness": {
+      toolsUsed.push("profileCompleteness");
+      content = [
+        "Your financial profile is scored from a checklist: risk signals, income/expenses, Wealth Graph holdings, goals, consent, and household context.",
+        ctx.assets.length === 0
+          ? "You still need assets in the Wealth Graph — that is usually the highest-impact next step."
+          : "Open Profile to see what remains and jump to the next gap.",
+        "Path: /app/profile",
+      ].join(" ");
+      confidence = 0.85;
       break;
     }
     case "affordability":

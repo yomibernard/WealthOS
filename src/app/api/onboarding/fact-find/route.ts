@@ -1,22 +1,20 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
+import { syncProfileCompleteness } from "@/services/profile-completeness";
 
 export async function POST(req: Request) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Please sign in first." }, { status: 401 });
   const body = await req.json();
-  const completeness = Math.min(
-    95,
-    20 + Object.values(body).filter((v) => String(v || "").trim()).length * 12,
-  );
 
   await prisma.user.update({
     where: { id: user.id },
     data: {
-      employmentStatus: body.employment || user.name,
+      employmentStatus: body.employment || undefined,
       riskTolerance: body.risk || undefined,
-      profileCompleteness: completeness,
+      investmentExperience: body.experience || undefined,
+      liquidityNeeds: body.liquidity || undefined,
     },
   });
 
@@ -44,5 +42,6 @@ export async function POST(req: Request) {
     });
   }
 
-  return NextResponse.json({ ok: true, completeness });
+  const report = await syncProfileCompleteness(user.id);
+  return NextResponse.json({ ok: true, completeness: report?.score ?? 0 });
 }
