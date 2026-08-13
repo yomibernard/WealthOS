@@ -1,16 +1,15 @@
 # Changelog
 
-## Unreleased — Phase 14.2
+## 0.1.7 — 13 Aug 2026 (WealthAI care pack)
 
-- Smoke covers `/app/ai` + local care_update chat probe; demo Act 5 includes WealthAI care-update question
+WealthAI answers adviser care-update questions on top of the 0.1.6 customer care loop.
 
-## Unreleased — Phase 14.1
+### Phase 14.x — WealthAI care
 
-- WealthAI `care_update` answers grounded in the live care-update pulse (count/headline/path)
-
-## Unreleased — Phase 14.0
-
-- WealthAI `care_update` intent routes adviser-acknowledgment questions to Support/Privacy Home paths (ops still authoritative)
+- **14.3** Freeze pack `v0.1.7`; `pilot:freeze` covers 14.x WealthAI care surface
+- **14.2** Smoke covers `/app/ai` + local care_update chat probe; demo Act 5 WealthAI care-update question
+- **14.1** WealthAI `care_update` answers grounded in the live care-update pulse (count/headline/path)
+- **14.0** WealthAI `care_update` intent routes adviser-acknowledgment questions to Support/Privacy Home paths (ops still authoritative)
 
 ## 0.1.6 — 13 Aug 2026 (Customer care loop pack)
 

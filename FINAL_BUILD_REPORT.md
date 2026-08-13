@@ -628,3 +628,10 @@ WealthAI care smoke + demo:
 
 - Local smoke POSTs a care_update question to `/api/ai/chat`; hosted smoke hits `/app/ai`
 - Demo Act 5 includes the WealthAI care-update prompt
+
+## Phase 14.3 delivered (13 Aug 2026)
+
+WealthAI care freeze pack **v0.1.7**:
+
+- `npm run pilot:freeze` checks WealthAI `care_update` intent, grounded pulse, `/app/ai` smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

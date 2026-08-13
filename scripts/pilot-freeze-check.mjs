@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.6 (… + ops care 12.x + customer care loop 13.x).
+ * Current pack: v0.1.7 (… + customer care 13.x + WealthAI care 14.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.6";
+const EXPECTED = "0.1.7";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -65,6 +65,11 @@ mustExist("src/app/adviser/customers/[id]/page.tsx");
 // 13.x customer care loop
 mustExist("src/app/api/care-updates/route.ts");
 
+// 14.x WealthAI care
+mustExist("src/ai/orchestrator.ts");
+mustExist("src/app/app/ai/page.tsx");
+mustExist("src/app/api/ai/chat/route.ts");
+
 mustExist("DEPLOY.md");
 mustExist("OPS_RUNBOOK.md");
 mustExist("LAUNCH_REVIEW.md");
@@ -75,7 +80,7 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.6")) failures.push("CHANGELOG.md missing 0.1.6 section");
+if (!changelog.includes("0.1.7")) failures.push("CHANGELOG.md missing 0.1.7 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
 if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
@@ -86,10 +91,14 @@ if (!changelog.includes("care handoff") && !changelog.includes("care_handoff")) 
 if (!changelog.includes("care-update") && !changelog.includes("care update")) {
   failures.push("CHANGELOG.md missing customer care-update mention");
 }
+if (!changelog.includes("care_update") && !changelog.includes("WealthAI care")) {
+  failures.push("CHANGELOG.md missing WealthAI care_update mention");
+}
 
 const deploy = read("DEPLOY.md");
 if (!deploy.includes("smoke:hosted")) failures.push("DEPLOY.md missing smoke:hosted");
 if (!deploy.includes("safe pilot")) failures.push("DEPLOY.md missing safe pilot guidance");
+if (!deploy.includes("v0.1.7")) failures.push("DEPLOY.md missing v0.1.7 tag guidance");
 
 const demo = read("DEMO_SCRIPT.md");
 if (!demo.includes("/admin/ops")) failures.push("DEMO_SCRIPT.md missing /admin/ops");
@@ -101,20 +110,25 @@ if (!demo.includes("Care desk")) failures.push("DEMO_SCRIPT.md missing Care desk
 if (!demo.includes("Unacked")) failures.push("DEMO_SCRIPT.md missing Unacked filter");
 if (!demo.includes("care handoff")) failures.push("DEMO_SCRIPT.md missing care handoff");
 if (!demo.includes("care update")) failures.push("DEMO_SCRIPT.md missing care update CTA");
+if (!demo.includes("WealthAI") || !demo.includes("/app/ai")) {
+  failures.push("DEMO_SCRIPT.md missing WealthAI care path");
+}
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.6")) failures.push("MVP_STATUS.md missing 0.1.6");
+if (!status.includes("0.1.7")) failures.push("MVP_STATUS.md missing 0.1.7");
 if (!status.includes("Adviser care ack")) failures.push("MVP_STATUS.md missing Adviser care ack");
 if (!status.includes("Adviser unacked radar")) failures.push("MVP_STATUS.md missing Adviser unacked radar");
 if (!status.includes("Ops care handoff")) failures.push("MVP_STATUS.md missing Ops care handoff");
 if (!status.includes("Privacy care cues")) failures.push("MVP_STATUS.md missing Privacy care cues");
 if (!status.includes("Customer care pulse")) failures.push("MVP_STATUS.md missing Customer care pulse");
 if (!status.includes("Privacy care updates")) failures.push("MVP_STATUS.md missing Privacy care updates");
+if (!status.includes("WealthAI care update")) failures.push("MVP_STATUS.md missing WealthAI care update");
 
 const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
 if (!launch.includes("/admin/flags")) failures.push("LAUNCH_REVIEW.md missing flag profiles path");
 if (!launch.includes("pilot:freeze")) failures.push("LAUNCH_REVIEW.md missing pilot:freeze");
+if (!launch.includes("0.1.7")) failures.push("LAUNCH_REVIEW.md missing 0.1.7 pack");
 
 const notificationsPage = read("src/app/app/notifications/page.tsx");
 if (!notificationsPage.includes("resolveNotificationLink")) {
@@ -151,6 +165,9 @@ if (!careAckEngine.includes("buildCareAckHistory")) {
 }
 if (!careAckEngine.includes("buildCareUpdatePulse")) {
   failures.push("care-ack engine missing buildCareUpdatePulse");
+}
+if (!careAckEngine.includes("formatCareUpdateAiContent")) {
+  failures.push("care-ack engine missing formatCareUpdateAiContent");
 }
 
 const customer360 = read("src/app/adviser/customers/[id]/page.tsx");
@@ -217,10 +234,30 @@ const smokeHosted = read("scripts/smoke-hosted.mjs");
 if (!smokeHosted.includes("/api/care-updates")) {
   failures.push("smoke-hosted missing /api/care-updates path");
 }
+if (!smokeHosted.includes("/app/ai")) {
+  failures.push("smoke-hosted missing /app/ai path");
+}
 
 const smokeLocal = read("scripts/smoke-journeys.mjs");
 if (!smokeLocal.includes("/app/support") || !smokeLocal.includes("/api/care-updates")) {
   failures.push("smoke-journeys missing support/care-updates coverage");
+}
+if (!smokeLocal.includes("/app/ai") || !smokeLocal.includes("/api/ai/chat")) {
+  failures.push("smoke-journeys missing WealthAI care coverage");
+}
+
+// 14.x WealthAI care surface
+const orchestrator = read("src/ai/orchestrator.ts");
+if (!orchestrator.includes("care_update")) {
+  failures.push("orchestrator missing care_update intent");
+}
+if (!orchestrator.includes("formatCareUpdateAiContent")) {
+  failures.push("orchestrator missing formatCareUpdateAiContent");
+}
+
+const wealthService = read("src/services/wealth.ts");
+if (!wealthService.includes("careUpdate") || !wealthService.includes("loadCareUpdatePulse")) {
+  failures.push("wealth service missing careUpdate context for WealthAI");
 }
 
 if (failures.length) {

@@ -1,8 +1,8 @@
 # WealthOS MVP status freeze
 
-**Version:** 0.1.6  
+**Version:** 0.1.7  
 **Date:** 13 August 2026  
-**Verdict:** Feature-complete for local/pilot demo through customer care loop (ops + trust + adviser care + care UX + ops care handoff + customer care updates). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
+**Verdict:** Feature-complete for local/pilot demo through WealthAI care (ops + trust + adviser care + care UX + ops care handoff + customer care updates + WealthAI care_update). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
 
 ## Promise
 
@@ -73,6 +73,7 @@
 - [x] Adviser care UX pack `v0.1.4` (`npm run pilot:freeze`)
 - [x] Ops care handoff pack `v0.1.5` (`npm run pilot:freeze`)
 - [x] Customer care loop pack `v0.1.6` (`npm run pilot:freeze`)
+- [x] WealthAI care pack `v0.1.7` (`npm run pilot:freeze`)
 - [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets + Postgres URL)
 - [ ] Hosted deploy smoke (`SMOKE_BASE_URL=… npm run smoke:hosted` — see [DEPLOY.md](./DEPLOY.md))
 - [ ] Human sign-off on `LAUNCH_REVIEW.md`
