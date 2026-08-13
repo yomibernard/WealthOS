@@ -43,6 +43,7 @@
 | Case inbox deep-links | Ready (demo) | Support/complaint lifecycle → `/app/support` |
 | Privacy request loop | Ready (demo) | Home + Inbox → `/app/privacy` |
 | Notification deep-links | Ready (demo) | `/app/notifications` → support/privacy/cadence |
+| Adviser care desk | Ready (demo) | 360 open support/privacy before product talk |
 
 ## Quality gates (this machine)
 

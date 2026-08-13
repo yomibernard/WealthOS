@@ -45,7 +45,7 @@ const acts = [
     mins: "5 min",
     steps: [
       "Consent Centre — pause AI, show gate, restore",
-      "Customer shares briefing → Adviser 360 insights pack",
+      "Customer shares briefing → Adviser 360 care desk + insights",
       "Adviser sends nudge → customer Inbox deep link",
       "Admin daily ops board — escalations / privacy / checker",
       "Support case → resolve → Home / Inbox / Notifications link",

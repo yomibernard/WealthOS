@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## Unreleased — Phase 10.0
 
-- (none — next product slice after trust-loop freeze)
+- Adviser care desk on customer 360 (open support/complaints + privacy requests)
+- Insights pack talking points for complaints and privacy before product talk
 
 ## 0.1.2 — 13 Aug 2026 (Customer trust loop)
 

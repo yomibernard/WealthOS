@@ -4,6 +4,8 @@ import { buildDataQualityReport } from "@/engines/data-quality";
 import { buildFundingPulse } from "@/engines/goal-funding";
 import { buildAdviserInsights, type AdviserInsightsPack } from "@/engines/adviser-insights";
 import { loadLatestWeeklyDigest } from "@/services/weekly-digest";
+import { classifyEscalationReason } from "@/engines/escalation-ops";
+import { loadAdviserCareDesk } from "@/services/adviser-care";
 
 export async function getAdviserInsightsPack(
   customerId: string,
@@ -11,14 +13,24 @@ export async function getAdviserInsightsPack(
   const dash = await buildHomeDashboard(customerId);
   if (!dash) return null;
 
-  const [assets, liabilities, goals, escalations, recs, digestPack] = await Promise.all([
-    prisma.asset.findMany({ where: { userId: customerId } }),
-    prisma.liability.findMany({ where: { userId: customerId } }),
-    prisma.goal.findMany({ where: { userId: customerId } }),
-    prisma.escalation.count({ where: { userId: customerId, status: "open" } }),
-    prisma.recommendation.count({ where: { userId: customerId, status: "PROPOSED" } }),
-    loadLatestWeeklyDigest(customerId),
-  ]);
+  const [assets, liabilities, goals, escalationRows, recs, digestPack, care] =
+    await Promise.all([
+      prisma.asset.findMany({ where: { userId: customerId } }),
+      prisma.liability.findMany({ where: { userId: customerId } }),
+      prisma.goal.findMany({ where: { userId: customerId } }),
+      prisma.escalation.findMany({
+        where: { userId: customerId, status: { in: ["open", "in_progress"] } },
+        select: { reason: true },
+      }),
+      prisma.recommendation.count({ where: { userId: customerId, status: "PROPOSED" } }),
+      loadLatestWeeklyDigest(customerId),
+      loadAdviserCareDesk(customerId),
+    ]);
+
+  const escalations = escalationRows.length;
+  const openComplaints = escalationRows.filter(
+    (e) => classifyEscalationReason(e.reason) === "complaint",
+  ).length;
 
   const quality = buildDataQualityReport(
     [
@@ -74,6 +86,8 @@ export async function getAdviserInsightsPack(
     behindGoalCount: funding.behindCount,
     monthlyFundingGapNgn: funding.totalMonthlyGap,
     openEscalations: escalations,
+    openComplaints,
+    openPrivacyRequests: care.privacyCount,
     proposedActions: recs,
     latestDigestHeadline,
     attention: dash.attention,

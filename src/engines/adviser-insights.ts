@@ -16,6 +16,8 @@ export type AdviserInsightInput = {
   behindGoalCount: number;
   monthlyFundingGapNgn: number;
   openEscalations: number;
+  openComplaints?: number;
+  openPrivacyRequests?: number;
   proposedActions: number;
   latestDigestHeadline?: string | null;
   attention: string[];
@@ -40,12 +42,26 @@ export function buildAdviserInsights(input: AdviserInsightInput): AdviserInsight
   const points: TalkingPoint[] = [];
 
   if (input.openEscalations > 0) {
+    const complaints = input.openComplaints ?? 0;
     points.push({
       id: "escalations",
       priority: "critical",
-      title: "Open human escalations",
-      detail: `${input.openEscalations} open escalation(s). Resolve care needs before product discussion.`,
+      title: complaints > 0 ? "Open complaints / escalations" : "Open human escalations",
+      detail:
+        complaints > 0
+          ? `${input.openEscalations} open case(s) including ${complaints} complaint(s). Resolve care needs before product discussion.`
+          : `${input.openEscalations} open escalation(s). Resolve care needs before product discussion.`,
       suggestedQuestion: "What would make you feel safer reviewing this with me today?",
+    });
+  }
+
+  if ((input.openPrivacyRequests ?? 0) > 0) {
+    points.push({
+      id: "privacy",
+      priority: "critical",
+      title: "Open privacy requests",
+      detail: `${input.openPrivacyRequests} privacy request(s) still open (access / rectification / erasure / objection). Acknowledge status before suitability talk.`,
+      suggestedQuestion: "Have you seen the update on your privacy request, or do you need anything clarified?",
     });
   }
 

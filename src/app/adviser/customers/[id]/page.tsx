@@ -4,6 +4,7 @@ import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { buildHomeDashboard } from "@/services/wealth";
 import { getAdviserInsightsPack } from "@/services/adviser-insights";
+import { loadAdviserCareDesk } from "@/services/adviser-care";
 import { formatNaira } from "@/lib/format";
 import { AdviserCopilot } from "@/components/AdviserCopilot";
 import { AdviserNotesPanel } from "@/components/AdviserNotesPanel";
@@ -30,7 +31,7 @@ export default async function AdviserCustomerPage({
       conversations: { include: { messages: { take: 6, orderBy: { createdAt: "desc" } } }, take: 3 },
       documents: true,
       consents: true,
-      escalations: { where: { status: "open" } },
+      escalations: { where: { status: { in: ["open", "in_progress"] } } },
     },
   });
   if (!customer) redirect("/adviser");
@@ -43,7 +44,10 @@ export default async function AdviserCustomerPage({
   }
 
   const dash = await buildHomeDashboard(customer.id);
-  const insights = await getAdviserInsightsPack(customer.id);
+  const [insights, care] = await Promise.all([
+    getAdviserInsightsPack(customer.id),
+    loadAdviserCareDesk(customer.id),
+  ]);
   const flags = getFeatureFlags();
 
   return (
@@ -57,7 +61,7 @@ export default async function AdviserCustomerPage({
           </Link>
         }
       />
-      <div className="grid gap-3 lg:grid-cols-3">
+      <div className="grid gap-3 lg:grid-cols-4">
         <Panel>
           <p className="eyebrow">Net worth</p>
           <p className="font-display text-3xl">
@@ -73,7 +77,63 @@ export default async function AdviserCustomerPage({
           <p className="eyebrow">Open escalations</p>
           <p className="font-display text-3xl">{customer.escalations.length}</p>
         </Panel>
+        <Panel>
+          <p className="eyebrow">Care desk</p>
+          <p className="font-display text-3xl">{care.openCount}</p>
+          {care.complaintCount > 0 ? (
+            <Badge tone="warn">{care.complaintCount} complaint(s)</Badge>
+          ) : (
+            <Badge>support + privacy</Badge>
+          )}
+        </Panel>
       </div>
+
+      <Panel className="mt-4 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="eyebrow">Care desk</p>
+          <Badge tone={care.openCount > 0 ? "warn" : "default"}>{care.openCount} open</Badge>
+        </div>
+        <p className="text-sm">{care.summary}</p>
+        {care.items.length ? (
+          <ul className="space-y-2">
+            {care.items.map((item) => (
+              <li key={`${item.kind}-${item.id}`} className="rounded-xl border border-line p-3">
+                <div className="flex flex-wrap gap-2">
+                  <Badge
+                    tone={
+                      item.priority === "critical"
+                        ? "danger"
+                        : item.priority === "important"
+                          ? "warn"
+                          : "default"
+                    }
+                  >
+                    {item.kind}
+                  </Badge>
+                  <Badge>{item.status}</Badge>
+                </div>
+                <p className="mt-2 font-semibold">{item.title}</p>
+                <p className="muted mt-1 text-sm">{item.detail}</p>
+                <p className="muted mt-1 text-xs">
+                  Updated {new Date(item.updatedAt).toLocaleString("en-GB")}
+                </p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="muted text-sm">Nothing in the care queue for this customer.</p>
+        )}
+        {user.role === "ADMIN" ? (
+          <div className="flex flex-wrap gap-2 border-t border-line pt-3 text-sm">
+            <Link href="/admin/escalations" className="font-semibold text-accent">
+              Admin escalations
+            </Link>
+            <Link href="/admin/privacy" className="font-semibold text-accent">
+              Admin privacy queue
+            </Link>
+          </div>
+        ) : null}
+      </Panel>
 
       {insights ? (
         <Panel className="mt-4 space-y-3">
