@@ -75,10 +75,28 @@ npm run build && npm run start
 
 ## 4. Health & gates
 
-- Probe: `GET /api/health`
+- Probe: `GET /api/health` (includes `config.demoMode` + `config.databaseKind`, never secrets)
 - Dev gate: `npm run launch:check`
 - Prod gate: `LAUNCH_PROFILE=production npm run launch:check` (must pass before public pilot)
 - Umbrella: `npm run release:check`
+
+### Post-deploy hosted smoke
+
+After Vercel (or other host) finishes deploying:
+
+```bash
+SMOKE_BASE_URL=https://your-app.vercel.app npm run smoke:hosted
+```
+
+Optional:
+
+| Variable | Effect |
+|----------|--------|
+| `SMOKE_STRICT=1` | Fail on DEMO_MODE / launch-gate warns |
+| `SMOKE_SKIP_AUTH=1` | Skip demo sign-in (no seed on host) |
+| `SMOKE_EMAIL` / `SMOKE_PASSWORD` | Non-default pilot user |
+
+Local laptop smoke remains `npm run smoke` (allows localhost).
 
 ## 5. Release tagging
 

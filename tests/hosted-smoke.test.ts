@@ -1,0 +1,64 @@
+import { describe, expect, it } from "vitest";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import {
+  databaseKindFromUrl,
+  evaluateHostedHealth,
+  smokePassed,
+} from "@/lib/hosted-smoke";
+
+describe("hosted smoke rules", () => {
+  it("detects database URL kinds", () => {
+    expect(databaseKindFromUrl("file:./dev.db")).toBe("sqlite");
+    expect(databaseKindFromUrl("postgresql://user:pass@host/db")).toBe("postgres");
+    expect(databaseKindFromUrl("postgres://user:pass@host/db")).toBe("postgres");
+    expect(databaseKindFromUrl(undefined)).toBe("missing");
+  });
+
+  it("passes a healthy Postgres pilot payload", () => {
+    const findings = evaluateHostedHealth({
+      status: "ok",
+      database: { ok: true },
+      config: { demoMode: false, databaseKind: "postgres" },
+      launch: { ok: true, blockers: [] },
+    });
+    expect(smokePassed(findings)).toBe(true);
+    expect(findings.every((f) => f.ok)).toBe(true);
+  });
+
+  it("blocks sqlite or down database on hosted smoke", () => {
+    const sqlite = evaluateHostedHealth({
+      status: "ok",
+      database: { ok: true },
+      config: { demoMode: false, databaseKind: "sqlite" },
+      launch: { blockers: [] },
+    });
+    expect(smokePassed(sqlite)).toBe(false);
+
+    const down = evaluateHostedHealth({
+      status: "degraded",
+      database: { ok: false, error: "timeout" },
+      config: { demoMode: false, databaseKind: "postgres" },
+      launch: { blockers: [] },
+    });
+    expect(smokePassed(down)).toBe(false);
+  });
+
+  it("warns on DEMO_MODE without failing default smoke", () => {
+    const findings = evaluateHostedHealth({
+      status: "ok",
+      database: { ok: true },
+      config: { demoMode: true, databaseKind: "postgres" },
+      launch: { blockers: ["session_secret"] },
+    });
+    expect(smokePassed(findings)).toBe(true);
+    expect(smokePassed(findings, true)).toBe(false);
+  });
+
+  it("ships smoke:hosted script in the release package", () => {
+    const root = process.cwd();
+    expect(existsSync(join(root, "scripts", "smoke-hosted.mjs"))).toBe(true);
+    expect(readFileSync(join(root, "package.json"), "utf8")).toContain("smoke:hosted");
+    expect(readFileSync(join(root, "DEPLOY.md"), "utf8")).toContain("smoke:hosted");
+  });
+});

@@ -111,9 +111,24 @@ export default async function AdminOpsPage() {
             <li>npm run db:postgres-ready</li>
             <li>npm run db:rehearse-postgres</li>
             <li>npm run smoke</li>
+            <li>SMOKE_BASE_URL=https://… npm run smoke:hosted</li>
             <li>npm run perf:check</li>
             <li>npm run build:vercel</li>
           </ul>
+        </Panel>
+        <Panel>
+          <p className="font-semibold">Post-deploy smoke (Phase 8.2)</p>
+          <ol className="muted mt-2 list-decimal space-y-1 pl-5 text-sm">
+            <li>Confirm Vercel env: Postgres <code>DATABASE_URL</code>, strong <code>SESSION_SECRET</code>, <code>DEMO_MODE=false</code></li>
+            <li>Open <code>/api/health</code> — expect <code>status: ok</code>, <code>databaseKind: postgres</code></li>
+            <li>
+              Run{" "}
+              <code className="font-mono text-ink">
+                SMOKE_BASE_URL=https://your-app.vercel.app npm run smoke:hosted
+              </code>
+            </li>
+            <li>If host has no seed: add <code>SMOKE_SKIP_AUTH=1</code>; for shared pilot use <code>SMOKE_STRICT=1</code></li>
+          </ol>
         </Panel>
         <Link href="/demo">
           <Panel>
@@ -124,7 +139,7 @@ export default async function AdminOpsPage() {
         <Link href="/api/health">
           <Panel>
             <p className="font-semibold">Health endpoint</p>
-            <p className="muted text-sm">JSON status for uptime probes</p>
+            <p className="muted text-sm">DB + demoMode + databaseKind (no secrets)</p>
           </Panel>
         </Link>
         <Link href="/admin/monitoring">

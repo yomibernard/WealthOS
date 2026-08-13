@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { evaluateLaunchGate } from "@/lib/launch-gate";
 import { getFeatureFlags } from "@/lib/feature-flags";
+import { databaseKindFromUrl } from "@/lib/hosted-smoke";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,9 @@ export async function GET() {
   const launch = evaluateLaunchGate();
   const flags = getFeatureFlags();
   const status = dbOk ? "ok" : "degraded";
+  const demoMode = ["1", "true", "yes", "on"].includes(
+    (process.env.DEMO_MODE ?? "").toLowerCase(),
+  );
 
   return NextResponse.json(
     {
@@ -28,6 +32,10 @@ export async function GET() {
       time: new Date().toISOString(),
       latencyMs: Date.now() - started,
       database: { ok: dbOk, error: dbError },
+      config: {
+        demoMode,
+        databaseKind: databaseKindFromUrl(process.env.DATABASE_URL),
+      },
       launch: {
         ok: launch.ok,
         profile: launch.profile,

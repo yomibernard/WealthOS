@@ -417,3 +417,11 @@ Privacy & support polish:
 - `exportCustomerData` portability pack now includes cadence snapshots, shares/nudges, prefs, inbox, privacy requests
 - `/app/support` L2 support/complaint intake + case history; admin escalations show complaint badges
 - `GET /api/escalations` for the customer’s own cases
+
+## Phase 8.2 delivered (13 Aug 2026)
+
+Hosted pilot smoke:
+
+- `npm run smoke:hosted` against `SMOKE_BASE_URL` (Postgres + DB probe required; DEMO_MODE warn)
+- `/api/health` exposes non-secret `config.demoMode` / `config.databaseKind`
+- Admin ops post-deploy checklist; LAUNCH_REVIEW / DEPLOY.md updated

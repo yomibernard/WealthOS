@@ -26,6 +26,7 @@
     "launch:check": "node scripts/launch-check.mjs",
     "release:check": "node scripts/release-check.mjs",
     "smoke": "node scripts/smoke-journeys.mjs",
+    "smoke:hosted": "node scripts/smoke-hosted.mjs",
     "postinstall": "prisma generate"
   },
   "dependencies": {

@@ -13,6 +13,7 @@ Use this before any public or regulated pilot. Tick in order; freeze code when s
 - [ ] No secrets in git (`.env` local only; use `.env.example`)
 - [ ] GitHub Actions CI green on `main`
 - [ ] Hosted pilot env documented per [DEPLOY.md](./DEPLOY.md)
+- [ ] `SMOKE_BASE_URL=https://… npm run smoke:hosted` green (or `SMOKE_SKIP_AUTH=1` if unseeded)
 - [ ] `SESSION_SECRET` is not the MVP default
 - [ ] `DEMO_MODE` is not `true` in production
 - [ ] Partner execution remains non-moving funds unless contracted rail is live

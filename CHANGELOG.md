@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 8.2
+
+- Hosted pilot smoke: `npm run smoke:hosted` + health `config.demoMode` / `databaseKind`
+- Admin ops post-deploy checklist; DEPLOY.md smoke table
+
 ## Unreleased — Phase 8.1
 
 - Privacy export includes monthly reports, weekly digests, adviser shares/nudges, prefs, inbox
