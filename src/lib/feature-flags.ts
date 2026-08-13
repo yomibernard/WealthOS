@@ -20,6 +20,7 @@ export type FeatureFlags = {
   taxLite: boolean;
   cryptoLite: boolean;
   lendingLite: boolean;
+  weeklyDigest: boolean;
 };
 
 function envFlag(name: string, fallback: boolean): boolean {
@@ -47,6 +48,7 @@ export function getFeatureFlags(): FeatureFlags {
     taxLite: envFlag("FF_TAX_LITE", true),
     cryptoLite: envFlag("FF_CRYPTO_LITE", true),
     lendingLite: envFlag("FF_LENDING_LITE", true),
+    weeklyDigest: envFlag("FF_WEEKLY_DIGEST", true),
   };
 }
 

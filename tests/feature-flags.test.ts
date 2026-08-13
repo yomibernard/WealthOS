@@ -6,6 +6,7 @@ describe("feature flags", () => {
     const flags = getFeatureFlags();
     expect(typeof flags.partnerExecution).toBe("boolean");
     expect(typeof flags.household).toBe("boolean");
+    expect(typeof flags.weeklyDigest).toBe("boolean");
   });
 
   it("requireFlag fails closed when disabled", () => {

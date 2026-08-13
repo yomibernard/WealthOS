@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 6.4
+
+- Weekly wealth digest engine + `/app/digest` (position, data quality, funding, inbox)
+- `GET/POST /api/digest/weekly`; flag `FF_WEEKLY_DIGEST`; WealthAI `weekly_digest` intent
+
 ## Unreleased — Phase 6.3
 
 - Goal funding pulse engine + `/app/plan/funding` with apply-suggested / custom monthly

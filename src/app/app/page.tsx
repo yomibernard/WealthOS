@@ -125,6 +125,11 @@ export default async function HomePage() {
         </Link>
       </Panel>
 
+      {flags.weeklyDigest ? (
+        <Link href="/app/digest" className="btn btn-ghost mt-3 w-full">
+          Weekly wealth digest
+        </Link>
+      ) : null}
       {flags.monthlyReports ? (
         <Link href="/app/reports" className="btn btn-ghost mt-3 w-full">
           Monthly wealth report

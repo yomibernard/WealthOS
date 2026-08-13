@@ -354,3 +354,11 @@ Goal funding pulse:
 - `goal-funding` engine ranks ahead / on track / behind / critical
 - `/app/plan/funding` with apply suggested or custom monthly contribution
 - API `POST /api/goals/[id]/funding`; WealthAI `goal_funding` intent
+
+## Phase 6.4 delivered (13 Aug 2026)
+
+Weekly wealth digest:
+
+- `weekly-digest` engine composes calm sections from live wealth state
+- `/app/digest` + generate → notification + snapshot; flag `FF_WEEKLY_DIGEST`
+- WealthAI `weekly_digest` intent

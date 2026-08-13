@@ -54,6 +54,7 @@ export type Intent =
   | "monthly_report"
   | "data_quality"
   | "goal_funding"
+  | "weekly_digest"
   | "escalation"
   | "general";
 
@@ -169,6 +170,8 @@ export function classifyIntent(message: string): Intent {
     )
   )
     return "goal_funding";
+  if (/weekly (wealth )?digest|this week.?s (summary|digest)|week in review/.test(m))
+    return "weekly_digest";
   if (/goal|saving enough/.test(m)) return "goals";
   if (/top three|what should i do|next best|priority/.test(m)) return "actions";
   if (/monthly (wealth )?report|wealth report|month.over.month|mom (change|report)/.test(m))
@@ -213,6 +216,7 @@ export function routeAgent(intent: Intent): AgentName {
     case "monthly_report":
     case "data_quality":
     case "goal_funding":
+    case "weekly_digest":
       return "CoachAI";
     case "net_worth":
     case "general":
@@ -803,6 +807,19 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
         "Path: /app/plan/funding",
       ].join(" ");
       confidence = Math.min(confidence, 0.8);
+      break;
+    }
+    case "weekly_digest": {
+      toolsUsed.push("weeklyDigest");
+      content = [
+        `Quick pulse: estimated net worth ₦${Math.round(nw.netWorthNgn).toLocaleString("en-NG")} (confidence ~${Math.round(nw.confidence * 100)}%), liquidity ≈ ${emergencyMonths.toFixed(1)} months.`,
+        nw.staleAssetIds.length
+          ? `${nw.staleAssetIds.length} stale valuation(s) — refresh in Data confidence.`
+          : "No heavily stale valuations flagged.",
+        "Open Weekly wealth digest for the full calm summary (position, data quality, funding, inbox), or generate one to save a notification.",
+        "Path: /app/digest",
+      ].join(" ");
+      confidence = Math.min(confidence, 0.85);
       break;
     }
     case "affordability":
