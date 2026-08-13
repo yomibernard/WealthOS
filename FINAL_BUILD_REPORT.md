@@ -530,3 +530,10 @@ Portfolio care filters:
 
 - `/adviser?care=` slices the book (needs care / complaints / privacy / support)
 - Book badges keep full totals; list + summary reflect the active filter
+
+## Phase 11.1 delivered (13 Aug 2026)
+
+Care acknowledgment history:
+
+- Customer 360 Care desk shows recent shared care acks so advisers avoid blind re-acks
+- Pure history builder over `care_ack` notes; ops queues still authoritative

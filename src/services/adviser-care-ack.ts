@@ -4,6 +4,7 @@ import { createUserNotification } from "@/services/notifications";
 import { createInboxFromDrafts } from "@/services/inbox";
 import {
   buildCareAckDraft,
+  buildCareAckHistory,
   type CareAckKind,
 } from "@/engines/adviser-care-ack";
 
@@ -76,4 +77,24 @@ export async function sendCareAcknowledgment(input: {
   });
 
   return { noteId: note.id, title: draft.title, href: draft.href };
+}
+
+export async function loadCareAckHistory(customerId: string, limit = 5) {
+  const notes = await prisma.adviserNote.findMany({
+    where: { customerId, kind: "care_ack" },
+    orderBy: { createdAt: "desc" },
+    take: Math.max(limit, 20),
+    include: { adviser: { select: { name: true } } },
+  });
+
+  return buildCareAckHistory(
+    notes.map((n) => ({
+      id: n.id,
+      title: n.title,
+      body: n.body,
+      createdAt: n.createdAt,
+      adviserName: n.adviser.name,
+    })),
+    limit,
+  );
 }

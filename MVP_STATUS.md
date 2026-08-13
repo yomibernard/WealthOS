@@ -47,6 +47,7 @@
 | Adviser care radar | Ready (demo) | `/adviser` portfolio sorted by care load |
 | Adviser care ack | Ready (demo) | 360 acknowledgment → customer Inbox |
 | Adviser care filters | Ready (demo) | `/adviser?care=` book slices |
+| Adviser care history | Ready (demo) | 360 recent care acknowledgments |
 
 ## Quality gates (this machine)
 

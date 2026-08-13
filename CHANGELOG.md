@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 11.1
+
+- Care acknowledgment history on customer 360 Care desk (recent `care_ack` notes)
+
 ## Unreleased — Phase 11.0
 
 - Adviser portfolio care filters on `/adviser` (`?care=` all / care / complaints / privacy / support)

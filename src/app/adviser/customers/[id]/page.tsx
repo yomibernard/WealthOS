@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { buildHomeDashboard } from "@/services/wealth";
 import { getAdviserInsightsPack } from "@/services/adviser-insights";
 import { loadAdviserCareDesk } from "@/services/adviser-care";
+import { loadCareAckHistory } from "@/services/adviser-care-ack";
 import { formatNaira } from "@/lib/format";
 import { AdviserCopilot } from "@/components/AdviserCopilot";
 import { AdviserNotesPanel } from "@/components/AdviserNotesPanel";
@@ -45,9 +46,10 @@ export default async function AdviserCustomerPage({
   }
 
   const dash = await buildHomeDashboard(customer.id);
-  const [insights, care] = await Promise.all([
+  const [insights, care, careHistory] = await Promise.all([
     getAdviserInsightsPack(customer.id),
     loadAdviserCareDesk(customer.id),
+    loadCareAckHistory(customer.id),
   ]);
   const flags = getFeatureFlags();
 
@@ -134,6 +136,28 @@ export default async function AdviserCustomerPage({
             </Link>
           </div>
         ) : null}
+        {careHistory.items.length ? (
+          <div className="space-y-2 border-t border-line pt-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="eyebrow">Recent care acknowledgments</p>
+              <Badge>{careHistory.count}</Badge>
+            </div>
+            <p className="muted text-sm">{careHistory.summary}</p>
+            <ul className="space-y-2">
+              {careHistory.items.map((h) => (
+                <li key={h.id} className="rounded-xl border border-line px-3 py-2">
+                  <p className="font-semibold text-sm">{h.title}</p>
+                  <p className="mt-1 text-sm">{h.preview}</p>
+                  <p className="muted mt-1 text-xs">
+                    {h.adviserName} · {new Date(h.createdAt).toLocaleString("en-GB")}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p className="muted border-t border-line pt-3 text-sm">{careHistory.summary}</p>
+        )}
         {flags.adviserCollab && care.items.length ? (
           <AdviserCareAck customerId={customer.id} items={care.items} />
         ) : null}
