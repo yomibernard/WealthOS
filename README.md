@@ -90,6 +90,11 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - **Health** — `GET /api/health` for uptime probes
 - **Admin** — `/admin/ops` launch gate summary
 
+## Adviser insights (Phase 7.0)
+
+- **Customer 360** — insights pack with talking points and guardrails for human review
+- API: `GET /api/adviser/insights/[customerId]` (adviser/admin)
+
 ## Weekly digest (Phase 6.4)
 
 - **Digest** — `/app/digest` one-page weekly summary (position, data quality, funding, inbox)

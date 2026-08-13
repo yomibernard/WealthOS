@@ -362,3 +362,11 @@ Weekly wealth digest:
 - `weekly-digest` engine composes calm sections from live wealth state
 - `/app/digest` + generate → notification + snapshot; flag `FF_WEEKLY_DIGEST`
 - WealthAI `weekly_digest` intent
+
+## Phase 7.0 delivered (13 Aug 2026)
+
+Adviser insights pack:
+
+- `adviser-insights` engine → briefing, prioritised talking points, do-not-say guardrails
+- Rendered on `/adviser/customers/[id]`; API `GET /api/adviser/insights/[customerId]`
+- Reuses data quality, funding pulse, weekly digest, escalations, and attention items

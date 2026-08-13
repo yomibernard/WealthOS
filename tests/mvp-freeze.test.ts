@@ -54,6 +54,7 @@ const engines = [
   "src/engines/data-quality.ts",
   "src/engines/goal-funding.ts",
   "src/engines/weekly-digest.ts",
+  "src/engines/adviser-insights.ts",
 ];
 
 describe("MVP freeze inventory", () => {

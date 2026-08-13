@@ -3,6 +3,7 @@ import { Badge, PageHeader, Panel } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { buildHomeDashboard } from "@/services/wealth";
+import { getAdviserInsightsPack } from "@/services/adviser-insights";
 import { formatNaira } from "@/lib/format";
 import { AdviserCopilot } from "@/components/AdviserCopilot";
 import { AdviserNotesPanel } from "@/components/AdviserNotesPanel";
@@ -33,7 +34,15 @@ export default async function AdviserCustomerPage({
   });
   if (!customer) redirect("/adviser");
 
+  if (user.role === "ADVISER") {
+    const link = await prisma.adviserCustomer.findFirst({
+      where: { adviserId: user.id, customerId: customer.id },
+    });
+    if (!link) redirect("/adviser");
+  }
+
   const dash = await buildHomeDashboard(customer.id);
+  const insights = await getAdviserInsightsPack(customer.id);
   const flags = getFeatureFlags();
 
   return (
@@ -64,6 +73,49 @@ export default async function AdviserCustomerPage({
           <p className="font-display text-3xl">{customer.escalations.length}</p>
         </Panel>
       </div>
+
+      {insights ? (
+        <Panel className="mt-4 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="eyebrow">Insights pack</p>
+            <Badge>{insights.talkingPoints.length} talking points</Badge>
+          </div>
+          <p className="text-sm leading-relaxed">{insights.briefing}</p>
+          <ul className="space-y-3">
+            {insights.talkingPoints.map((tp) => (
+              <li key={tp.id} className="rounded-xl border border-line p-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-semibold">{tp.title}</p>
+                  <Badge
+                    tone={
+                      tp.priority === "critical"
+                        ? "danger"
+                        : tp.priority === "important"
+                          ? "warn"
+                          : "default"
+                    }
+                  >
+                    {tp.priority}
+                  </Badge>
+                </div>
+                <p className="muted mt-1 text-sm">{tp.detail}</p>
+                <p className="mt-2 text-sm">
+                  <span className="font-medium">Ask: </span>
+                  {tp.suggestedQuestion}
+                </p>
+              </li>
+            ))}
+          </ul>
+          <div className="border-t border-line pt-3">
+            <p className="eyebrow">Guardrails</p>
+            <ul className="muted mt-2 list-disc space-y-1 pl-5 text-sm">
+              {insights.doNotSay.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </div>
+        </Panel>
+      ) : null}
 
       <div className="mt-4 grid gap-3 lg:grid-cols-2">
         <Panel>

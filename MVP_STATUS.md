@@ -19,7 +19,7 @@
 | WealthAI | Ready (demo) | multi-agent + deterministic tools |
 | WealthGuard | Ready (demo) | cautious labels, no auto scam/safe |
 | Consent / Privacy | Ready (demo) | consent centre, export/erasure |
-| Adviser portal | Ready (demo) | 360, notes, timeline |
+| Adviser portal | Ready (demo) | 360, notes, timeline, insights pack |
 | Admin / maker-checker | Ready (demo) | products, FX, flags, privacy queue |
 | Open banking | Demo only | consent-gated sync, no real bank login |
 | Partner execution | Demo only | `fundsMoved: false` |

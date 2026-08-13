@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — Phase 7.0
+
+- Adviser insights pack on customer 360 (talking points + guardrails)
+- `GET /api/adviser/insights/[customerId]` for assigned advisers / admin
+
 ## Unreleased — Phase 6.4
 
 - Weekly wealth digest engine + `/app/digest` (position, data quality, funding, inbox)
