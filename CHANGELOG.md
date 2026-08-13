@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 13.2
+
+- Privacy Centre lists privacy-related care updates; smoke journeys cover support/privacy/`/api/care-updates`
+
 ## Unreleased — Phase 13.1
 
 - Support page lists recent adviser care updates (`GET /api/care-updates`) for the Home pulse destination

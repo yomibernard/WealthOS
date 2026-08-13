@@ -593,3 +593,10 @@ Support care updates:
 
 - `/app/support` shows recent adviser care acknowledgments
 - `GET /api/care-updates` powers Home + Support from the same pulse builder
+
+## Phase 13.2 delivered (13 Aug 2026)
+
+Privacy care updates + smoke:
+
+- `/app/privacy` shows privacy-related care acknowledgments
+- Local/hosted smoke checks support, privacy, and `/api/care-updates`

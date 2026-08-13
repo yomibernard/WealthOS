@@ -46,7 +46,7 @@ const acts = [
     steps: [
       "Consent Centre — pause AI, show gate, restore",
       "Adviser care radar (unacked cues) → 360 care desk + history/ack + insights",
-      "Customer Home care-update pulse → Support shows recent acks",
+      "Customer Home care-update pulse → Support/Privacy recent acks",
       "Adviser sends nudge → customer Inbox deep link",
       "Admin ops — care handoff + escalation/privacy care-ack cues",
       "Support case → resolve → Home / Inbox / Notifications link",

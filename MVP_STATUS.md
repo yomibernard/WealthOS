@@ -54,6 +54,7 @@
 | Privacy care cues | Ready (demo) | `/admin/privacy` care-ack badge + 360 link |
 | Customer care pulse | Ready (demo) | Home CTA for recent adviser care updates |
 | Support care updates | Ready (demo) | `/app/support` recent care acknowledgments |
+| Privacy care updates | Ready (demo) | `/app/privacy` recent care acknowledgments |
 
 ## Quality gates (this machine)
 

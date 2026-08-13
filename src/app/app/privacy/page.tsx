@@ -12,15 +12,36 @@ type PrivacyReq = {
   resolution: string | null;
 };
 
+type CareUpdate = {
+  id: string;
+  title: string;
+  preview: string;
+  adviserName: string;
+  createdAt: string;
+  href: string;
+};
+
 export default function PrivacyPage() {
   const [requests, setRequests] = useState<PrivacyReq[]>([]);
+  const [careUpdates, setCareUpdates] = useState<CareUpdate[]>([]);
   const [type, setType] = useState("access");
   const [details, setDetails] = useState("");
   const [message, setMessage] = useState<string | null>(null);
 
   async function load() {
-    const res = await fetch("/api/privacy/requests");
-    if (res.ok) setRequests(await res.json());
+    const [reqRes, careRes] = await Promise.all([
+      fetch("/api/privacy/requests"),
+      fetch("/api/care-updates"),
+    ]);
+    if (reqRes.ok) setRequests(await reqRes.json());
+    if (careRes.ok) {
+      const data = (await careRes.json()) as { items?: CareUpdate[] };
+      setCareUpdates(
+        (data.items ?? []).filter(
+          (i) => i.href === "/app/privacy" || /privacy/i.test(i.title),
+        ),
+      );
+    }
   }
 
   useEffect(() => {
@@ -50,6 +71,29 @@ export default function PrivacyPage() {
         title="Privacy Centre"
         subtitle="Download your data or request access, correction, objection or erasure. Retention rules still apply where legally required."
       />
+
+      {careUpdates.length ? (
+        <Panel className="mb-3 space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-semibold">Recent care updates</p>
+            <Badge>{careUpdates.length}</Badge>
+          </div>
+          <p className="muted text-sm">
+            Your adviser acknowledged a privacy-related item. Ops still handles formal completion.
+          </p>
+          <ul className="space-y-2">
+            {careUpdates.map((u) => (
+              <li key={u.id} className="rounded-xl border border-line px-3 py-2">
+                <p className="font-semibold text-sm">{u.title}</p>
+                <p className="mt-1 text-sm">{u.preview}</p>
+                <p className="muted mt-1 text-xs">
+                  {u.adviserName} · {new Date(u.createdAt).toLocaleString("en-GB")}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      ) : null}
 
       <Panel className="space-y-3">
         <p className="font-semibold">Data portability</p>
@@ -95,19 +139,25 @@ export default function PrivacyPage() {
       </Panel>
 
       <div className="mt-4 space-y-3">
-        {requests.map((r) => (
-          <Panel key={r.id}>
-            <div className="flex flex-wrap gap-2">
-              <Badge>{r.type}</Badge>
-              <Badge tone={r.status === "open" ? "warn" : "default"}>{r.status}</Badge>
-            </div>
-            <p className="muted mt-2 text-sm">
-              {new Date(r.createdAt).toLocaleString("en-GB")}
-            </p>
-            {r.details ? <p className="mt-1 text-sm">{r.details}</p> : null}
-            {r.resolution ? <p className="mt-2 text-sm">{r.resolution}</p> : null}
+        {requests.length === 0 ? (
+          <Panel>
+            <p className="muted text-sm">No privacy requests yet.</p>
           </Panel>
-        ))}
+        ) : (
+          requests.map((r) => (
+            <Panel key={r.id}>
+              <div className="flex flex-wrap gap-2">
+                <Badge>{r.type}</Badge>
+                <Badge tone={r.status === "open" ? "warn" : "default"}>{r.status}</Badge>
+              </div>
+              <p className="muted mt-2 text-sm">
+                {new Date(r.createdAt).toLocaleString("en-GB")}
+              </p>
+              {r.details ? <p className="mt-1 text-sm">{r.details}</p> : null}
+              {r.resolution ? <p className="mt-2 text-sm">{r.resolution}</p> : null}
+            </Panel>
+          ))
+        )}
       </div>
     </main>
   );

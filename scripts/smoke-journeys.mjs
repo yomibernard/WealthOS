@@ -59,7 +59,15 @@ try {
     console.log(`  [FAIL] sign-in Yomi → ${login.res.status}`);
   } else {
     console.log("  [OK] sign-in Yomi");
-    const appPaths = ["/app", "/app/inbox", "/app/wealth", "/app/actions", "/app/wealthguard"];
+    const appPaths = [
+      "/app",
+      "/app/inbox",
+      "/app/wealth",
+      "/app/actions",
+      "/app/wealthguard",
+      "/app/support",
+      "/app/privacy",
+    ];
     for (const path of appPaths) {
       const res = await authedGet(path, login.cookie);
       // Next may 200 or 307 depending on middleware; accept 200/307/308
@@ -67,6 +75,10 @@ try {
       console.log(`  [${ok ? "OK" : "FAIL"}] GET ${path} → ${res.status}`);
       if (!ok) failures.push(`${path} status ${res.status}`);
     }
+    const careRes = await authedGet("/api/care-updates", login.cookie);
+    const careOk = careRes.status === 200;
+    console.log(`  [${careOk ? "OK" : "FAIL"}] GET /api/care-updates → ${careRes.status}`);
+    if (!careOk) failures.push(`/api/care-updates status ${careRes.status}`);
   }
 } catch (err) {
   console.error("\nSmoke could not reach the server.");

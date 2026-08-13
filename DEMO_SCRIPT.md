@@ -52,11 +52,11 @@ Presenter checklist UI: `/demo`
 2. **Connections** — sync demo bank (consent-gated)
 3. As Yomi — **Adviser collaboration** → **Share a briefing** (full or digest)
 4. **Adviser** portal — **Care radar** filters (`Needs care` / **Unacked** / Complaints / Privacy / Support) → 360 **Care desk** (see **recent acks**, optional **acknowledge**) + **Insights**; send a **nudge**
-5. Back as Yomi — **Home** may show **care update** CTA → **Support** lists the acknowledgment; **Inbox** shows nudge deep link
+5. Back as Yomi — **Home** may show **care update** CTA → **Support** or **Privacy** lists the acknowledgment; **Inbox** shows nudge deep link
 6. **Admin** — daily ops board on `/admin` / `/admin/ops` (escalations, privacy, **care handoff**, maker-checker, flag risk)
 7. Optional: `/admin/escalations` + `/admin/privacy` — note **care-ack** badges + Care desk links; `/admin/flags` safe pilot; `/admin/audit` filter + download
 8. Trust loop (optional, ~2 min): Yomi `/app/support` → case; admin resolve → Yomi **Home** / **Inbox** / **Notifications** deep-link back to Support
-9. Privacy loop (optional): Yomi Privacy Centre request → admin `/admin/privacy` → Yomi Inbox/Notifications → `/app/privacy`
+9. Privacy loop (optional): Yomi Privacy Centre request → admin `/admin/privacy` → Yomi Inbox/Notifications → `/app/privacy` (care updates if acked)
 
 ## Closing lines
 

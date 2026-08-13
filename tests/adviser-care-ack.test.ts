@@ -93,5 +93,20 @@ describe("adviser care acknowledgment", () => {
     expect(pulse.headline).toMatch(/Ada sent a care update/i);
     expect(pulse.primaryHref).toBe("/app/support");
     expect(pulse.items[0]?.preview).toMatch(/I've seen this/i);
+
+    const privacyPulse = buildCareUpdatePulse(
+      [
+        {
+          id: "p1",
+          title: "Adviser acknowledged your privacy request",
+          body: "Ada: Your erasure request is with ops.",
+          createdAt: "2026-08-13T09:00:00.000Z",
+          adviserName: "Ada",
+        },
+      ],
+      now,
+    );
+    expect(privacyPulse.primaryHref).toBe("/app/privacy");
+    expect(privacyPulse.items[0]?.href).toBe("/app/privacy");
   });
 });
