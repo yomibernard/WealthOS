@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 13.0
+
+- Customer Home care-update pulse when an adviser recently acknowledged open care
+
 ## 0.1.5 — 13 Aug 2026 (Ops care handoff pack)
 
 Ops visibility into adviser care acknowledgments on top of the 0.1.4 care UX pack.

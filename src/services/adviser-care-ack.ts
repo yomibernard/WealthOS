@@ -5,6 +5,7 @@ import { createInboxFromDrafts } from "@/services/inbox";
 import {
   buildCareAckDraft,
   buildCareAckHistory,
+  buildCareUpdatePulse,
   type CareAckKind,
 } from "@/engines/adviser-care-ack";
 
@@ -96,5 +97,27 @@ export async function loadCareAckHistory(customerId: string, limit = 5) {
       adviserName: n.adviser.name,
     })),
     limit,
+  );
+}
+
+export async function loadCareUpdatePulse(customerId: string) {
+  const notes = await prisma.adviserNote.findMany({
+    where: {
+      customerId,
+      kind: "care_ack",
+      sharedWithCustomer: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+    include: { adviser: { select: { name: true } } },
+  });
+
+  return buildCareUpdatePulse(
+    notes.map((n) => ({
+      title: n.title,
+      body: n.body,
+      createdAt: n.createdAt,
+      adviserName: n.adviser.name,
+    })),
   );
 }

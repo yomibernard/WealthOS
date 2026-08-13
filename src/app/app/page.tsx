@@ -7,6 +7,7 @@ import { refreshInbox } from "@/services/inbox";
 import { syncProfileCompleteness } from "@/services/profile-completeness";
 import { loadCustomerCasesPulse } from "@/services/customer-cases";
 import { loadPrivacyRequestsPulse } from "@/services/privacy";
+import { loadCareUpdatePulse } from "@/services/adviser-care-ack";
 import { formatNaira, greetingForHour } from "@/lib/format";
 import { getFeatureFlags } from "@/lib/feature-flags";
 
@@ -20,10 +21,11 @@ export default async function HomePage() {
 
   const flags = getFeatureFlags();
   const inbox = flags.wealthInbox ? await refreshInbox(user.id) : { unread: 0 };
-  const [profile, cases, privacyPulse] = await Promise.all([
+  const [profile, cases, privacyPulse, carePulse] = await Promise.all([
     syncProfileCompleteness(user.id),
     loadCustomerCasesPulse(user.id),
     loadPrivacyRequestsPulse(user.id),
+    loadCareUpdatePulse(user.id),
   ]);
 
   const hour = new Date().getHours();
@@ -154,6 +156,12 @@ export default async function HomePage() {
           className={`btn mt-3 w-full ${privacyPulse.erasureOpen ? "btn-soft" : "btn-ghost"}`}
         >
           {privacyPulse.headline}
+        </Link>
+      ) : null}
+
+      {carePulse.headline ? (
+        <Link href={carePulse.primaryHref} className="btn btn-ghost mt-3 w-full">
+          {carePulse.headline}
         </Link>
       ) : null}
 

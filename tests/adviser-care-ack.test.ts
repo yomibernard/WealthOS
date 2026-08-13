@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildCareAckDraft, buildCareAckHistory } from "@/engines/adviser-care-ack";
+import {
+  buildCareAckDraft,
+  buildCareAckHistory,
+  buildCareUpdatePulse,
+} from "@/engines/adviser-care-ack";
 import { resolveNotificationLink } from "@/lib/notification-links";
 
 describe("adviser care acknowledgment", () => {
@@ -58,5 +62,32 @@ describe("adviser care acknowledgment", () => {
     expect(history.items[0]?.id).toBe("n1");
     expect(history.items[0]?.preview).toMatch(/Following up personally/i);
     expect(history.summary).toMatch(/2 care acknowledgment/i);
+  });
+
+  it("builds a Home care-update pulse for recent acks", () => {
+    const now = new Date("2026-08-13T12:00:00.000Z");
+    const empty = buildCareUpdatePulse([], now);
+    expect(empty.headline).toBeNull();
+
+    const pulse = buildCareUpdatePulse(
+      [
+        {
+          title: "Adviser acknowledged your complaint",
+          body: "Ada: I've seen this.",
+          createdAt: "2026-08-12T10:00:00.000Z",
+          adviserName: "Ada",
+        },
+        {
+          title: "Adviser acknowledged your privacy request",
+          body: "Ada: ops has your request.",
+          createdAt: "2026-07-01T10:00:00.000Z",
+          adviserName: "Ada",
+        },
+      ],
+      now,
+    );
+    expect(pulse.count).toBe(1);
+    expect(pulse.headline).toMatch(/Ada sent a care update/i);
+    expect(pulse.primaryHref).toBe("/app/support");
   });
 });

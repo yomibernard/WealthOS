@@ -102,7 +102,7 @@ Init SQL lives in `prisma/migrations-postgres/` so SQLite `db:push` is undisturb
 - Flag profiles: `/admin/flags` (safe pilot / incident lockdown)
 - Pilot freeze: `npm run pilot:freeze` (v0.1.5 ops care handoff pack)
 - Adviser care: `/adviser` radar (`?care=` incl. unacked) → 360 Care desk (history + optional ack)
-- Home shows open/recent support cases; ask WealthAI about support or privacy export
+- Home shows open/recent support cases; care-update pulse after adviser ack; ask WealthAI about support or privacy export
 - Admin module index: `/admin/ops`
 
 ## Notification preferences (Phase 7.4)

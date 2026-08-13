@@ -109,3 +109,51 @@ export function buildCareAckHistory(
 
   return { count: notes.length, latestAt, summary, items };
 }
+
+export type CareUpdatePulse = {
+  count: number;
+  headline: string | null;
+  primaryHref: string;
+  latestAt: string | null;
+};
+
+/** Customer Home CTA when an adviser recently acknowledged open care. */
+export function buildCareUpdatePulse(
+  notes: Array<{
+    title: string;
+    body: string;
+    createdAt: Date | string;
+    adviserName: string;
+  }>,
+  now = new Date(),
+  windowDays = 14,
+): CareUpdatePulse {
+  const cutoff = now.getTime() - windowDays * 86_400_000;
+  const recent = notes
+    .map((n) => ({
+      ...n,
+      createdAt:
+        typeof n.createdAt === "string" ? n.createdAt : n.createdAt.toISOString(),
+    }))
+    .filter((n) => new Date(n.createdAt).getTime() >= cutoff)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+  if (recent.length === 0) {
+    return { count: 0, headline: null, primaryHref: "/app/inbox", latestAt: null };
+  }
+
+  const latest = recent[0]!;
+  const privacy = /privacy/i.test(latest.title);
+  const primaryHref = privacy ? "/app/privacy" : "/app/support";
+  const headline =
+    recent.length === 1
+      ? `${latest.adviserName} sent a care update`
+      : `${recent.length} recent care updates from your adviser`;
+
+  return {
+    count: recent.length,
+    headline,
+    primaryHref,
+    latestAt: latest.createdAt,
+  };
+}

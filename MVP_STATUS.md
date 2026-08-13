@@ -52,6 +52,7 @@
 | Ops care handoff | Ready (demo) | `/admin/ops` unacked queue + recent acks |
 | Escalation care cues | Ready (demo) | `/admin/escalations` care-ack badge + 360 link |
 | Privacy care cues | Ready (demo) | `/admin/privacy` care-ack badge + 360 link |
+| Customer care pulse | Ready (demo) | Home CTA for recent adviser care updates |
 
 ## Quality gates (this machine)
 

@@ -579,3 +579,10 @@ Ops care handoff freeze pack **v0.1.5**:
 
 - `npm run pilot:freeze` checks 12.x handoff + escalation/privacy care cues
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 13.0 delivered (13 Aug 2026)
+
+Customer care-update pulse:
+
+- Home CTA when a shared care acknowledgment arrived in the last 14 days
+- Deep-links to Support or Privacy Centre from the latest ack topic
