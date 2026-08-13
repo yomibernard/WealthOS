@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.9 (… + care receipts 15.x + close-loop 16.x).
+ * Current pack: v0.1.10 (… + close-loop 16.x + adviser notifications 17.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.9";
+const EXPECTED = "0.1.10";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -74,6 +74,11 @@ mustExist("src/app/api/ai/chat/route.ts");
 mustExist("src/app/api/care-updates/[id]/seen/route.ts");
 mustExist("src/components/CareUpdateReceiptList.tsx");
 
+// 17.x adviser notifications
+mustExist("src/engines/adviser-notifications.ts");
+mustExist("src/app/adviser/notifications/page.tsx");
+mustExist("src/app/api/notifications/[id]/route.ts");
+
 mustExist("DEPLOY.md");
 mustExist("OPS_RUNBOOK.md");
 mustExist("LAUNCH_REVIEW.md");
@@ -84,7 +89,7 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.9")) failures.push("CHANGELOG.md missing 0.1.9 section");
+if (!changelog.includes("0.1.10")) failures.push("CHANGELOG.md missing 0.1.10 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
 if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
@@ -109,11 +114,14 @@ if (
 if (!changelog.includes("awaiting") && !changelog.includes("close-loop")) {
   failures.push("CHANGELOG.md missing care close-loop / awaiting mention");
 }
+if (!changelog.includes("Adviser notification") && !changelog.includes("adviser notification")) {
+  failures.push("CHANGELOG.md missing adviser notification centre mention");
+}
 
 const deploy = read("DEPLOY.md");
 if (!deploy.includes("smoke:hosted")) failures.push("DEPLOY.md missing smoke:hosted");
 if (!deploy.includes("safe pilot")) failures.push("DEPLOY.md missing safe pilot guidance");
-if (!deploy.includes("v0.1.9")) failures.push("DEPLOY.md missing v0.1.9 tag guidance");
+if (!deploy.includes("v0.1.10")) failures.push("DEPLOY.md missing v0.1.10 tag guidance");
 
 const demo = read("DEMO_SCRIPT.md");
 if (!demo.includes("/admin/ops")) failures.push("DEMO_SCRIPT.md missing /admin/ops");
@@ -134,9 +142,15 @@ if (!demo.includes("Mark as seen") && !demo.includes("mark as seen")) {
 if (!demo.includes("Awaiting receipt") && !demo.includes("awaiting")) {
   failures.push("DEMO_SCRIPT.md missing Awaiting receipt close-loop beat");
 }
+if (!demo.includes("Adviser notifications") && !demo.includes("/adviser/notifications")) {
+  failures.push("DEMO_SCRIPT.md missing Adviser notifications beat");
+}
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.9")) failures.push("MVP_STATUS.md missing 0.1.9");
+if (!status.includes("0.1.10")) failures.push("MVP_STATUS.md missing 0.1.10");
+if (!status.includes("Adviser notifications")) {
+  failures.push("MVP_STATUS.md missing Adviser notifications");
+}
 if (!status.includes("Care receipt close-loop")) {
   failures.push("MVP_STATUS.md missing Care receipt close-loop");
 }
@@ -153,7 +167,7 @@ const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
 if (!launch.includes("/admin/flags")) failures.push("LAUNCH_REVIEW.md missing flag profiles path");
 if (!launch.includes("pilot:freeze")) failures.push("LAUNCH_REVIEW.md missing pilot:freeze");
-if (!launch.includes("0.1.9")) failures.push("LAUNCH_REVIEW.md missing 0.1.9 pack");
+if (!launch.includes("0.1.10")) failures.push("LAUNCH_REVIEW.md missing 0.1.10 pack");
 
 const notificationsPage = read("src/app/app/notifications/page.tsx");
 if (!notificationsPage.includes("resolveNotificationLink")) {
@@ -352,6 +366,38 @@ if (!seed.includes('status: "seen"') && !seed.includes("status: 'seen'")) {
 const notificationLinks = read("src/lib/notification-links.ts");
 if (!notificationLinks.includes("/adviser")) {
   failures.push("notification-links missing /adviser Path extraction");
+}
+
+// 17.x adviser notification centre
+const adviserNotifyEngine = read("src/engines/adviser-notifications.ts");
+if (!adviserNotifyEngine.includes("buildAdviserNotificationPulse")) {
+  failures.push("adviser-notifications engine missing buildAdviserNotificationPulse");
+}
+
+const notifyService = read("src/services/notifications.ts");
+if (!notifyService.includes("loadAdviserNotificationPulse") || !notifyService.includes("markNotificationRead")) {
+  failures.push("notifications service missing adviser pulse / mark read");
+}
+
+const adviserNotifyPage = read("src/app/adviser/notifications/page.tsx");
+if (!adviserNotifyPage.includes("Mark as read") && !adviserNotifyPage.includes("/api/notifications/")) {
+  failures.push("adviser notifications page missing mark-as-read UI");
+}
+
+const adviserHomePage = read("src/app/adviser/page.tsx");
+if (!adviserHomePage.includes("loadAdviserNotificationPulse") && !adviserHomePage.includes("/adviser/notifications")) {
+  failures.push("adviser home missing notification pulse link");
+}
+
+if (!smokeLocal.includes("/adviser/notifications") || !smokeLocal.includes("/api/notifications")) {
+  failures.push("smoke-journeys missing adviser notifications coverage");
+}
+if (!smokeHosted.includes("/adviser/notifications")) {
+  failures.push("smoke-hosted missing /adviser/notifications path");
+}
+
+if (!seed.includes("marked your care update as seen")) {
+  failures.push("seed missing adviser care-receipt notification");
 }
 
 if (failures.length) {

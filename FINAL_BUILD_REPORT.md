@@ -696,3 +696,10 @@ Adviser notification smoke:
 
 - Local smoke GETs `/api/notifications` as adviser and PATCHes mark-as-read when unread exists
 - Hosted smoke includes `/api/notifications` on the adviser path set
+
+## Phase 17.2 delivered (14 Aug 2026)
+
+Adviser notification centre freeze pack **v0.1.10**:
+
+- `npm run pilot:freeze` checks `/adviser/notifications`, mark-as-read API, unread pulse, seed + smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

@@ -1,12 +1,14 @@
 # Changelog
 
-## Unreleased — Phase 17.1
+## 0.1.10 — 14 Aug 2026 (Adviser notification centre pack)
 
-- Smoke covers adviser `/api/notifications` + mark-as-read; hosted smoke hits the notifications API
+Adviser-facing notification centre on top of the 0.1.9 care receipt close-loop pack.
 
-## Unreleased — Phase 17.0
+### Phase 17.x — Adviser notifications
 
-- Adviser notification centre at `/adviser/notifications` with unread pulse, mark-as-read, and Care desk deep-links
+- **17.2** Freeze pack `v0.1.10`; `pilot:freeze` covers 17.x adviser notification surface
+- **17.1** Smoke covers adviser `/api/notifications` + mark-as-read; hosted smoke hits the notifications API
+- **17.0** `/adviser/notifications` with unread pulse, mark-as-read, and Care desk deep-links
 
 ## 0.1.9 — 13 Aug 2026 (Care receipt close-loop pack)
 
