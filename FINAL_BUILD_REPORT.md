@@ -784,3 +784,10 @@ Home next-steps smoke:
 
 - Local smoke checks next-steps `primaryHref` / item hrefs
 - WealthAI probe: “What should I do next?” must cite an in-app path or next-steps copy
+
+## Phase 21.2 delivered (14 Aug 2026)
+
+Home next-steps pulse freeze pack **v0.1.14**:
+
+- `npm run pilot:freeze` checks next-steps engine/service/API, Home UI, AI grounding, smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

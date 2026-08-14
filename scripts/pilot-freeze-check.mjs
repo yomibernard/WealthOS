@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.13 (… + customer triage 19.x + inbox triage 20.x).
+ * Current pack: v0.1.14 (… + inbox triage 20.x + next-steps 21.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.13";
+const EXPECTED = "0.1.14";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -89,7 +89,7 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.13")) failures.push("CHANGELOG.md missing 0.1.13 section");
+if (!changelog.includes("0.1.14")) failures.push("CHANGELOG.md missing 0.1.14 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
 if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
@@ -121,7 +121,7 @@ if (!changelog.includes("Adviser notification") && !changelog.includes("adviser 
 const deploy = read("DEPLOY.md");
 if (!deploy.includes("smoke:hosted")) failures.push("DEPLOY.md missing smoke:hosted");
 if (!deploy.includes("safe pilot")) failures.push("DEPLOY.md missing safe pilot guidance");
-if (!deploy.includes("v0.1.13")) failures.push("DEPLOY.md missing v0.1.13 tag guidance");
+if (!deploy.includes("v0.1.14")) failures.push("DEPLOY.md missing v0.1.14 tag guidance");
 
 const demo = read("DEMO_SCRIPT.md");
 if (!demo.includes("/admin/ops")) failures.push("DEMO_SCRIPT.md missing /admin/ops");
@@ -147,7 +147,10 @@ if (!demo.includes("Adviser notifications") && !demo.includes("/adviser/notifica
 }
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.13")) failures.push("MVP_STATUS.md missing 0.1.13");
+if (!status.includes("0.1.14")) failures.push("MVP_STATUS.md missing 0.1.14");
+if (!status.includes("Home next-steps pulse")) {
+  failures.push("MVP_STATUS.md missing Home next-steps pulse");
+}
 if (!status.includes("Wealth Inbox triage")) {
   failures.push("MVP_STATUS.md missing Wealth Inbox triage");
 }
@@ -176,7 +179,7 @@ const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
 if (!launch.includes("/admin/flags")) failures.push("LAUNCH_REVIEW.md missing flag profiles path");
 if (!launch.includes("pilot:freeze")) failures.push("LAUNCH_REVIEW.md missing pilot:freeze");
-if (!launch.includes("0.1.13")) failures.push("LAUNCH_REVIEW.md missing 0.1.13 pack");
+if (!launch.includes("0.1.14")) failures.push("LAUNCH_REVIEW.md missing 0.1.14 pack");
 
 const notificationsPage = read("src/app/app/notifications/page.tsx");
 if (!notificationsPage.includes("resolveNotificationLink")) {
@@ -525,6 +528,43 @@ if (
 }
 if (!demo.includes("/app/inbox?status=unread") && !demo.includes("Wealth Inbox unread")) {
   failures.push("DEMO_SCRIPT.md missing Wealth Inbox triage beat");
+}
+
+// 21.x Home next-steps pulse
+mustExist("src/engines/next-steps.ts");
+mustExist("src/services/next-steps.ts");
+mustExist("src/app/api/next-steps/route.ts");
+const nextStepsEngine = read("src/engines/next-steps.ts");
+if (
+  !nextStepsEngine.includes("buildNextStepsPulse") ||
+  !nextStepsEngine.includes("formatNextStepsAiContent") ||
+  !nextStepsEngine.includes("do_nothing")
+) {
+  failures.push("next-steps engine missing pulse / AI / do-nothing helpers");
+}
+const nextStepsService = read("src/services/next-steps.ts");
+if (!nextStepsService.includes("loadNextStepsPulse")) {
+  failures.push("next-steps service missing loadNextStepsPulse");
+}
+if (!customerHome.includes("loadNextStepsPulse") || !customerHome.includes("Needs your attention")) {
+  failures.push("customer Home missing next-steps pulse UI");
+}
+const aiChat = read("src/app/api/ai/chat/route.ts");
+if (!aiChat.includes("loadNextStepsPulse") || !aiChat.includes("nextSteps")) {
+  failures.push("AI chat route missing next-steps grounding");
+}
+if (
+  !smokeLocal.includes("/api/next-steps") ||
+  !smokeLocal.includes("primaryHref") ||
+  !smokeLocal.includes("What should I do next?")
+) {
+  failures.push("smoke-journeys missing next-steps / WealthAI coverage");
+}
+if (!smokeHosted.includes("/api/next-steps")) {
+  failures.push("smoke-hosted missing /api/next-steps");
+}
+if (!demo.includes("next-steps") && !demo.includes("What should I do next?")) {
+  failures.push("DEMO_SCRIPT.md missing next-steps beat");
 }
 
 if (failures.length) {

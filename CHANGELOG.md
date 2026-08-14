@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.1.14 — 14 Aug 2026 (Home next-steps pulse pack)
+
+Ranked Home next-steps with deep links on top of the 0.1.13 Wealth Inbox triage pack.
 
 ### Phase 21.x — Home next-steps pulse
 
+- **21.2** Freeze pack `v0.1.14`; `pilot:freeze` covers 21.x next-steps surface
 - **21.1** Smoke asserts next-steps `primaryHref` + WealthAI “What should I do next?” path grounding
 - **21.0** Ranked Home next-steps with deep links; `GET /api/next-steps`; WealthAI “what should I do next?” grounded on the pulse
 
