@@ -311,20 +311,35 @@ try {
       body: JSON.stringify({ message: "What should I do next for my book?" }),
     });
     const adviserAiData = await adviserAiRes.json().catch(() => ({}));
+    const adviserAiContent =
+      typeof adviserAiData.content === "string" ? adviserAiData.content : "";
+    const adviserAiHasPath = /Path:\s*\/adviser(\/|\?|$| )/i.test(adviserAiContent);
+    const adviserAiTools = Array.isArray(adviserAiData.toolsUsed)
+      ? adviserAiData.toolsUsed
+      : [];
+    const adviserAiToolOk = adviserAiTools.includes("adviserNextStepsPulse");
+    const adviserAiAgentOk = adviserAiData.agent === "CoachAI";
     const adviserAiOk =
       adviserAiRes.status === 200 &&
-      typeof adviserAiData.content === "string" &&
-      (/Path:\s*\/adviser/i.test(adviserAiData.content) ||
-        /Care radar|book next|Needs your attention|\/adviser(\/|\?)/i.test(
-          adviserAiData.content,
-        ));
+      adviserAiHasPath &&
+      adviserAiToolOk &&
+      adviserAiAgentOk;
     console.log(
-      `  [${adviserAiOk ? "OK" : "FAIL"}] POST /api/adviser/ai book_next_steps → ${adviserAiRes.status}`,
+      `  [${adviserAiOk ? "OK" : "FAIL"}] POST /api/adviser/ai book_next_steps agent=${adviserAiData.agent ?? "n/a"} tools=${adviserAiTools.join(",") || "n/a"} path=${adviserAiHasPath ? "yes" : "no"} → ${adviserAiRes.status}`,
     );
     if (!adviserAiOk) {
       failures.push(
-        `adviser ai book_next_steps failed: ${adviserAiRes.status} ${String(adviserAiData.content ?? "").slice(0, 120)}`,
+        `adviser ai book_next_steps failed: status=${adviserAiRes.status} agent=${adviserAiData.agent ?? "n/a"} tools=${adviserAiTools.join(",") || "n/a"} hasPath=${adviserAiHasPath} ${adviserAiContent.slice(0, 120)}`,
       );
+    }
+    if (adviserAiRes.status === 200 && !adviserAiHasPath) {
+      failures.push("adviser ai book_next_steps missing Path: /adviser");
+    }
+    if (adviserAiRes.status === 200 && !adviserAiToolOk) {
+      failures.push("adviser ai book_next_steps missing adviserNextStepsPulse tool");
+    }
+    if (adviserAiRes.status === 200 && !adviserAiAgentOk) {
+      failures.push("adviser ai book_next_steps expected CoachAI agent");
     }
 
     const noteRes = await authedGet("/api/notifications", adviserLogin.cookie);

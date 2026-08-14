@@ -111,8 +111,14 @@ describe("hosted smoke rules", () => {
     expect(local).toContain("What should I do next for my book?");
     expect(local).toContain("book_next_steps");
     expect(local).toContain("/adviser/ai");
+    expect(local).toContain("adviserNextStepsPulse");
+    expect(local).toContain("CoachAI");
+    expect(local).toContain("adviser ai book_next_steps missing Path: /adviser");
     expect(hosted).toContain("/api/next-steps");
     expect(hosted).toContain("/api/adviser/next-steps");
     expect(hosted).toContain("/adviser/ai");
+    expect(hosted).toContain("/api/adviser/ai");
+    expect(hosted).toContain("What should I do next for my book?");
+    expect(hosted).toContain("adviserNextStepsPulse");
   });
 });

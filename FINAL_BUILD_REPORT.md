@@ -821,3 +821,10 @@ Adviser WealthAI book next-steps:
 - `/adviser/ai` + `POST /api/adviser/ai` — “What should I do next for my book?” grounded on Care radar pulse
 - Paths stay under `/adviser…`; ops queues remain authoritative
 - Smoke asserts adviser AI reply cites book next-steps / adviser paths
+
+## Phase 23.1 delivered (14 Aug 2026)
+
+Adviser WealthAI book next-steps smoke:
+
+- Local smoke requires CoachAI, `adviserNextStepsPulse`, and `Path: /adviser`
+- Hosted smoke POSTs `/api/adviser/ai` book next-steps probe

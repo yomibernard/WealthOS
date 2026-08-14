@@ -4,6 +4,7 @@
 
 ### Phase 23.x — Adviser WealthAI book next-steps
 
+- **23.1** Smoke asserts CoachAI + `adviserNextStepsPulse` + `Path: /adviser`; hosted POST probe
 - **23.0** `/adviser/ai` + `POST /api/adviser/ai` grounds “What should I do next for my book?” on the Care radar pulse
 
 ## 0.1.15 — 14 Aug 2026 (Adviser book next-steps pack)

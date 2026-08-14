@@ -193,6 +193,32 @@ try {
           console.log(`  [${ok ? "OK" : "FAIL"}] GET ${path} → ${res.status}`);
           if (!ok) failures.push(`${path} status ${res.status}`);
         }
+        if (label === "adviser") {
+          const adviserAiRes = await fetch(`${base}/api/adviser/ai`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(roleCookie ? { cookie: roleCookie } : {}),
+            },
+            body: JSON.stringify({ message: "What should I do next for my book?" }),
+          });
+          const adviserAiData = await adviserAiRes.json().catch(() => ({}));
+          const adviserAiContent =
+            typeof adviserAiData.content === "string" ? adviserAiData.content : "";
+          const adviserAiOk =
+            adviserAiRes.status === 200 &&
+            /Path:\s*\/adviser/i.test(adviserAiContent) &&
+            Array.isArray(adviserAiData.toolsUsed) &&
+            adviserAiData.toolsUsed.includes("adviserNextStepsPulse");
+          console.log(
+            `  [${adviserAiOk ? "OK" : "FAIL"}] POST /api/adviser/ai book_next_steps → ${adviserAiRes.status}`,
+          );
+          if (!adviserAiOk) {
+            failures.push(
+              `hosted adviser ai book_next_steps failed: ${adviserAiRes.status} ${adviserAiContent.slice(0, 120)}`,
+            );
+          }
+        }
       }
     }
   } else {
