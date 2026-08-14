@@ -109,6 +109,12 @@ describe("adviser notification triage", () => {
   it("classifies care receipts, shares, and other", () => {
     expect(classifyAdviserNotificationKind(notes[0]!)).toBe("care_receipt");
     expect(classifyAdviserNotificationKind(notes[1]!)).toBe("share");
+    expect(
+      classifyAdviserNotificationKind({
+        title: "Ops reminder: Yomi still needs a care acknowledgment",
+        body: "Ops asked you to acknowledge open care for Yomi. Path: /adviser/customers/yomi",
+      }),
+    ).toBe("care_handoff");
     expect(classifyAdviserNotificationKind(notes[3]!)).toBe("other");
   });
 

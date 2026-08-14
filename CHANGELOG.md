@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Phase 26.x — Ops care remind
+
+- **26.0** Admin “Remind linked advisers” on Care handoff; adviser notifications **Care handoff** kind; queues stay open
+
 ## 0.1.18 — 14 Aug 2026 (Admin WealthAI ops next-steps pack)
 
 Admin WealthAI ops next-steps on top of the 0.1.17 admin/ops next-steps pack.

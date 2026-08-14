@@ -268,6 +268,7 @@ try {
       "/adviser/notifications",
       "/adviser/notifications?read=unread",
       "/adviser/notifications?kind=care_receipt",
+      "/adviser/notifications?kind=care_handoff",
       "/adviser/notifications?kind=share",
     ]) {
       const res = await authedGet(path, adviserLogin.cookie);
@@ -419,6 +420,28 @@ try {
       if (!hasHref) failures.push("ops next-steps pulse missing primaryHref");
       if (!firstHrefOk) failures.push("ops next-steps first href not admin/adviser path");
       if (!firstKindOk) failures.push("ops next-steps first item missing kind");
+    }
+
+    const careRemindRes = await fetch(`${base}/api/admin/care-remind`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(adminLogin.cookie ? { cookie: adminLogin.cookie } : {}),
+      },
+      body: JSON.stringify({}),
+    });
+    const careRemindData = await careRemindRes.json().catch(() => ({}));
+    const careRemindOk =
+      careRemindRes.status === 200 &&
+      typeof careRemindData.reminded === "number" &&
+      /queues/i.test(String(careRemindData.note ?? ""));
+    console.log(
+      `  [${careRemindOk ? "OK" : "FAIL"}] POST /api/admin/care-remind reminded=${careRemindData.reminded ?? "n/a"} → ${careRemindRes.status}`,
+    );
+    if (!careRemindOk) {
+      failures.push(
+        `admin care-remind failed: ${careRemindRes.status} ${String(careRemindData.error ?? "").slice(0, 120)}`,
+      );
     }
 
     const adminAiRes = await fetch(`${base}/api/admin/ai`, {

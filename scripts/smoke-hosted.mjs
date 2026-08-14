@@ -166,6 +166,7 @@ try {
           "/adviser/notifications",
           "/adviser/notifications?read=unread",
           "/adviser/notifications?kind=care_receipt",
+          "/adviser/notifications?kind=care_handoff",
           "/api/notifications",
           "/api/adviser/next-steps",
         ]],

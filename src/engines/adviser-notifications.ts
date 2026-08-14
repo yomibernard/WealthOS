@@ -11,7 +11,7 @@ export type AdviserNotificationInput = {
   createdAt: Date | string;
 };
 
-export type AdviserNotificationKind = "care_receipt" | "share" | "other";
+export type AdviserNotificationKind = "care_receipt" | "care_handoff" | "share" | "other";
 
 export type AdviserNotificationReadFilter = "all" | "unread" | "read";
 
@@ -31,6 +31,12 @@ export function classifyAdviserNotificationKind(note: {
     /sent a care receipt/i.test(note.body)
   ) {
     return "care_receipt";
+  }
+  if (
+    /Ops reminder:.*still needs a care acknowledgment/i.test(note.title) ||
+    /asked you to acknowledge open care/i.test(note.body)
+  ) {
+    return "care_handoff";
   }
   if (
     /^Customer shared/i.test(note.title) ||
@@ -99,6 +105,7 @@ export function adviserNotificationLinkLabel(href: string): string {
 
 export function adviserNotificationKindLabel(kind: AdviserNotificationKind): string {
   if (kind === "care_receipt") return "Care receipt";
+  if (kind === "care_handoff") return "Care handoff";
   if (kind === "share") return "Share";
   return "Other";
 }

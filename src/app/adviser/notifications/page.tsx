@@ -30,6 +30,7 @@ const READ_CHIPS: { id: AdviserNotificationReadFilter; label: string }[] = [
 const KIND_CHIPS: { id: AdviserNotificationKind | "all"; label: string }[] = [
   { id: "all", label: "All kinds" },
   { id: "care_receipt", label: "Care receipts" },
+  { id: "care_handoff", label: "Care handoff" },
   { id: "share", label: "Shares" },
 ];
 
@@ -48,7 +49,10 @@ function AdviserNotificationsInner() {
   const readFilter: AdviserNotificationReadFilter =
     readRaw === "unread" || readRaw === "read" ? readRaw : "all";
   const kindFilter: AdviserNotificationKind | "all" =
-    kindRaw === "care_receipt" || kindRaw === "share" || kindRaw === "other"
+    kindRaw === "care_receipt" ||
+    kindRaw === "care_handoff" ||
+    kindRaw === "share" ||
+    kindRaw === "other"
       ? kindRaw
       : "all";
 

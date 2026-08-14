@@ -879,3 +879,11 @@ Admin WealthAI ops next-steps freeze pack **v0.1.18**:
 
 - `npm run pilot:freeze` checks admin WealthAI engine helpers, `/admin/ai`, API grounding, smoke
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 26.0 delivered (14 Aug 2026)
+
+Ops care remind:
+
+- `/admin/ops` Care handoff CTA reminds linked advisers for unacked customers
+- `POST /api/admin/care-remind`; adviser notifications classify as **Care handoff**
+- Reminders never close escalation or privacy queues; audit `OPS_CARE_REMIND`

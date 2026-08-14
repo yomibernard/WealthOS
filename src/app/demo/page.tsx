@@ -56,6 +56,7 @@ const acts = [
       "WealthAI: ask where to see adviser care update",
       "Adviser sends nudge → customer Inbox deep link",
       "Admin ops next-steps → care handoff + escalation/privacy queues",
+      "Ops care remind → adviser Care handoff notifications → Care desk",
       "WealthAI (ops): What should I do next for ops?",
       "Admin ops — care handoff + escalation/privacy care-ack cues",
       "Support case → resolve → Home / Inbox / Notifications link",

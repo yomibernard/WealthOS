@@ -6,6 +6,7 @@ import { evaluateLaunchGate } from "@/lib/launch-gate";
 import { getFeatureFlags } from "@/lib/feature-flags";
 import { loadOpsDailyBoard } from "@/services/ops-daily";
 import { loadOpsNextStepsPulse } from "@/services/ops-next-steps";
+import { OpsCareRemindButton } from "@/components/OpsCareRemindButton";
 
 const moduleIndex = [
   { href: "/app/reports", label: "Monthly reports", flag: "monthlyReports" as const },
@@ -160,6 +161,7 @@ export default async function AdminOpsPage() {
             <Link href="/adviser?care=unacked">Open unacked care radar</Link>
             <Link href="/adviser?care=awaiting">Open awaiting receipt</Link>
           </div>
+          <OpsCareRemindButton unackedCount={daily.careHandoff.unackedCareCustomers} />
         </div>
       </Panel>
 

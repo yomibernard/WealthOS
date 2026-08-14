@@ -75,6 +75,10 @@ describe("hosted smoke rules", () => {
     expect(local).toContain("/adviser/notifications");
     expect(local).toContain("read=unread");
     expect(local).toContain("kind=care_receipt");
+    expect(local).toContain("kind=care_handoff");
+    expect(local).toContain("/api/admin/care-remind");
+    expect(local).toContain("admin care-remind");
+    expect(hosted).toContain("kind=care_handoff");
     expect(local).toContain("PATCH");
     expect(local).toContain("/api/notifications");
     expect(local).toContain("mark-all-read");
