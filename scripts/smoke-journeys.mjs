@@ -94,8 +94,18 @@ try {
     } else {
       const pulse = await nextStepsRes.json().catch(() => ({}));
       const hasItems = Array.isArray(pulse.items) && pulse.items.length > 0;
-      console.log(`  [${hasItems ? "OK" : "FAIL"}] next-steps items=${pulse.items?.length ?? 0}`);
+      const hasHref =
+        typeof pulse.primaryHref === "string" && pulse.primaryHref.startsWith("/app/");
+      const firstHref =
+        hasItems && typeof pulse.items[0]?.href === "string" ? pulse.items[0].href : null;
+      console.log(
+        `  [${hasItems && hasHref ? "OK" : "FAIL"}] next-steps items=${pulse.items?.length ?? 0} primaryHref=${pulse.primaryHref ?? "n/a"}`,
+      );
       if (!hasItems) failures.push("next-steps pulse missing items");
+      if (!hasHref) failures.push("next-steps pulse missing primaryHref");
+      if (firstHref && !String(firstHref).startsWith("/app/")) {
+        failures.push(`next-steps first href not in-app: ${firstHref}`);
+      }
     }
 
     const inboxRes = await authedGet("/api/inbox?refresh=1", login.cookie);
@@ -217,6 +227,29 @@ try {
     if (!aiOk) {
       failures.push(
         `ai care_update chat failed: ${aiRes.status} ${String(aiData.content ?? "").slice(0, 120)}`,
+      );
+    }
+
+    const nextAiRes = await fetch(`${base}/api/ai/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(login.cookie ? { cookie: login.cookie } : {}),
+      },
+      body: JSON.stringify({ message: "What should I do next?" }),
+    });
+    const nextAiData = await nextAiRes.json().catch(() => ({}));
+    const nextAiOk =
+      nextAiRes.status === 200 &&
+      typeof nextAiData.content === "string" &&
+      (/Path:\s*\/app\//i.test(nextAiData.content) ||
+        /next step|do next|Home pulse|\/app\/(support|privacy|actions|wealth|profile)/i.test(
+          nextAiData.content,
+        ));
+    console.log(`  [${nextAiOk ? "OK" : "FAIL"}] POST /api/ai/chat next_steps → ${nextAiRes.status}`);
+    if (!nextAiOk) {
+      failures.push(
+        `ai next_steps chat failed: ${nextAiRes.status} ${String(nextAiData.content ?? "").slice(0, 120)}`,
       );
     }
   }

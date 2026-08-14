@@ -777,3 +777,10 @@ Home next-steps pulse:
 - Ranked deep-linked next steps on Home (care → support/privacy → data quality → profile → actions)
 - `GET /api/next-steps`; WealthAI actions intent uses the same pulse when available
 - Smoke hits `/api/next-steps`
+
+## Phase 21.1 delivered (14 Aug 2026)
+
+Home next-steps smoke:
+
+- Local smoke checks next-steps `primaryHref` / item hrefs
+- WealthAI probe: “What should I do next?” must cite an in-app path or next-steps copy

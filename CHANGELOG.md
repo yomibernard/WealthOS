@@ -4,6 +4,7 @@
 
 ### Phase 21.x — Home next-steps pulse
 
+- **21.1** Smoke asserts next-steps `primaryHref` + WealthAI “What should I do next?” path grounding
 - **21.0** Ranked Home next-steps with deep links; `GET /api/next-steps`; WealthAI “what should I do next?” grounded on the pulse
 
 ## 0.1.13 — 14 Aug 2026 (Wealth Inbox triage pack)
