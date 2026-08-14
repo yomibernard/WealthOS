@@ -4,6 +4,7 @@
 
 ### Phase 22.x — Adviser book next-steps
 
+- **22.1** Smoke asserts adviser next-steps kind + first href are adviser paths
 - **22.0** Ranked adviser book next-steps on `/adviser`; `GET /api/adviser/next-steps`; Care desk / filter deep links
 
 ## 0.1.14 — 14 Aug 2026 (Home next-steps pulse pack)

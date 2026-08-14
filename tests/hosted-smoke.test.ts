@@ -105,6 +105,8 @@ describe("hosted smoke rules", () => {
     expect(local).toContain("What should I do next?");
     expect(local).toContain("next_steps");
     expect(local).toContain("/api/adviser/next-steps");
+    expect(local).toContain("adviser next-steps first href");
+    expect(local).toContain("adviser next-steps first item missing kind");
     expect(hosted).toContain("/api/next-steps");
     expect(hosted).toContain("/api/adviser/next-steps");
   });

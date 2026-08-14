@@ -799,3 +799,10 @@ Adviser book next-steps:
 - Ranked “Needs your attention” on `/adviser` (complaints → privacy → unacked → awaiting → support → notifications)
 - `GET /api/adviser/next-steps`; Care desk / `?care=` deep links
 - Smoke hits adviser next-steps API
+
+## Phase 22.1 delivered (14 Aug 2026)
+
+Adviser book next-steps smoke:
+
+- Local smoke checks first item `kind` + adviser-scoped `href` / `primaryHref`
+- Hosted smoke includes `/api/adviser/next-steps`

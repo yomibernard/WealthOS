@@ -286,11 +286,19 @@ try {
       const hasHref =
         typeof pulse.primaryHref === "string" &&
         (/^\/adviser(\/|\?|$)/.test(pulse.primaryHref) || pulse.primaryHref.startsWith("/adviser/"));
+      const first = hasItems ? pulse.items[0] : null;
+      const firstHrefOk =
+        first &&
+        typeof first.href === "string" &&
+        (/^\/adviser(\/|\?|$)/.test(first.href) || first.href.startsWith("/adviser/"));
+      const firstKindOk = first && typeof first.kind === "string" && first.kind.length > 0;
       console.log(
-        `  [${hasItems && hasHref ? "OK" : "FAIL"}] adviser next-steps items=${pulse.items?.length ?? 0} primaryHref=${pulse.primaryHref ?? "n/a"}`,
+        `  [${hasItems && hasHref && firstHrefOk && firstKindOk ? "OK" : "FAIL"}] adviser next-steps items=${pulse.items?.length ?? 0} kind=${first?.kind ?? "n/a"} primaryHref=${pulse.primaryHref ?? "n/a"}`,
       );
       if (!hasItems) failures.push("adviser next-steps pulse missing items");
       if (!hasHref) failures.push("adviser next-steps pulse missing primaryHref");
+      if (!firstHrefOk) failures.push("adviser next-steps first href not adviser path");
+      if (!firstKindOk) failures.push("adviser next-steps first item missing kind");
     }
 
     const noteRes = await authedGet("/api/notifications", adviserLogin.cookie);
