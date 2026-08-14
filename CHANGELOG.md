@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.1.15 — 14 Aug 2026 (Adviser book next-steps pack)
+
+Adviser book next-steps on Care radar on top of the 0.1.14 Home next-steps pulse pack.
 
 ### Phase 22.x — Adviser book next-steps
 
+- **22.2** Freeze pack `v0.1.15`; `pilot:freeze` covers 22.x adviser book next-steps surface
 - **22.1** Smoke asserts adviser next-steps kind + first href are adviser paths
 - **22.0** Ranked adviser book next-steps on `/adviser`; `GET /api/adviser/next-steps`; Care desk / filter deep links
 

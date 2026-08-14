@@ -806,3 +806,10 @@ Adviser book next-steps smoke:
 
 - Local smoke checks first item `kind` + adviser-scoped `href` / `primaryHref`
 - Hosted smoke includes `/api/adviser/next-steps`
+
+## Phase 22.2 delivered (14 Aug 2026)
+
+Adviser book next-steps freeze pack **v0.1.15**:
+
+- `npm run pilot:freeze` checks adviser next-steps engine/service/API, portal UI, smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
