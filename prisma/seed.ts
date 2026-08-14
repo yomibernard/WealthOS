@@ -481,12 +481,21 @@ async function main() {
         category: "Important",
         title: "Liquidity below target",
         body: "Emergency coverage is under 3 months of expenses.",
+        read: false,
       },
       {
         userId: yomi.id,
         category: "Advisory",
         title: "Stale property valuations",
         body: "Two property estimates are over 6 months old.",
+        read: true,
+      },
+      {
+        userId: yomi.id,
+        category: "Informational",
+        title: "Weekly wealth digest ready",
+        body: "Your weekly wealth digest is ready to review.",
+        read: false,
       },
     ],
   });
@@ -931,6 +940,7 @@ async function main() {
       category: "important",
       title: yomiCareAck.title,
       body: `${adviser.name}: I've seen your support note — thank you for raising it.`,
+      read: false,
     },
   });
 

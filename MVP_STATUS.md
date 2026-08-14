@@ -60,6 +60,7 @@
 | Care receipt close-loop | Ready (demo) | Adviser notify; ops receipts; `?care=awaiting` |
 | Adviser notifications | Ready (demo) | `/adviser/notifications` unread pulse + mark read |
 | Adviser notification triage | Ready (demo) | Unread/kind filters + mark-all-read |
+| Customer notification triage | Ready (demo) | `/app/notifications` filters + Home unread pulse |
 
 ## Quality gates (this machine)
 

@@ -5,6 +5,7 @@ import {
   type NotificationCategory,
 } from "@/lib/notification-prefs";
 import { buildAdviserNotificationPulse } from "@/engines/adviser-notifications";
+import { buildCustomerNotificationPulse } from "@/engines/customer-notifications";
 
 export async function createUserNotification(input: {
   userId: string;
@@ -48,6 +49,20 @@ export async function listUserNotifications(userId: string, take = 50) {
 export async function loadAdviserNotificationPulse(adviserId: string) {
   const notes = await listUserNotifications(adviserId, 50);
   return buildAdviserNotificationPulse(
+    notes.map((n) => ({
+      id: n.id,
+      category: n.category,
+      title: n.title,
+      body: n.body,
+      read: n.read,
+      createdAt: n.createdAt,
+    })),
+  );
+}
+
+export async function loadCustomerNotificationPulse(userId: string) {
+  const notes = await listUserNotifications(userId, 50);
+  return buildCustomerNotificationPulse(
     notes.map((n) => ({
       id: n.id,
       category: n.category,

@@ -8,6 +8,7 @@ import { syncProfileCompleteness } from "@/services/profile-completeness";
 import { loadCustomerCasesPulse } from "@/services/customer-cases";
 import { loadPrivacyRequestsPulse } from "@/services/privacy";
 import { loadCareUpdatePulse } from "@/services/adviser-care-ack";
+import { loadCustomerNotificationPulse } from "@/services/notifications";
 import { formatNaira, greetingForHour } from "@/lib/format";
 import { getFeatureFlags } from "@/lib/feature-flags";
 
@@ -21,11 +22,12 @@ export default async function HomePage() {
 
   const flags = getFeatureFlags();
   const inbox = flags.wealthInbox ? await refreshInbox(user.id) : { unread: 0 };
-  const [profile, cases, privacyPulse, carePulse] = await Promise.all([
+  const [profile, cases, privacyPulse, carePulse, notifyPulse] = await Promise.all([
     syncProfileCompleteness(user.id),
     loadCustomerCasesPulse(user.id),
     loadPrivacyRequestsPulse(user.id),
     loadCareUpdatePulse(user.id),
+    loadCustomerNotificationPulse(user.id),
   ]);
 
   const hour = new Date().getHours();
@@ -162,6 +164,12 @@ export default async function HomePage() {
       {carePulse.headline ? (
         <Link href={carePulse.primaryHref} className="btn btn-ghost mt-3 w-full">
           {carePulse.headline}
+        </Link>
+      ) : null}
+
+      {notifyPulse.headline ? (
+        <Link href={notifyPulse.primaryHref} className="btn btn-ghost mt-3 w-full">
+          {notifyPulse.headline}
         </Link>
       ) : null}
 

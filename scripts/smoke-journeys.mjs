@@ -68,6 +68,10 @@ try {
       "/app/support",
       "/app/privacy",
       "/app/ai",
+      "/app/notifications",
+      "/app/notifications?read=unread",
+      "/app/notifications?kind=care_update",
+      "/app/notifications?kind=cadence",
     ];
     for (const path of appPaths) {
       const res = await authedGet(path, login.cookie);
@@ -76,6 +80,32 @@ try {
       console.log(`  [${ok ? "OK" : "FAIL"}] GET ${path} → ${res.status}`);
       if (!ok) failures.push(`${path} status ${res.status}`);
     }
+
+    const custNoteRes = await authedGet("/api/notifications", login.cookie);
+    const custNoteOk = custNoteRes.status === 200;
+    console.log(`  [${custNoteOk ? "OK" : "FAIL"}] GET /api/notifications (customer) → ${custNoteRes.status}`);
+    if (!custNoteOk) {
+      failures.push(`/api/notifications customer status ${custNoteRes.status}`);
+    } else {
+      const notes = await custNoteRes.json().catch(() => []);
+      const unread = Array.isArray(notes) ? notes.find((n) => n && n.read === false && n.id) : null;
+      if (unread?.id) {
+        const patchRes = await fetch(`${base}/api/notifications/${unread.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(login.cookie ? { cookie: login.cookie } : {}),
+          },
+          body: JSON.stringify({ read: true }),
+        });
+        const patchOk = patchRes.status === 200;
+        console.log(`  [${patchOk ? "OK" : "FAIL"}] PATCH /api/notifications/:id (customer) → ${patchRes.status}`);
+        if (!patchOk) failures.push(`customer notification mark-read status ${patchRes.status}`);
+      } else {
+        console.log("  [SKIP] PATCH /api/notifications/:id (no unread customer notification in seed)");
+      }
+    }
+
     const careRes = await authedGet("/api/care-updates", login.cookie);
     const careOk = careRes.status === 200;
     console.log(`  [${careOk ? "OK" : "FAIL"}] GET /api/care-updates → ${careRes.status}`);

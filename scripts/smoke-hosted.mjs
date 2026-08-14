@@ -78,8 +78,11 @@ const appPaths = [
   "/app/support",
   "/app/digest",
   "/app/ai",
+  "/app/notifications",
+  "/app/notifications?read=unread",
   "/api/care-updates",
   "/api/care-updates?list=1",
+  "/api/notifications",
 ];
 
 if (!base) {

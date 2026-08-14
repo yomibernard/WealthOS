@@ -78,8 +78,11 @@ describe("hosted smoke rules", () => {
     expect(local).toContain("PATCH");
     expect(local).toContain("/api/notifications");
     expect(local).toContain("mark-all-read");
+    expect(local).toContain("/app/notifications");
+    expect(local).toContain("kind=care_update");
     expect(hosted).toContain("/adviser/notifications");
     expect(hosted).toContain("read=unread");
     expect(hosted).toContain("/api/notifications");
+    expect(hosted).toContain("/app/notifications");
   });
 });

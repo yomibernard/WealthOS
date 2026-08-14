@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Phase 19.x — Customer notification triage
+
+- **19.0** Customer `/app/notifications` unread/kind triage + mark-read/mark-all; Home unread pulse; seed cadence + care mix
+
 ## 0.1.11 — 14 Aug 2026 (Adviser notification triage pack)
 
 Triage filters and mark-all-read on top of the 0.1.10 adviser notification centre pack.

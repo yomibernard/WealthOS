@@ -725,3 +725,11 @@ Adviser notification triage freeze pack **v0.1.11**:
 
 - `npm run pilot:freeze` checks triage helpers, mark-all-read API/UI, seed share, smoke filters
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 19.0 delivered (14 Aug 2026)
+
+Customer notification triage:
+
+- `/app/notifications` Unread/All + Care/Support/Privacy/Cadence chips, mark-as-read / mark-all-read
+- Home unread notifications pulse → `?read=unread`; seed mixes care + cadence + read history
+- Local smoke hits customer notification triage paths + mark-read
