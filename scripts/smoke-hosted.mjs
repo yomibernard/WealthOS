@@ -166,6 +166,7 @@ try {
           "/adviser/notifications?read=unread",
           "/adviser/notifications?kind=care_receipt",
           "/api/notifications",
+          "/api/adviser/next-steps",
         ]],
         ["admin", adminEmail, ["/admin/ops"]],
       ]) {

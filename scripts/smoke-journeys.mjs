@@ -275,6 +275,24 @@ try {
       if (!ok) failures.push(`${path} status ${res.status}`);
     }
 
+    const adviserNextRes = await authedGet("/api/adviser/next-steps", adviserLogin.cookie);
+    const adviserNextOk = adviserNextRes.status === 200;
+    console.log(`  [${adviserNextOk ? "OK" : "FAIL"}] GET /api/adviser/next-steps → ${adviserNextRes.status}`);
+    if (!adviserNextOk) {
+      failures.push(`/api/adviser/next-steps status ${adviserNextRes.status}`);
+    } else {
+      const pulse = await adviserNextRes.json().catch(() => ({}));
+      const hasItems = Array.isArray(pulse.items) && pulse.items.length > 0;
+      const hasHref =
+        typeof pulse.primaryHref === "string" &&
+        (/^\/adviser(\/|\?|$)/.test(pulse.primaryHref) || pulse.primaryHref.startsWith("/adviser/"));
+      console.log(
+        `  [${hasItems && hasHref ? "OK" : "FAIL"}] adviser next-steps items=${pulse.items?.length ?? 0} primaryHref=${pulse.primaryHref ?? "n/a"}`,
+      );
+      if (!hasItems) failures.push("adviser next-steps pulse missing items");
+      if (!hasHref) failures.push("adviser next-steps pulse missing primaryHref");
+    }
+
     const noteRes = await authedGet("/api/notifications", adviserLogin.cookie);
     const noteOk = noteRes.status === 200;
     console.log(`  [${noteOk ? "OK" : "FAIL"}] GET /api/notifications (adviser) → ${noteRes.status}`);

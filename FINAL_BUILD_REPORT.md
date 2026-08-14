@@ -791,3 +791,11 @@ Home next-steps pulse freeze pack **v0.1.14**:
 
 - `npm run pilot:freeze` checks next-steps engine/service/API, Home UI, AI grounding, smoke
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 22.0 delivered (14 Aug 2026)
+
+Adviser book next-steps:
+
+- Ranked “Needs your attention” on `/adviser` (complaints → privacy → unacked → awaiting → support → notifications)
+- `GET /api/adviser/next-steps`; Care desk / `?care=` deep links
+- Smoke hits adviser next-steps API

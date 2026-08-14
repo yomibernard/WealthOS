@@ -104,6 +104,8 @@ describe("hosted smoke rules", () => {
     expect(local).toContain("primaryHref");
     expect(local).toContain("What should I do next?");
     expect(local).toContain("next_steps");
+    expect(local).toContain("/api/adviser/next-steps");
     expect(hosted).toContain("/api/next-steps");
+    expect(hosted).toContain("/api/adviser/next-steps");
   });
 });

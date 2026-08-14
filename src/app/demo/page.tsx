@@ -46,6 +46,7 @@ const acts = [
     mins: "5 min",
     steps: [
       "Consent Centre — pause AI, show gate, restore",
+      "Adviser book next-steps → Care desk / filters + care radar",
       "Adviser care radar (unacked cues) → 360 care desk + history/ack + insights",
       "Customer Home care-update pulse → Support/Privacy mark as seen",
       "Customer notifications triage (Unread / Care / Cadence) · Mark all as read",

@@ -5,6 +5,7 @@ import { getSessionUser } from "@/lib/session";
 import { SignOutButton } from "@/components/SignOutButton";
 import { loadAdviserPortfolioCareRadar } from "@/services/adviser-portfolio";
 import { loadAdviserNotificationPulse } from "@/services/notifications";
+import { loadAdviserNextStepsPulse } from "@/services/adviser-next-steps";
 import {
   filterPortfolioCareRadar,
   parsePortfolioCareFilter,
@@ -37,7 +38,10 @@ export default async function AdviserHomePage({
     role: user.role,
   });
   const radar = filterPortfolioCareRadar(full, filter);
-  const notifyPulse = await loadAdviserNotificationPulse(user.id);
+  const [notifyPulse, nextSteps] = await Promise.all([
+    loadAdviserNotificationPulse(user.id),
+    loadAdviserNextStepsPulse({ adviserId: user.id, role: user.role }),
+  ]);
 
   return (
     <main className="page-wide">
@@ -60,6 +64,24 @@ export default async function AdviserHomePage({
           Adviser notifications
         </Link>
       )}
+
+      <Panel className="mb-4">
+        <p className="eyebrow">Needs your attention</p>
+        <p className="muted mt-1 text-sm">{nextSteps.summary}</p>
+        <ol className="mt-3 list-decimal space-y-3 pl-5">
+          {nextSteps.items.map((item) => (
+            <li key={item.id}>
+              <Link href={item.href} className="font-semibold text-accent hover:underline">
+                {item.title}
+              </Link>
+              <p className="muted mt-1 text-sm">{item.detail}</p>
+            </li>
+          ))}
+        </ol>
+        <Link href={nextSteps.primaryHref} className="btn btn-primary mt-4 w-full sm:w-auto">
+          {nextSteps.items[0]?.kind === "do_nothing" ? "Open Care radar" : "Take the next step"}
+        </Link>
+      </Panel>
 
       <Panel className="mb-4">
         <div className="flex flex-wrap items-center gap-2">
