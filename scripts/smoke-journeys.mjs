@@ -104,6 +104,18 @@ try {
       } else {
         console.log("  [SKIP] PATCH /api/notifications/:id (no unread customer notification in seed)");
       }
+
+      const custMarkAllRes = await fetch(`${base}/api/notifications/mark-all-read`, {
+        method: "POST",
+        headers: login.cookie ? { cookie: login.cookie } : {},
+      });
+      const custMarkAllOk = custMarkAllRes.status === 200;
+      console.log(
+        `  [${custMarkAllOk ? "OK" : "FAIL"}] POST /api/notifications/mark-all-read (customer) → ${custMarkAllRes.status}`,
+      );
+      if (!custMarkAllOk) {
+        failures.push(`customer notification mark-all-read status ${custMarkAllRes.status}`);
+      }
     }
 
     const careRes = await authedGet("/api/care-updates", login.cookie);

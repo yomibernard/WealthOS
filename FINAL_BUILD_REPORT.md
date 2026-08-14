@@ -733,3 +733,10 @@ Customer notification triage:
 - `/app/notifications` Unread/All + Care/Support/Privacy/Cadence chips, mark-as-read / mark-all-read
 - Home unread notifications pulse → `?read=unread`; seed mixes care + cadence + read history
 - Local smoke hits customer notification triage paths + mark-read
+
+## Phase 19.1 delivered (14 Aug 2026)
+
+Customer notification triage smoke:
+
+- Local smoke POSTs customer `mark-all-read` after single mark-read
+- Hosted smoke includes `kind=care_update` and `kind=cadence` triage paths

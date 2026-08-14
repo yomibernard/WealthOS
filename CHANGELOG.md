@@ -4,6 +4,7 @@
 
 ### Phase 19.x — Customer notification triage
 
+- **19.1** Smoke covers customer mark-all-read + cadence/care triage paths; hosted hits care_update/cadence filters
 - **19.0** Customer `/app/notifications` unread/kind triage + mark-read/mark-all; Home unread pulse; seed cadence + care mix
 
 ## 0.1.11 — 14 Aug 2026 (Adviser notification triage pack)

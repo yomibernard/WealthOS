@@ -80,6 +80,8 @@ const appPaths = [
   "/app/ai",
   "/app/notifications",
   "/app/notifications?read=unread",
+  "/app/notifications?kind=care_update",
+  "/app/notifications?kind=cadence",
   "/api/care-updates",
   "/api/care-updates?list=1",
   "/api/notifications",
