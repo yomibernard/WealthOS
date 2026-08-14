@@ -65,6 +65,8 @@ try {
       "/app/inbox?status=unread",
       "/app/inbox?kind=recommendation",
       "/app/inbox?kind=adviser",
+      "/app/inbox?kind=connection",
+      "/app/inbox?kind=data_quality",
       "/app/wealth",
       "/app/actions",
       "/app/wealthguard",
@@ -115,7 +117,7 @@ try {
         headers: login.cookie ? { cookie: login.cookie } : {},
       });
       const markAllOk = markAllRes.status === 200;
-      console.log(`  [${markAllOk ? "OK" : "FAIL"}] POST /api/inbox/mark-all-read → ${markAllRes.status}`);
+      console.log(`  [${markAllOk ? "OK" : "FAIL"}] POST /api/inbox/mark-all-read (inbox) → ${markAllRes.status}`);
       if (!markAllOk) failures.push(`inbox mark-all-read status ${markAllRes.status}`);
     }
 

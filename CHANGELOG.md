@@ -4,6 +4,7 @@
 
 ### Phase 20.x — Wealth Inbox triage
 
+- **20.1** Smoke covers inbox kind filters (recommendation/adviser/connection/data_quality) + labeled mark-all-read; hosted hits recommendation/adviser
 - **20.0** Customer `/app/inbox` unread/kind triage + mark-all-read; Home unread deep-link; smoke paths
 
 ## 0.1.12 — 14 Aug 2026 (Customer notification triage pack)

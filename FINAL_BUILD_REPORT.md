@@ -755,3 +755,10 @@ Wealth Inbox triage:
 - `/app/inbox` Unread/All + kind chips (Recommendations, Connections, Adviser, …) + mark-all-read
 - Home Wealth Inbox badge deep-links to `?status=unread` when unread
 - Local/hosted smoke hits inbox triage paths + mark-read / mark-all-read
+
+## Phase 20.1 delivered (14 Aug 2026)
+
+Wealth Inbox triage smoke:
+
+- Local smoke hits connection/data_quality kind filters; mark-all-read labeled `(inbox)`
+- Hosted smoke includes `kind=recommendation` and `kind=adviser`

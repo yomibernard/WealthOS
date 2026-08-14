@@ -80,6 +80,8 @@ const appPaths = [
   "/app/ai",
   "/app/inbox",
   "/app/inbox?status=unread",
+  "/app/inbox?kind=recommendation",
+  "/app/inbox?kind=adviser",
   "/app/notifications",
   "/app/notifications?read=unread",
   "/app/notifications?kind=care_update",
