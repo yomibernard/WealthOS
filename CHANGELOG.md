@@ -4,6 +4,7 @@
 
 ### Phase 26.x — Ops care remind
 
+- **26.1** Smoke asserts queues-stay-open note + adviser Care handoff notification; hosted POST probe
 - **26.0** Admin “Remind linked advisers” on Care handoff; adviser notifications **Care handoff** kind; queues stay open
 
 ## 0.1.18 — 14 Aug 2026 (Admin WealthAI ops next-steps pack)

@@ -887,3 +887,10 @@ Ops care remind:
 - `/admin/ops` Care handoff CTA reminds linked advisers for unacked customers
 - `POST /api/admin/care-remind`; adviser notifications classify as **Care handoff**
 - Reminders never close escalation or privacy queues; audit `OPS_CARE_REMIND`
+
+## Phase 26.1 delivered (14 Aug 2026)
+
+Ops care remind smoke:
+
+- Local smoke asserts queues-stay-open note + adviser Care handoff notification after remind
+- Hosted smoke POSTs `/api/admin/care-remind`

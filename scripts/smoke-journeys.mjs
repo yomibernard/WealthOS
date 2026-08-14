@@ -431,17 +431,57 @@ try {
       body: JSON.stringify({}),
     });
     const careRemindData = await careRemindRes.json().catch(() => ({}));
+    const careRemindNote = String(careRemindData.note ?? "");
+    const careRemindQueuesOk = /do not close|queues stay open|Queues stay open/i.test(
+      careRemindNote,
+    );
+    const careRemindResultsOk = Array.isArray(careRemindData.results);
     const careRemindOk =
       careRemindRes.status === 200 &&
       typeof careRemindData.reminded === "number" &&
-      /queues/i.test(String(careRemindData.note ?? ""));
+      careRemindQueuesOk &&
+      careRemindResultsOk;
     console.log(
-      `  [${careRemindOk ? "OK" : "FAIL"}] POST /api/admin/care-remind reminded=${careRemindData.reminded ?? "n/a"} → ${careRemindRes.status}`,
+      `  [${careRemindOk ? "OK" : "FAIL"}] POST /api/admin/care-remind reminded=${careRemindData.reminded ?? "n/a"} queuesOk=${careRemindQueuesOk ? "yes" : "no"} → ${careRemindRes.status}`,
     );
     if (!careRemindOk) {
       failures.push(
-        `admin care-remind failed: ${careRemindRes.status} ${String(careRemindData.error ?? "").slice(0, 120)}`,
+        `admin care-remind failed: status=${careRemindRes.status} reminded=${careRemindData.reminded ?? "n/a"} queuesOk=${careRemindQueuesOk} ${String(careRemindData.error ?? careRemindNote).slice(0, 120)}`,
       );
+    }
+    if (careRemindRes.status === 200 && !careRemindQueuesOk) {
+      failures.push("admin care-remind missing queues-stay-open note");
+    }
+    if (careRemindRes.status === 200 && !careRemindResultsOk) {
+      failures.push("admin care-remind missing results array");
+    }
+
+    if (careRemindOk && (careRemindData.reminded ?? 0) > 0) {
+      const adviserRecheck = await signIn("adviser@demo.wealthos.ng", "WealthOSdemo1!");
+      if (adviserRecheck.res.ok) {
+        const notesRes = await authedGet("/api/notifications", adviserRecheck.cookie);
+        const notes = notesRes.status === 200 ? await notesRes.json().catch(() => []) : [];
+        const handoffNote = Array.isArray(notes)
+          ? notes.find(
+              (n) =>
+                n &&
+                typeof n.title === "string" &&
+                /Ops reminder:.*still needs a care acknowledgment/i.test(n.title),
+            )
+          : null;
+        const handoffOk =
+          Boolean(handoffNote) &&
+          typeof handoffNote.body === "string" &&
+          /Path:\s*\/adviser\/customers\//i.test(handoffNote.body);
+        console.log(
+          `  [${handoffOk ? "OK" : "FAIL"}] adviser care_handoff notification after remind → ${notesRes.status}`,
+        );
+        if (!handoffOk) {
+          failures.push("adviser care_handoff notification missing after ops care-remind");
+        }
+      } else {
+        failures.push(`adviser re-sign-in after care-remind failed: ${adviserRecheck.res.status}`);
+      }
     }
 
     const adminAiRes = await fetch(`${base}/api/admin/ai`, {

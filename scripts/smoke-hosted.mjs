@@ -221,6 +221,28 @@ try {
           }
         }
         if (label === "admin") {
+          const careRemindRes = await fetch(`${base}/api/admin/care-remind`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(roleCookie ? { cookie: roleCookie } : {}),
+            },
+            body: JSON.stringify({}),
+          });
+          const careRemindData = await careRemindRes.json().catch(() => ({}));
+          const careRemindOk =
+            careRemindRes.status === 200 &&
+            typeof careRemindData.reminded === "number" &&
+            /do not close|queues/i.test(String(careRemindData.note ?? ""));
+          console.log(
+            `  [${careRemindOk ? "OK" : "FAIL"}] POST /api/admin/care-remind → ${careRemindRes.status}`,
+          );
+          if (!careRemindOk) {
+            failures.push(
+              `hosted admin care-remind failed: ${careRemindRes.status} ${String(careRemindData.error ?? "").slice(0, 120)}`,
+            );
+          }
+
           const adminAiRes = await fetch(`${base}/api/admin/ai`, {
             method: "POST",
             headers: {
