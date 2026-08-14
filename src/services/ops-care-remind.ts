@@ -105,6 +105,8 @@ export async function sendOpsCareReminds(input: {
         entityId: customer.id,
         payloadJson: JSON.stringify({
           customerId: customer.id,
+          customerName: customer.name,
+          adminName: input.adminName,
           adviserId,
           notificationCreated: note.created,
           queuesUnchanged: true,

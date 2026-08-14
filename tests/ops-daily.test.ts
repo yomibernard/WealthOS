@@ -58,7 +58,7 @@ describe("ops daily board", () => {
     });
     const handoff = board.queues.find((q) => q.id === "care_handoff");
     expect(handoff?.count).toBe(2);
-    expect(handoff?.href).toBe("/adviser?care=unacked");
+    expect(handoff?.href).toBe("/admin/escalations");
     expect(handoff?.tone).toBe("warn");
     expect(board.attentionScore).toBe(2);
     expect(board.summary).toMatch(/Care handoff/i);
@@ -85,11 +85,23 @@ describe("ops daily board", () => {
           thanksPreview: "Thanks — noted.",
         },
       ],
+      recentReminds: [
+        {
+          id: "rm1",
+          customerName: "Yomi",
+          adminName: "Admin",
+          createdAt: "2026-08-14T10:00:00.000Z",
+          notificationCreated: true,
+        },
+      ],
     });
     expect(strip.summary).toMatch(/first care acknowledgment/i);
+    expect(strip.summary).toMatch(/recent ops remind/i);
     expect(strip.recentAcks).toHaveLength(1);
     expect(strip.awaitingReceiptCount).toBe(1);
     expect(strip.recentReceipts[0]?.thanksPreview).toMatch(/Thanks/i);
+    expect(strip.recentReminds).toHaveLength(1);
+    expect(strip.recentRemindCount).toBe(1);
 
     const awaitingOnly = buildOpsCareHandoff({
       unackedCareCustomers: 0,

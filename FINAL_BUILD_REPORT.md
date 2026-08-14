@@ -909,3 +909,10 @@ Ops queue care remind:
 - Per-customer **Remind adviser** on `/admin/escalations` + `/admin/privacy` when **No care ack**
 - Reuses `POST /api/admin/care-remind` with `customerId`; queues stay open
 - Ops next-steps care handoff points at escalations + Remind copy
+
+## Phase 27.1 delivered (14 Aug 2026)
+
+Ops care remind trail + smoke:
+
+- Care handoff shows **Recent ops reminds** from `OPS_CARE_REMIND` audit
+- Local/hosted smoke assert trail after remind; queue care_handoff tile → escalations

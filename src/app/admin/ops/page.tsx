@@ -157,7 +157,29 @@ export default async function AdminOpsPage() {
               </ul>
             </div>
           ) : null}
+          {daily.careHandoff.recentReminds.length ? (
+            <div className="mt-2 space-y-1">
+              <p className="muted text-xs font-semibold uppercase tracking-wide">
+                Recent ops reminds
+              </p>
+              <ul className="space-y-1 text-sm">
+                {daily.careHandoff.recentReminds.map((r) => (
+                  <li key={r.id}>
+                    <span className="font-medium">{r.customerName}</span>
+                    {" — "}
+                    {r.adminName}
+                    {r.notificationCreated ? " reminded linked adviser" : " remind attempted"}
+                    <span className="muted">
+                      {" · "}
+                      {new Date(r.createdAt).toLocaleString("en-GB")}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <div className="mt-2 flex flex-wrap gap-3 text-sm font-semibold text-accent">
+            <Link href="/admin/escalations">Remind from escalations</Link>
             <Link href="/adviser?care=unacked">Open unacked care radar</Link>
             <Link href="/adviser?care=awaiting">Open awaiting receipt</Link>
           </div>

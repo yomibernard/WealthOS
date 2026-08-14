@@ -272,6 +272,24 @@ try {
             }
           }
 
+          if (careRemindOk && (careRemindData.reminded ?? 0) > 0) {
+            const opsDailyRes = await fetch(`${base}/api/admin/ops-daily`, {
+              headers: roleCookie ? { cookie: roleCookie } : {},
+            });
+            const opsDaily = opsDailyRes.status === 200 ? await opsDailyRes.json().catch(() => ({})) : {};
+            const reminds = opsDaily?.careHandoff?.recentReminds;
+            const trailOk =
+              opsDailyRes.status === 200 &&
+              Array.isArray(reminds) &&
+              reminds.length > 0;
+            console.log(
+              `  [${trailOk ? "OK" : "FAIL"}] hosted ops care remind trail → ${opsDailyRes.status}`,
+            );
+            if (!trailOk) {
+              failures.push("hosted ops care remind trail missing recentReminds");
+            }
+          }
+
           const adminAiRes = await fetch(`${base}/api/admin/ai`, {
             method: "POST",
             headers: {

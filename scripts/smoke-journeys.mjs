@@ -517,6 +517,21 @@ try {
       } else {
         failures.push(`adviser re-sign-in after care-remind failed: ${adviserRecheck.res.status}`);
       }
+
+      const opsDailyRes = await authedGet("/api/admin/ops-daily", adminLogin.cookie);
+      const opsDaily = opsDailyRes.status === 200 ? await opsDailyRes.json().catch(() => ({})) : {};
+      const reminds = opsDaily?.careHandoff?.recentReminds;
+      const trailOk =
+        opsDailyRes.status === 200 &&
+        Array.isArray(reminds) &&
+        reminds.length > 0 &&
+        typeof reminds[0]?.customerName === "string";
+      console.log(
+        `  [${trailOk ? "OK" : "FAIL"}] ops care remind trail recentReminds=${Array.isArray(reminds) ? reminds.length : "n/a"} → ${opsDailyRes.status}`,
+      );
+      if (!trailOk) {
+        failures.push("ops care remind trail missing recentReminds after care-remind");
+      }
     }
 
     const adminAiRes = await fetch(`${base}/api/admin/ai`, {

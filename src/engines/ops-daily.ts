@@ -40,14 +40,24 @@ export type OpsCareHandoffReceipt = {
   thanksPreview: string | null;
 };
 
+export type OpsCareHandoffRemind = {
+  id: string;
+  customerName: string;
+  adminName: string;
+  createdAt: string;
+  notificationCreated: boolean;
+};
+
 export type OpsCareHandoff = {
   unackedCareCustomers: number;
   awaitingReceiptCount: number;
   recentAckCount: number;
   recentReceiptCount: number;
+  recentRemindCount: number;
   summary: string;
   recentAcks: OpsCareHandoffAck[];
   recentReceipts: OpsCareHandoffReceipt[];
+  recentReminds: OpsCareHandoffRemind[];
 };
 
 export type OpsQueueItem = {
@@ -134,11 +144,11 @@ export function buildOpsDailyBoard(input: OpsQueueInput): {
       id: "care_handoff",
       label: "Care handoff (unacked)",
       count: input.unackedCareCustomers ?? 0,
-      href: "/adviser?care=unacked",
+      href: "/admin/escalations",
       tone: (input.unackedCareCustomers ?? 0) > 0 ? "warn" : "ok",
       detail:
         (input.unackedCareCustomers ?? 0) > 0
-          ? "Open care without an adviser acknowledgment — check Care radar."
+          ? "Open care without an adviser acknowledgment — Remind adviser on the queue."
           : "Every open-care customer has at least one care acknowledgment.",
     },
   ];
@@ -172,20 +182,26 @@ export function buildOpsCareHandoff(input: {
   awaitingReceiptCount?: number;
   recentAcks: OpsCareHandoffAck[];
   recentReceipts?: OpsCareHandoffReceipt[];
+  recentReminds?: OpsCareHandoffRemind[];
 }): OpsCareHandoff {
   const recentAcks = input.recentAcks.slice(0, 5);
   const recentReceipts = (input.recentReceipts ?? []).slice(0, 5);
+  const recentReminds = (input.recentReminds ?? []).slice(0, 5);
   const awaitingReceiptCount = input.awaitingReceiptCount ?? 0;
   let summary: string;
   if (
     input.unackedCareCustomers === 0 &&
     awaitingReceiptCount === 0 &&
     recentAcks.length === 0 &&
-    recentReceipts.length === 0
+    recentReceipts.length === 0 &&
+    recentReminds.length === 0
   ) {
     summary = "No open care handoff gaps and no recent adviser acknowledgments.";
   } else if (input.unackedCareCustomers > 0) {
     summary = `${input.unackedCareCustomers} customer(s) still need a first care acknowledgment.`;
+    if (recentReminds.length > 0) {
+      summary += ` ${recentReminds.length} recent ops remind(s) sent.`;
+    }
   } else if (awaitingReceiptCount > 0) {
     summary = `${awaitingReceiptCount} care acknowledgment(s) awaiting a customer receipt (seen).`;
   } else if (recentReceipts.length > 0) {
@@ -198,8 +214,10 @@ export function buildOpsCareHandoff(input: {
     awaitingReceiptCount,
     recentAckCount: recentAcks.length,
     recentReceiptCount: recentReceipts.length,
+    recentRemindCount: recentReminds.length,
     summary,
     recentAcks,
     recentReceipts,
+    recentReminds,
   };
 }

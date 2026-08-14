@@ -18,6 +18,7 @@ export async function loadOpsDailyBoard() {
     careAcks,
     recentCareAcks,
     recentCareReceipts,
+    recentCareReminds,
     awaitingReceiptCount,
   ] = await Promise.all([
     prisma.escalation.count({
@@ -76,6 +77,12 @@ export async function loadOpsDailyBoard() {
       orderBy: { updatedAt: "desc" },
       take: 5,
     }),
+    prisma.auditEvent.findMany({
+      where: { eventType: "OPS_CARE_REMIND" },
+      include: { user: { select: { name: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
     prisma.adviserNote.count({
       where: {
         kind: "care_ack",
@@ -115,6 +122,22 @@ export async function loadOpsDailyBoard() {
     unackedCareCustomers,
   });
 
+  const customerIdsFromReminds = [
+    ...new Set(
+      recentCareReminds
+        .map((e) => e.entityId)
+        .filter((id): id is string => typeof id === "string" && id.length > 0),
+    ),
+  ];
+  const remindCustomers =
+    customerIdsFromReminds.length > 0
+      ? await prisma.user.findMany({
+          where: { id: { in: customerIdsFromReminds } },
+          select: { id: true, name: true },
+        })
+      : [];
+  const remindCustomerName = new Map(remindCustomers.map((c) => [c.id, c.name]));
+
   const careHandoff = buildOpsCareHandoff({
     unackedCareCustomers,
     awaitingReceiptCount,
@@ -134,6 +157,29 @@ export async function loadOpsDailyBoard() {
         title: n.title,
         seenAt: receipt.seenAt ?? n.updatedAt.toISOString(),
         thanksPreview: receipt.thanksPreview,
+      };
+    }),
+    recentReminds: recentCareReminds.map((e) => {
+      let payload: {
+        customerName?: string;
+        adminName?: string;
+        notificationCreated?: boolean;
+      } = {};
+      try {
+        payload = JSON.parse(e.payloadJson) as typeof payload;
+      } catch {
+        payload = {};
+      }
+      const customerId = e.entityId ?? "";
+      return {
+        id: e.id,
+        customerName:
+          payload.customerName ??
+          remindCustomerName.get(customerId) ??
+          (customerId ? `Customer ${customerId.slice(0, 8)}…` : "Customer"),
+        adminName: payload.adminName ?? e.user?.name ?? "Ops",
+        createdAt: e.createdAt.toISOString(),
+        notificationCreated: Boolean(payload.notificationCreated),
       };
     }),
   });
