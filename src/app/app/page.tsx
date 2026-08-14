@@ -40,7 +40,7 @@ export default async function HomePage() {
         <h1 className="font-display mt-1 text-3xl">{greetingForHour(hour, dash.name)}</h1>
         {flags.wealthInbox ? (
           <Link
-            href="/app/inbox"
+            href={inbox.unread > 0 ? "/app/inbox?status=unread" : "/app/inbox"}
             className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-accent"
           >
             Wealth Inbox

@@ -61,6 +61,7 @@
 | Adviser notifications | Ready (demo) | `/adviser/notifications` unread pulse + mark read |
 | Adviser notification triage | Ready (demo) | Unread/kind filters + mark-all-read |
 | Customer notification triage | Ready (demo) | `/app/notifications` filters + Home unread pulse |
+| Wealth Inbox triage | Ready (demo) | `/app/inbox` status/kind filters + mark-all-read |
 
 ## Quality gates (this machine)
 

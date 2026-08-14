@@ -15,7 +15,7 @@ const acts = [
     title: "Act 2 — Persona A (Yomi)",
     mins: "5 min",
     steps: [
-      "Home → Inbox → Fix data quality if shown",
+      "Home → Inbox triage (Unread / Recommendations / Adviser) · Mark all as read",
       "Property intelligence + Plan → Goal funding pulse",
       "Actions (explain before accept; do-nothing is valid)",
       "WealthGuard on a ‘guaranteed’ WhatsApp-style offer",

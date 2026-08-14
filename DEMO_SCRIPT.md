@@ -25,7 +25,7 @@ Presenter checklist UI: `/demo`
 ## Act 2 — Persona A depth (5 min)
 
 1. Sign in as Yomi
-2. **Home** — net worth, health, Wealth Inbox unread; optional **Fix data quality**
+2. **Home** — net worth, health, Wealth Inbox unread → `/app/inbox?status=unread` triage (**Recommendations** / **Adviser** / **Mark all as read**); optional **Fix data quality**
 3. **Wealth** — provenance, confidence, allocation
 4. **Property** — equity / LTV / concentration
 5. **Plan** — goals; open **Goal funding pulse**

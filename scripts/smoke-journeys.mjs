@@ -62,6 +62,9 @@ try {
     const appPaths = [
       "/app",
       "/app/inbox",
+      "/app/inbox?status=unread",
+      "/app/inbox?kind=recommendation",
+      "/app/inbox?kind=adviser",
       "/app/wealth",
       "/app/actions",
       "/app/wealthguard",
@@ -79,6 +82,41 @@ try {
       const ok = res.status === 200 || res.status === 307 || res.status === 308;
       console.log(`  [${ok ? "OK" : "FAIL"}] GET ${path} → ${res.status}`);
       if (!ok) failures.push(`${path} status ${res.status}`);
+    }
+
+    const inboxRes = await authedGet("/api/inbox?refresh=1", login.cookie);
+    const inboxOk = inboxRes.status === 200;
+    console.log(`  [${inboxOk ? "OK" : "FAIL"}] GET /api/inbox?refresh=1 → ${inboxRes.status}`);
+    if (!inboxOk) {
+      failures.push(`/api/inbox status ${inboxRes.status}`);
+    } else {
+      const inboxData = await inboxRes.json().catch(() => ({}));
+      const unreadItem = Array.isArray(inboxData.items)
+        ? inboxData.items.find((i) => i && i.status === "unread" && i.id)
+        : null;
+      if (unreadItem?.id) {
+        const patchRes = await fetch(`${base}/api/inbox/${unreadItem.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(login.cookie ? { cookie: login.cookie } : {}),
+          },
+          body: JSON.stringify({ status: "read" }),
+        });
+        const patchOk = patchRes.status === 200;
+        console.log(`  [${patchOk ? "OK" : "FAIL"}] PATCH /api/inbox/:id read → ${patchRes.status}`);
+        if (!patchOk) failures.push(`inbox mark-read status ${patchRes.status}`);
+      } else {
+        console.log("  [SKIP] PATCH /api/inbox/:id (no unread inbox item after refresh)");
+      }
+
+      const markAllRes = await fetch(`${base}/api/inbox/mark-all-read`, {
+        method: "POST",
+        headers: login.cookie ? { cookie: login.cookie } : {},
+      });
+      const markAllOk = markAllRes.status === 200;
+      console.log(`  [${markAllOk ? "OK" : "FAIL"}] POST /api/inbox/mark-all-read → ${markAllRes.status}`);
+      if (!markAllOk) failures.push(`inbox mark-all-read status ${markAllRes.status}`);
     }
 
     const custNoteRes = await authedGet("/api/notifications", login.cookie);

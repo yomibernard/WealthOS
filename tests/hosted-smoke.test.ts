@@ -82,11 +82,17 @@ describe("hosted smoke rules", () => {
     expect(local).toContain("kind=care_update");
     expect(local).toContain("kind=cadence");
     expect(local).toContain("mark-all-read (customer)");
+    expect(local).toContain("/app/inbox?status=unread");
+    expect(local).toContain("kind=recommendation");
+    expect(local).toContain("/api/inbox/mark-all-read");
     expect(hosted).toContain("/adviser/notifications");
     expect(hosted).toContain("read=unread");
     expect(hosted).toContain("/api/notifications");
     expect(hosted).toContain("/app/notifications");
     expect(hosted).toContain("kind=care_update");
     expect(hosted).toContain("kind=cadence");
+    expect(hosted).toContain("/app/inbox");
+    expect(hosted).toContain("status=unread");
+    expect(hosted).toContain("/api/inbox");
   });
 });

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Phase 20.x — Wealth Inbox triage
+
+- **20.0** Customer `/app/inbox` unread/kind triage + mark-all-read; Home unread deep-link; smoke paths
+
 ## 0.1.12 — 14 Aug 2026 (Customer notification triage pack)
 
 Customer-facing notification triage on top of the 0.1.11 adviser notification triage pack.

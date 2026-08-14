@@ -211,3 +211,11 @@ export async function updateInboxItem(
     data: { status },
   });
 }
+
+export async function markAllInboxRead(userId: string) {
+  const result = await prisma.inboxItem.updateMany({
+    where: { userId, status: "unread" },
+    data: { status: "read" },
+  });
+  return { updated: result.count };
+}

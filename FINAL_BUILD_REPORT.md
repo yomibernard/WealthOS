@@ -747,3 +747,11 @@ Customer notification triage freeze pack **v0.1.12**:
 
 - `npm run pilot:freeze` checks customer triage engine, Home pulse, mark-all-read UI, seed cadence, smoke
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 20.0 delivered (14 Aug 2026)
+
+Wealth Inbox triage:
+
+- `/app/inbox` Unread/All + kind chips (Recommendations, Connections, Adviser, …) + mark-all-read
+- Home Wealth Inbox badge deep-links to `?status=unread` when unread
+- Local/hosted smoke hits inbox triage paths + mark-read / mark-all-read
