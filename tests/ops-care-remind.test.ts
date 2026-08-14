@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildOpsCareRemindDraft,
   isOpsCareRemindTitle,
+  shouldOfferOpsCareRemind,
 } from "@/engines/ops-care-remind";
 import { classifyAdviserNotificationKind } from "@/engines/adviser-notifications";
 
@@ -26,5 +27,21 @@ describe("ops care remind", () => {
       adminName: "Ops",
     });
     expect(classifyAdviserNotificationKind(draft)).toBe("care_handoff");
+  });
+
+  it("offers per-queue Remind only for open unacked rows", () => {
+    expect(
+      shouldOfferOpsCareRemind({ status: "open", hasCareAck: false }),
+    ).toBe(true);
+    expect(
+      shouldOfferOpsCareRemind({ status: "in_progress", hasCareAck: false }),
+    ).toBe(true);
+    expect(
+      shouldOfferOpsCareRemind({ status: "open", hasCareAck: true }),
+    ).toBe(false);
+    expect(
+      shouldOfferOpsCareRemind({ status: "resolved", hasCareAck: false }),
+    ).toBe(false);
+    expect(shouldOfferOpsCareRemind({ status: "open" })).toBe(false);
   });
 });

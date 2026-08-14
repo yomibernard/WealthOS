@@ -60,8 +60,9 @@ Presenter checklist UI: `/demo`
 5d. Optional: `/adviser?care=awaiting` after Yomi marks seen (clears awaiting; ops lists receipt)
 6. **Admin** — **Needs your attention** ops next-steps on `/admin` / `/admin/ops` (escalations, privacy, **care handoff**, maker-checker, flag risk)
 6a. Optional: **Remind linked advisers** on Care handoff (unacked) → Ada **notifications** (**Care handoff** filter) → Care desk ack (queues stay open)
-6b. Optional: **WealthAI (ops)** (`/admin/ai`) — “What should I do next for ops?” cites the same daily board pulse with `/admin…` paths
-7. Optional: `/admin/escalations` + `/admin/privacy` — note **care-ack** badges + Care desk links; `/admin/flags` safe pilot; `/admin/audit` filter + download
+6b. Optional: on `/admin/escalations` or `/admin/privacy`, **Remind adviser** on a **No care ack** row (same notify; queues stay open)
+6c. Optional: **WealthAI (ops)** (`/admin/ai`) — “What should I do next for ops?” cites the same daily board pulse with `/admin…` paths
+7. Optional: `/admin/escalations` + `/admin/privacy` — note **care-ack** badges + Care desk links + per-row Remind; `/admin/flags` safe pilot; `/admin/audit` filter + download
 8. Trust loop (optional, ~2 min): Yomi `/app/support` → case; admin resolve → Yomi **Home** / **Inbox** / **Notifications** deep-link back to Support; optional WealthAI “care update” question
 9. Privacy loop (optional): Yomi Privacy Centre request → admin `/admin/privacy` → Yomi Inbox/Notifications → `/app/privacy` (care updates if acked)
 

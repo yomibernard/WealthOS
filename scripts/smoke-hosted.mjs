@@ -243,6 +243,35 @@ try {
             );
           }
 
+          const scopedId =
+            Array.isArray(careRemindData.results) &&
+            careRemindData.results.find(
+              (r) => r && typeof r.customerId === "string" && r.customerId.length > 0,
+            )?.customerId;
+          if (scopedId) {
+            const scopedRes = await fetch(`${base}/api/admin/care-remind`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...(roleCookie ? { cookie: roleCookie } : {}),
+              },
+              body: JSON.stringify({ customerId: scopedId }),
+            });
+            const scopedData = await scopedRes.json().catch(() => ({}));
+            const scopedOk =
+              scopedRes.status === 200 &&
+              typeof scopedData.reminded === "number" &&
+              /do not close|queues/i.test(String(scopedData.note ?? ""));
+            console.log(
+              `  [${scopedOk ? "OK" : "FAIL"}] POST /api/admin/care-remind customerId → ${scopedRes.status}`,
+            );
+            if (!scopedOk) {
+              failures.push(
+                `hosted admin care-remind customerId failed: ${scopedRes.status} ${String(scopedData.error ?? "").slice(0, 120)}`,
+              );
+            }
+          }
+
           const adminAiRes = await fetch(`${base}/api/admin/ai`, {
             method: "POST",
             headers: {

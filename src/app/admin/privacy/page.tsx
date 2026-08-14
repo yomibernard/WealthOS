@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { OpsCareRemindButton } from "@/components/OpsCareRemindButton";
+import { shouldOfferOpsCareRemind } from "@/engines/ops-care-remind";
 import { Badge, Button, Field, PageHeader, Panel, TextInput } from "@/components/ui";
 
 type Row = {
@@ -104,6 +106,14 @@ export default function AdminPrivacyPage() {
                   Open Care desk
                 </Link>
               </p>
+              {shouldOfferOpsCareRemind({
+                status: r.status,
+                hasCareAck: r.careAck?.hasCareAck,
+              }) ? (
+                <div className="mt-2">
+                  <OpsCareRemindButton customerId={r.userId} />
+                </div>
+              ) : null}
               {r.status === "open" || r.status === "in_progress" ? (
                 <div className="mt-3 space-y-2">
                   <Field label="Resolution note" id={`res-${r.id}`}>

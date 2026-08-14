@@ -107,8 +107,9 @@ export function buildOpsNextStepsPulse(input: OpsNextStepsInput): OpsNextStepsPu
       kind: "care_handoff",
       priority: "important",
       title: `${unacked} care handoff gap${unacked === 1 ? "" : "s"} (unacked)`,
-      detail: "Open care without an adviser acknowledgment — check Care radar.",
-      href: "/adviser?care=unacked",
+      detail:
+        "Open care without an adviser acknowledgment — Remind adviser on escalations/privacy or Care handoff.",
+      href: "/admin/escalations",
     });
   }
 

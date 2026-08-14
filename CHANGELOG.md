@@ -4,6 +4,10 @@
 
 Ops care remind on top of the 0.1.18 admin WealthAI ops next-steps pack.
 
+### Phase 27.x — Ops queue care remind (in progress)
+
+- **27.0** Per-customer **Remind adviser** on `/admin/escalations` + `/admin/privacy` (No care ack); ops next-steps care handoff → escalations
+
 ### Phase 26.x — Ops care remind
 
 - **26.2** Freeze pack `v0.1.19`; `pilot:freeze` covers 26.x ops care remind surface

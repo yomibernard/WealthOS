@@ -29,7 +29,8 @@ describe("ops next-steps pulse", () => {
       awaitingReceiptCount: 1,
     });
     expect(pulse.items[0]?.kind).toBe("care_handoff");
-    expect(pulse.items[0]?.href).toBe("/adviser?care=unacked");
+    expect(pulse.items[0]?.href).toBe("/admin/escalations");
+    expect(pulse.items[0]?.detail).toMatch(/Remind adviser/i);
     expect(pulse.items.some((i) => i.kind === "awaiting")).toBe(true);
   });
 

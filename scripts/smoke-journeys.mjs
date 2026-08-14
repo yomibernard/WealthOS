@@ -456,6 +456,41 @@ try {
       failures.push("admin care-remind missing results array");
     }
 
+    const scopedCustomerId =
+      careRemindResultsOk &&
+      careRemindData.results.find(
+        (r) => r && typeof r.customerId === "string" && r.customerId.length > 0,
+      )?.customerId;
+    if (scopedCustomerId) {
+      const scopedRes = await fetch(`${base}/api/admin/care-remind`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(adminLogin.cookie ? { cookie: adminLogin.cookie } : {}),
+        },
+        body: JSON.stringify({ customerId: scopedCustomerId }),
+      });
+      const scopedData = await scopedRes.json().catch(() => ({}));
+      const scopedNote = String(scopedData.note ?? "");
+      const scopedQueuesOk = /do not close|queues stay open|Queues stay open/i.test(
+        scopedNote,
+      );
+      const scopedOk =
+        scopedRes.status === 200 &&
+        typeof scopedData.reminded === "number" &&
+        scopedQueuesOk;
+      console.log(
+        `  [${scopedOk ? "OK" : "FAIL"}] POST /api/admin/care-remind customerId=${scopedCustomerId.slice(0, 8)}… reminded=${scopedData.reminded ?? "n/a"} → ${scopedRes.status}`,
+      );
+      if (!scopedOk) {
+        failures.push(
+          `admin care-remind customerId failed: status=${scopedRes.status} queuesOk=${scopedQueuesOk} ${String(scopedData.error ?? scopedNote).slice(0, 120)}`,
+        );
+      }
+    } else if (careRemindOk) {
+      console.log("  [SKIP] POST /api/admin/care-remind customerId (no result customerId)");
+    }
+
     if (careRemindOk && (careRemindData.reminded ?? 0) > 0) {
       const adviserRecheck = await signIn("adviser@demo.wealthos.ng", "WealthOSdemo1!");
       if (adviserRecheck.res.ok) {

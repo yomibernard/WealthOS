@@ -29,3 +29,12 @@ export function buildOpsCareRemindDraft(input: {
 export function isOpsCareRemindTitle(title: string): boolean {
   return /Ops reminder:.*still needs a care acknowledgment/i.test(title);
 }
+
+/** Offer per-row Remind only on open/in_progress rows without a care ack. */
+export function shouldOfferOpsCareRemind(input: {
+  status: string;
+  hasCareAck?: boolean;
+}): boolean {
+  const open = input.status === "open" || input.status === "in_progress";
+  return open && input.hasCareAck === false;
+}

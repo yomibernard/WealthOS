@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { OpsCareRemindButton } from "@/components/OpsCareRemindButton";
+import { shouldOfferOpsCareRemind } from "@/engines/ops-care-remind";
 import { Badge, Button, Field, PageHeader, Panel, TextInput } from "@/components/ui";
 
 type CaseRow = {
@@ -105,6 +107,14 @@ export default function AdminEscalationsPage() {
                   Open Care desk
                 </Link>
               </p>
+              {shouldOfferOpsCareRemind({
+                status: e.status,
+                hasCareAck: e.careAck?.hasCareAck,
+              }) ? (
+                <div className="mt-2">
+                  <OpsCareRemindButton customerId={e.customer.id} />
+                </div>
+              ) : null}
               <p className="muted mt-1 text-sm">{e.summaryPreview}</p>
               {e.resolution ? (
                 <p className="mt-2 text-sm">

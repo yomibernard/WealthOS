@@ -901,3 +901,11 @@ Ops care remind freeze pack **v0.1.19**:
 
 - `npm run pilot:freeze` checks ops care remind engine/service/API, admin CTA, Care handoff kind, smoke
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 27.0 delivered (14 Aug 2026)
+
+Ops queue care remind:
+
+- Per-customer **Remind adviser** on `/admin/escalations` + `/admin/privacy` when **No care ack**
+- Reuses `POST /api/admin/care-remind` with `customerId`; queues stay open
+- Ops next-steps care handoff points at escalations + Remind copy
