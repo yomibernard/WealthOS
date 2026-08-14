@@ -762,3 +762,10 @@ Wealth Inbox triage smoke:
 
 - Local smoke hits connection/data_quality kind filters; mark-all-read labeled `(inbox)`
 - Hosted smoke includes `kind=recommendation` and `kind=adviser`
+
+## Phase 20.2 delivered (14 Aug 2026)
+
+Wealth Inbox triage freeze pack **v0.1.13**:
+
+- `npm run pilot:freeze` checks inbox triage engine, mark-all-read API/UI, Home unread link, smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

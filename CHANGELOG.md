@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.1.13 — 14 Aug 2026 (Wealth Inbox triage pack)
+
+Customer Wealth Inbox triage on top of the 0.1.12 customer notification triage pack.
 
 ### Phase 20.x — Wealth Inbox triage
 
+- **20.2** Freeze pack `v0.1.13`; `pilot:freeze` covers 20.x inbox triage surface
 - **20.1** Smoke covers inbox kind filters (recommendation/adviser/connection/data_quality) + labeled mark-all-read; hosted hits recommendation/adviser
 - **20.0** Customer `/app/inbox` unread/kind triage + mark-all-read; Home unread deep-link; smoke paths
 
