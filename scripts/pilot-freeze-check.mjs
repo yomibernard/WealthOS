@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.19 (… + admin WealthAI ops 25.x + ops care remind 26.x).
+ * Current pack: v0.1.20 (… + ops care remind 26.x + ops queue care remind 27.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.19";
+const EXPECTED = "0.1.20";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -817,6 +817,66 @@ if (
 }
 if (!demo.includes("Remind linked advisers") && !demo.includes("Care handoff")) {
   failures.push("DEMO_SCRIPT.md missing ops care remind beat");
+}
+
+// 27.x Ops queue care remind
+if (
+  !opsCareRemindEngine.includes("shouldOfferOpsCareRemind") ||
+  !opsCareRemindService.includes("customerName") ||
+  !opsCareRemindService.includes("adminName")
+) {
+  failures.push("ops-care-remind missing per-queue offer helper / enriched audit payload");
+}
+const careRemindButton = read("src/components/OpsCareRemindButton.tsx");
+if (
+  !careRemindButton.includes("customerId") ||
+  !careRemindButton.includes("Remind adviser")
+) {
+  failures.push("OpsCareRemindButton missing per-customer Remind adviser mode");
+}
+if (
+  !adminEsc.includes("OpsCareRemindButton") ||
+  !adminEsc.includes("shouldOfferOpsCareRemind")
+) {
+  failures.push("admin escalations missing per-queue care remind");
+}
+if (
+  !adminPrivacy.includes("OpsCareRemindButton") ||
+  !adminPrivacy.includes("shouldOfferOpsCareRemind")
+) {
+  failures.push("admin privacy missing per-queue care remind");
+}
+if (
+  !opsDaily.includes("recentReminds") ||
+  !opsDaily.includes("OpsCareHandoffRemind") ||
+  !adminOps.includes("recentReminds")
+) {
+  failures.push("ops daily / Care handoff missing recent ops reminds trail");
+}
+if (
+  !opsNextEngine.includes('href: "/admin/escalations"') ||
+  !opsNextEngine.includes("Remind adviser")
+) {
+  failures.push("ops-next-steps care handoff missing escalations Remind path");
+}
+if (
+  !smokeLocal.includes("admin care-remind customerId") ||
+  !smokeLocal.includes("ops care remind trail") ||
+  !smokeLocal.includes("recentReminds")
+) {
+  failures.push("smoke-journeys missing ops queue care remind / trail coverage");
+}
+if (
+  !smokeHosted.includes("customerId") ||
+  !smokeHosted.includes("hosted ops care remind trail")
+) {
+  failures.push("smoke-hosted missing ops queue care remind / trail coverage");
+}
+if (
+  !demo.includes("Remind adviser") ||
+  !demo.includes("Recent ops reminds")
+) {
+  failures.push("DEMO_SCRIPT.md missing ops queue care remind beat");
 }
 
 if (failures.length) {

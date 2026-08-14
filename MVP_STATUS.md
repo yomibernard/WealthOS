@@ -1,8 +1,8 @@
 # WealthOS MVP status freeze
 
-**Version:** 0.1.19  
+**Version:** 0.1.20  
 **Date:** 14 August 2026  
-**Verdict:** Feature-complete for local/pilot demo through ops care remind (ops + trust + adviser care + care UX + ops care handoff + customer care updates + WealthAI care_update + mark-as-seen + receipt close-loop + adviser notifications + adviser triage + customer triage + inbox triage + Home next-steps + adviser book next-steps + adviser WealthAI book + admin/ops next-steps + admin WealthAI ops + ops care remind). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
+**Verdict:** Feature-complete for local/pilot demo through ops queue care remind (ops + trust + adviser care + care UX + ops care handoff + customer care updates + WealthAI care_update + mark-as-seen + receipt close-loop + adviser notifications + adviser triage + customer triage + inbox triage + Home next-steps + adviser book next-steps + adviser WealthAI book + admin/ops next-steps + admin WealthAI ops + ops care remind + queue remind). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
 
 ## Promise
 
@@ -67,7 +67,7 @@
 | Adviser WealthAI book | Ready (demo) | `/adviser/ai` grounded on book next-steps pulse |
 | Admin/ops next-steps | Ready (demo) | Ranked ops next steps on `/admin` + `/admin/ops` |
 | Admin WealthAI ops | Ready (demo) | `/admin/ai` grounded on ops next-steps pulse |
-| Ops care remind | Ready (demo) | Admin remind → adviser Care handoff notify; per-queue Remind on escalations/privacy |
+| Ops care remind | Ready (demo) | Bulk + per-queue Remind → adviser Care handoff; recent ops reminds trail |
 
 ## Quality gates (this machine)
 
@@ -98,6 +98,7 @@
 - [x] Admin/ops next-steps pack `v0.1.17` (`npm run pilot:freeze`)
 - [x] Admin WealthAI ops next-steps pack `v0.1.18` (`npm run pilot:freeze`)
 - [x] Ops care remind pack `v0.1.19` (`npm run pilot:freeze`)
+- [x] Ops queue care remind pack `v0.1.20` (`npm run pilot:freeze`)
 - [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets + Postgres URL)
 - [ ] Hosted deploy smoke (`SMOKE_BASE_URL=… npm run smoke:hosted` — see [DEPLOY.md](./DEPLOY.md))
 - [ ] Human sign-off on `LAUNCH_REVIEW.md`

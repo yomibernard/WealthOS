@@ -916,3 +916,10 @@ Ops care remind trail + smoke:
 
 - Care handoff shows **Recent ops reminds** from `OPS_CARE_REMIND` audit
 - Local/hosted smoke assert trail after remind; queue care_handoff tile → escalations
+
+## Phase 27.2 delivered (14 Aug 2026)
+
+Ops queue care remind freeze pack **v0.1.20**:
+
+- `npm run pilot:freeze` checks per-queue Remind, recent reminds trail, smoke, DEMO
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
