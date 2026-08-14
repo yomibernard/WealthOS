@@ -133,7 +133,15 @@ try {
     console.log(`  [FAIL] sign-in adviser → ${adviserLogin.res.status}`);
   } else {
     console.log("  [OK] sign-in adviser");
-    for (const path of ["/adviser", "/adviser?care=awaiting", "/adviser?care=unacked", "/adviser/notifications"]) {
+    for (const path of [
+      "/adviser",
+      "/adviser?care=awaiting",
+      "/adviser?care=unacked",
+      "/adviser/notifications",
+      "/adviser/notifications?read=unread",
+      "/adviser/notifications?kind=care_receipt",
+      "/adviser/notifications?kind=share",
+    ]) {
       const res = await authedGet(path, adviserLogin.cookie);
       const ok = res.status === 200 || res.status === 307 || res.status === 308;
       console.log(`  [${ok ? "OK" : "FAIL"}] GET ${path} → ${res.status}`);
@@ -163,6 +171,16 @@ try {
       } else {
         console.log("  [SKIP] PATCH /api/notifications/:id (no unread adviser notification in seed)");
       }
+
+      const markAllRes = await fetch(`${base}/api/notifications/mark-all-read`, {
+        method: "POST",
+        headers: adviserLogin.cookie ? { cookie: adviserLogin.cookie } : {},
+      });
+      const markAllOk = markAllRes.status === 200;
+      console.log(
+        `  [${markAllOk ? "OK" : "FAIL"}] POST /api/notifications/mark-all-read → ${markAllRes.status}`,
+      );
+      if (!markAllOk) failures.push(`adviser notification mark-all-read status ${markAllRes.status}`);
     }
   }
 

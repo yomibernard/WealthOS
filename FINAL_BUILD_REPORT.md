@@ -711,3 +711,10 @@ Adviser notification triage:
 - Unread / All + Care receipts / Shares chips on `/adviser/notifications`
 - `POST /api/notifications/mark-all-read`; unread pulse deep-links to `?read=unread`
 - Seed leaves Ada an unread care receipt and an unread Yomi share for demo filters
+
+## Phase 18.1 delivered (14 Aug 2026)
+
+Adviser notification triage smoke:
+
+- Local smoke hits `?read=unread` / kind filters and `POST /api/notifications/mark-all-read`
+- Hosted smoke includes unread + care-receipt triage paths

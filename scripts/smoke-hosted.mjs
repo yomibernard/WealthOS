@@ -148,7 +148,14 @@ try {
       const adviserEmail = process.env.SMOKE_ADVISER_EMAIL || "adviser@demo.wealthos.ng";
       const adminEmail = process.env.SMOKE_ADMIN_EMAIL || "admin@demo.wealthos.ng";
       for (const [label, roleEmail, paths] of [
-        ["adviser", adviserEmail, ["/adviser", "/adviser?care=awaiting", "/adviser/notifications", "/api/notifications"]],
+        ["adviser", adviserEmail, [
+          "/adviser",
+          "/adviser?care=awaiting",
+          "/adviser/notifications",
+          "/adviser/notifications?read=unread",
+          "/adviser/notifications?kind=care_receipt",
+          "/api/notifications",
+        ]],
         ["admin", adminEmail, ["/admin/ops"]],
       ]) {
         const roleLogin = await fetch(`${base}/api/auth/sign-in`, {
