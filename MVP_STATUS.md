@@ -1,8 +1,8 @@
 # WealthOS MVP status freeze
 
-**Version:** 0.1.17  
+**Version:** 0.1.18  
 **Date:** 14 August 2026  
-**Verdict:** Feature-complete for local/pilot demo through admin/ops next-steps (ops + trust + adviser care + care UX + ops care handoff + customer care updates + WealthAI care_update + mark-as-seen + receipt close-loop + adviser notifications + adviser triage + customer triage + inbox triage + Home next-steps + adviser book next-steps + adviser WealthAI book + admin/ops next-steps). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
+**Verdict:** Feature-complete for local/pilot demo through admin WealthAI ops next-steps (ops + trust + adviser care + care UX + ops care handoff + customer care updates + WealthAI care_update + mark-as-seen + receipt close-loop + adviser notifications + adviser triage + customer triage + inbox triage + Home next-steps + adviser book next-steps + adviser WealthAI book + admin/ops next-steps + admin WealthAI ops). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
 
 ## Promise
 
@@ -95,6 +95,7 @@
 - [x] Adviser book next-steps pack `v0.1.15` (`npm run pilot:freeze`)
 - [x] Adviser WealthAI book next-steps pack `v0.1.16` (`npm run pilot:freeze`)
 - [x] Admin/ops next-steps pack `v0.1.17` (`npm run pilot:freeze`)
+- [x] Admin WealthAI ops next-steps pack `v0.1.18` (`npm run pilot:freeze`)
 - [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets + Postgres URL)
 - [ ] Hosted deploy smoke (`SMOKE_BASE_URL=… npm run smoke:hosted` — see [DEPLOY.md](./DEPLOY.md))
 - [ ] Human sign-off on `LAUNCH_REVIEW.md`

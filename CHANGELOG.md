@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.1.18 — 14 Aug 2026 (Admin WealthAI ops next-steps pack)
+
+Admin WealthAI ops next-steps on top of the 0.1.17 admin/ops next-steps pack.
 
 ### Phase 25.x — Admin WealthAI ops next-steps
 
+- **25.2** Freeze pack `v0.1.18`; `pilot:freeze` covers 25.x admin WealthAI ops surface
 - **25.1** Smoke asserts CoachAI + `opsNextStepsPulse` + `Path:`; hosted POST probe
 - **25.0** `/admin/ai` + `POST /api/admin/ai` grounds “What should I do next for ops?” on the daily board pulse
 

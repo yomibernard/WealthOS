@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.17 (… + adviser WealthAI book 23.x + admin/ops next-steps 24.x).
+ * Current pack: v0.1.18 (… + admin/ops next-steps 24.x + admin WealthAI ops 25.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.17";
+const EXPECTED = "0.1.18";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -89,7 +89,7 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.17")) failures.push("CHANGELOG.md missing 0.1.17 section");
+if (!changelog.includes("0.1.18")) failures.push("CHANGELOG.md missing 0.1.18 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
 if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
@@ -121,7 +121,7 @@ if (!changelog.includes("Adviser notification") && !changelog.includes("adviser 
 const deploy = read("DEPLOY.md");
 if (!deploy.includes("smoke:hosted")) failures.push("DEPLOY.md missing smoke:hosted");
 if (!deploy.includes("safe pilot")) failures.push("DEPLOY.md missing safe pilot guidance");
-if (!deploy.includes("v0.1.17")) failures.push("DEPLOY.md missing v0.1.17 tag guidance");
+if (!deploy.includes("v0.1.18")) failures.push("DEPLOY.md missing v0.1.18 tag guidance");
 
 const demo = read("DEMO_SCRIPT.md");
 if (!demo.includes("/admin/ops")) failures.push("DEMO_SCRIPT.md missing /admin/ops");
@@ -147,12 +147,12 @@ if (!demo.includes("Adviser notifications") && !demo.includes("/adviser/notifica
 }
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.17")) failures.push("MVP_STATUS.md missing 0.1.17");
+if (!status.includes("0.1.18")) failures.push("MVP_STATUS.md missing 0.1.18");
+if (!status.includes("Admin WealthAI ops")) {
+  failures.push("MVP_STATUS.md missing Admin WealthAI ops");
+}
 if (!status.includes("Admin/ops next-steps")) {
   failures.push("MVP_STATUS.md missing Admin/ops next-steps");
-}
-if (!status.includes("Adviser WealthAI book")) {
-  failures.push("MVP_STATUS.md missing Adviser WealthAI book");
 }
 if (!status.includes("Adviser book next-steps")) {
   failures.push("MVP_STATUS.md missing Adviser book next-steps");
@@ -188,7 +188,7 @@ const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
 if (!launch.includes("/admin/flags")) failures.push("LAUNCH_REVIEW.md missing flag profiles path");
 if (!launch.includes("pilot:freeze")) failures.push("LAUNCH_REVIEW.md missing pilot:freeze");
-if (!launch.includes("0.1.17")) failures.push("LAUNCH_REVIEW.md missing 0.1.17 pack");
+if (!launch.includes("0.1.18")) failures.push("LAUNCH_REVIEW.md missing 0.1.18 pack");
 
 const notificationsPage = read("src/app/app/notifications/page.tsx");
 if (!notificationsPage.includes("resolveNotificationLink")) {
@@ -711,6 +711,60 @@ if (!smokeHosted.includes("/api/admin/next-steps")) {
 }
 if (!demo.includes("ops next-steps") && !demo.includes("Needs your attention** ops")) {
   failures.push("DEMO_SCRIPT.md missing admin/ops next-steps beat");
+}
+
+// 25.x Admin WealthAI ops next-steps
+mustExist("src/app/api/admin/ai/route.ts");
+mustExist("src/app/admin/ai/page.tsx");
+if (
+  !opsNextEngine.includes("formatOpsNextStepsAiContent") ||
+  !opsNextEngine.includes("wantsOpsNextSteps")
+) {
+  failures.push("ops-next-steps engine missing AI format helpers");
+}
+if (
+  !orchestrator.includes("runAdminWealthAI") ||
+  !orchestrator.includes("opsNextStepsPulse")
+) {
+  failures.push("orchestrator missing runAdminWealthAI / opsNextStepsPulse");
+}
+const adminAiRoute = read("src/app/api/admin/ai/route.ts");
+if (
+  !adminAiRoute.includes("loadOpsNextStepsPulse") ||
+  !adminAiRoute.includes("runAdminWealthAI")
+) {
+  failures.push("admin AI route missing pulse grounding");
+}
+const adminAiPage = read("src/app/admin/ai/page.tsx");
+if (
+  !adminAiPage.includes("/api/admin/ai") ||
+  !adminAiPage.includes("What should I do next for ops?")
+) {
+  failures.push("admin AI page missing ops next-steps chat UI");
+}
+if (!adminOps.includes("/admin/ai") || !adminHomePage.includes("/admin/ai")) {
+  failures.push("admin pages missing WealthAI ops CTA");
+}
+if (
+  !smokeLocal.includes("/api/admin/ai") ||
+  !smokeLocal.includes("opsNextStepsPulse") ||
+  !smokeLocal.includes("What should I do next for ops?") ||
+  !smokeLocal.includes("admin ai ops_next_steps expected CoachAI agent")
+) {
+  failures.push("smoke-journeys missing admin WealthAI ops coverage");
+}
+if (
+  !smokeHosted.includes("/api/admin/ai") ||
+  !smokeHosted.includes("/admin/ai") ||
+  !smokeHosted.includes("opsNextStepsPulse")
+) {
+  failures.push("smoke-hosted missing admin WealthAI ops coverage");
+}
+if (
+  !demo.includes("WealthAI (ops)") &&
+  !demo.includes("What should I do next for ops?")
+) {
+  failures.push("DEMO_SCRIPT.md missing admin WealthAI ops beat");
 }
 
 if (failures.length) {

@@ -28,7 +28,7 @@ export async function GET() {
     {
       status,
       service: "wealthos",
-      version: process.env.npm_package_version ?? "0.1.17",
+      version: process.env.npm_package_version ?? "0.1.18",
       time: new Date().toISOString(),
       latencyMs: Date.now() - started,
       database: { ok: dbOk, error: dbError },

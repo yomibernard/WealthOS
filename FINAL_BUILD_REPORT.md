@@ -872,3 +872,10 @@ Admin WealthAI ops next-steps smoke:
 
 - Local smoke requires CoachAI, `opsNextStepsPulse`, and `Path: /admin` or `/adviser`
 - Hosted smoke POSTs `/api/admin/ai` ops next-steps probe
+
+## Phase 25.2 delivered (14 Aug 2026)
+
+Admin WealthAI ops next-steps freeze pack **v0.1.18**:
+
+- `npm run pilot:freeze` checks admin WealthAI engine helpers, `/admin/ai`, API grounding, smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
