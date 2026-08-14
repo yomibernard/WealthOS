@@ -79,7 +79,7 @@ describe("hosted smoke rules", () => {
     expect(local).toContain("/api/admin/care-remind");
     expect(local).toContain("admin care-remind");
     expect(local).toContain("admin care-remind missing queues-stay-open note");
-    expect(local).toContain("adviser care_handoff notification after ops care-remind");
+    expect(local).toContain("adviser care_handoff notification missing after ops care-remind");
     expect(hosted).toContain("kind=care_handoff");
     expect(hosted).toContain("/api/admin/care-remind");
     expect(hosted).toContain("hosted admin care-remind");
