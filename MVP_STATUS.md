@@ -64,6 +64,7 @@
 | Wealth Inbox triage | Ready (demo) | `/app/inbox` status/kind filters + mark-all-read |
 | Home next-steps pulse | Ready (demo) | Ranked deep links on Home + `/api/next-steps` |
 | Adviser book next-steps | Ready (demo) | Ranked Care radar next steps on `/adviser` |
+| Adviser WealthAI book | Ready (demo) | `/adviser/ai` grounded on book next-steps pulse |
 
 ## Quality gates (this machine)
 

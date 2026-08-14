@@ -20,6 +20,11 @@ import { analyseCrypto } from "@/engines/crypto";
 import { analyseLending } from "@/engines/lending";
 import { formatCareUpdateAiContent } from "@/engines/adviser-care-ack";
 import { formatNextStepsAiContent } from "@/engines/next-steps";
+import {
+  formatAdviserNextStepsAiContent,
+  wantsAdviserBookNextSteps,
+  type AdviserNextStepsPulse,
+} from "@/engines/adviser-next-steps";
 import type { FxRateRow } from "@/engines/fx";
 
 export type AgentName =
@@ -972,5 +977,40 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
     missingInformation,
     escalate,
     escalationReason,
+  };
+}
+
+/** Thin WealthAI for advisers — book next-steps only; no customer Wealth Graph. */
+export function runAdviserWealthAI(
+  message: string,
+  pulse: AdviserNextStepsPulse,
+): AiResponse {
+  if (wantsAdviserBookNextSteps(message)) {
+    return {
+      intent: "actions",
+      agent: "CoachAI",
+      content: formatAdviserNextStepsAiContent(pulse),
+      confidence: 0.88,
+      toolsUsed: ["adviserNextStepsPulse"],
+      assumptions: [],
+      missingInformation: [],
+      escalate: false,
+    };
+  }
+
+  return {
+    intent: "general",
+    agent: "ConciergeAI",
+    content: [
+      "I’m WealthAI for your adviser book — Care first, then product talk.",
+      "Ask “What should I do next for my book?” to ground on the live Care radar pulse (paths stay under /adviser).",
+      "Customer Wealth Graph and personal balances stay on the customer side.",
+      `Right now: ${pulse.summary}`,
+    ].join(" "),
+    confidence: 0.7,
+    toolsUsed: ["adviserNextStepsPulse"],
+    assumptions: [],
+    missingInformation: [],
+    escalate: false,
   };
 }

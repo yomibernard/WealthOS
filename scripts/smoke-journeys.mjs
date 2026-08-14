@@ -264,6 +264,7 @@ try {
       "/adviser",
       "/adviser?care=awaiting",
       "/adviser?care=unacked",
+      "/adviser/ai",
       "/adviser/notifications",
       "/adviser/notifications?read=unread",
       "/adviser/notifications?kind=care_receipt",
@@ -299,6 +300,31 @@ try {
       if (!hasHref) failures.push("adviser next-steps pulse missing primaryHref");
       if (!firstHrefOk) failures.push("adviser next-steps first href not adviser path");
       if (!firstKindOk) failures.push("adviser next-steps first item missing kind");
+    }
+
+    const adviserAiRes = await fetch(`${base}/api/adviser/ai`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(adviserLogin.cookie ? { cookie: adviserLogin.cookie } : {}),
+      },
+      body: JSON.stringify({ message: "What should I do next for my book?" }),
+    });
+    const adviserAiData = await adviserAiRes.json().catch(() => ({}));
+    const adviserAiOk =
+      adviserAiRes.status === 200 &&
+      typeof adviserAiData.content === "string" &&
+      (/Path:\s*\/adviser/i.test(adviserAiData.content) ||
+        /Care radar|book next|Needs your attention|\/adviser(\/|\?)/i.test(
+          adviserAiData.content,
+        ));
+    console.log(
+      `  [${adviserAiOk ? "OK" : "FAIL"}] POST /api/adviser/ai book_next_steps → ${adviserAiRes.status}`,
+    );
+    if (!adviserAiOk) {
+      failures.push(
+        `adviser ai book_next_steps failed: ${adviserAiRes.status} ${String(adviserAiData.content ?? "").slice(0, 120)}`,
+      );
     }
 
     const noteRes = await authedGet("/api/notifications", adviserLogin.cookie);

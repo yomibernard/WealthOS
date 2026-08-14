@@ -184,3 +184,26 @@ export function buildAdviserNextStepsPulse(
     summary: `${items.length} next step${items.length === 1 ? "" : "s"} for your book.`,
   };
 }
+
+export function formatAdviserNextStepsAiContent(
+  pulse: AdviserNextStepsPulse | null | undefined,
+): string {
+  if (!pulse?.items.length) {
+    return "I do not see a ranked book next-steps pulse yet. Open Care radar on /adviser — doing nothing can still be valid when the book is quiet.";
+  }
+  const lines = pulse.items.map(
+    (s, i) => `${i + 1}. ${s.title} — ${s.detail} Path: ${s.href}`,
+  );
+  return [
+    "Here is what to do next for your book from the live Care radar pulse (complaints and privacy first):",
+    ...lines,
+    "Ops queues stay authoritative for complaints and privacy; care acks and receipts never close admin queues.",
+  ].join("\n");
+}
+
+export function wantsAdviserBookNextSteps(message: string): boolean {
+  const m = message.toLowerCase();
+  return /what should i do|next (step|best)|priority|care radar|my book|book next|needs (my|your) attention/.test(
+    m,
+  );
+}

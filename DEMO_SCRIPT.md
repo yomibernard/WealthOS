@@ -53,6 +53,7 @@ Presenter checklist UI: `/demo`
 2. **Connections** — sync demo bank (consent-gated)
 3. As Yomi — **Adviser collaboration** → **Share a briefing** (full or digest)
 4. **Adviser** portal — **Needs your attention** book next-steps → Care desk / filters; **Care radar** (`Needs care` / **Unacked** / Complaints / Privacy / Support) → 360 **Care desk** (see **recent acks**, optional **acknowledge**) + **Insights**; send a **nudge**
+4b. Optional: **WealthAI (book)** (`/adviser/ai`) — “What should I do next for my book?” cites the same Care radar pulse with `/adviser…` paths
 5. Back as Yomi — **Home** may show **care update** CTA and **unread notifications** pulse (seeded after `db:setup`) → **Notifications** triage (**Unread** / **Care** / **Cadence**) → **Mark as read** / **Mark all as read**; **Support** or **Privacy** lists the acknowledgment → **Mark as seen**; **Inbox** shows care/nudge deep links
 5b. Optional: **WealthAI** (`/app/ai`) — ask “Where do I see my adviser care update?” (grounded unseen pulse; ops still authoritative)
 5c. Back as Ada — **Adviser notifications** (`/adviser/notifications`) — triage **Unread** / **Care receipts** / **Shares**, open Care desk, optional **Mark all as read**; 360 history **Seen** / **Unseen**; Care radar **Awaiting receipt**; Admin ops shows recent receipts

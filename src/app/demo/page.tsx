@@ -47,6 +47,7 @@ const acts = [
     steps: [
       "Consent Centre — pause AI, show gate, restore",
       "Adviser book next-steps → Care desk / filters + care radar",
+      "WealthAI (book): What should I do next for my book?",
       "Adviser care radar (unacked cues) → 360 care desk + history/ack + insights",
       "Customer Home care-update pulse → Support/Privacy mark as seen",
       "Customer notifications triage (Unread / Care / Cadence) · Mark all as read",
@@ -69,6 +70,7 @@ const quickLinks = [
   { href: "/app/wealth/confidence", label: "Data confidence" },
   { href: "/app/adviser-collab", label: "Adviser collab" },
   { href: "/adviser", label: "Adviser portal" },
+  { href: "/adviser/ai", label: "WealthAI (book)" },
   { href: "/app/ai", label: "WealthAI" },
   { href: "/app/support", label: "Support" },
   { href: "/app/privacy", label: "Privacy" },

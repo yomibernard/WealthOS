@@ -78,9 +78,14 @@ export default async function AdviserHomePage({
             </li>
           ))}
         </ol>
-        <Link href={nextSteps.primaryHref} className="btn btn-primary mt-4 w-full sm:w-auto">
-          {nextSteps.items[0]?.kind === "do_nothing" ? "Open Care radar" : "Take the next step"}
-        </Link>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link href={nextSteps.primaryHref} className="btn btn-primary w-full sm:w-auto">
+            {nextSteps.items[0]?.kind === "do_nothing" ? "Open Care radar" : "Take the next step"}
+          </Link>
+          <Link href="/adviser/ai" className="btn btn-soft w-full sm:w-auto">
+            Ask WealthAI what to do next
+          </Link>
+        </div>
       </Panel>
 
       <Panel className="mb-4">

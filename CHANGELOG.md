@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Phase 23.x — Adviser WealthAI book next-steps
+
+- **23.0** `/adviser/ai` + `POST /api/adviser/ai` grounds “What should I do next for my book?” on the Care radar pulse
+
 ## 0.1.15 — 14 Aug 2026 (Adviser book next-steps pack)
 
 Adviser book next-steps on Care radar on top of the 0.1.14 Home next-steps pulse pack.

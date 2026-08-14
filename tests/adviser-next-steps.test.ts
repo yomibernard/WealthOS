@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildAdviserNextStepsPulse } from "@/engines/adviser-next-steps";
+import {
+  buildAdviserNextStepsPulse,
+  formatAdviserNextStepsAiContent,
+  wantsAdviserBookNextSteps,
+} from "@/engines/adviser-next-steps";
+import { runAdviserWealthAI } from "@/ai/orchestrator";
 
 const customers = [
   {
@@ -96,5 +101,22 @@ describe("adviser next-steps pulse", () => {
     });
     const awaiting = pulse.items.find((i) => i.kind === "awaiting");
     expect(awaiting?.href).toBe("/adviser?care=awaiting");
+  });
+
+  it("formats AI content with adviser Path links", () => {
+    const pulse = buildAdviserNextStepsPulse({
+      totalComplaints: 1,
+      customers,
+    });
+    const text = formatAdviserNextStepsAiContent(pulse);
+    expect(text).toMatch(/Path:\s*\/adviser/);
+    expect(text).toMatch(/Care radar|book/i);
+    expect(wantsAdviserBookNextSteps("What should I do next for my book?")).toBe(true);
+    expect(wantsAdviserBookNextSteps("Hello")).toBe(false);
+
+    const ai = runAdviserWealthAI("What should I do next for my book?", pulse);
+    expect(ai.toolsUsed).toContain("adviserNextStepsPulse");
+    expect(ai.content).toMatch(/Path:\s*\/adviser/);
+    expect(ai.agent).toBe("CoachAI");
   });
 });
