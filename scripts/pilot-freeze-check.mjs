@@ -586,7 +586,6 @@ const adviserNextService = read("src/services/adviser-next-steps.ts");
 if (!adviserNextService.includes("loadAdviserNextStepsPulse")) {
   failures.push("adviser-next-steps service missing loadAdviserNextStepsPulse");
 }
-const adviserHomePage = read("src/app/adviser/page.tsx");
 if (
   !adviserHomePage.includes("loadAdviserNextStepsPulse") ||
   !adviserHomePage.includes("Needs your attention")
