@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.1.11 — 14 Aug 2026 (Adviser notification triage pack)
+
+Triage filters and mark-all-read on top of the 0.1.10 adviser notification centre pack.
 
 ### Phase 18.x — Adviser notification triage
 
+- **18.2** Freeze pack `v0.1.11`; `pilot:freeze` covers 18.x triage surface
 - **18.1** Smoke covers triage query paths + `POST /api/notifications/mark-all-read`; hosted hits unread/care-receipt filters
 - **18.0** Unread/kind filters + mark-all-read on `/adviser/notifications`; seed share + care receipt for Ada
 

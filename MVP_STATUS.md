@@ -1,8 +1,8 @@
 # WealthOS MVP status freeze
 
-**Version:** 0.1.10  
+**Version:** 0.1.11  
 **Date:** 14 August 2026  
-**Verdict:** Feature-complete for local/pilot demo through adviser notification centre (ops + trust + adviser care + care UX + ops care handoff + customer care updates + WealthAI care_update + mark-as-seen + receipt close-loop + adviser notifications). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
+**Verdict:** Feature-complete for local/pilot demo through adviser notification triage (ops + trust + adviser care + care UX + ops care handoff + customer care updates + WealthAI care_update + mark-as-seen + receipt close-loop + adviser notifications + triage filters/mark-all-read). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
 
 ## Promise
 
@@ -58,7 +58,8 @@
 | WealthAI care update | Ready (demo) | `care_update` intent grounded + smoke/demo |
 | Care receipts | Ready (demo) | Mark-as-seen + thanks; Home unseen pulse; 360 Seen/Unseen |
 | Care receipt close-loop | Ready (demo) | Adviser notify; ops receipts; `?care=awaiting` |
-| Adviser notifications | Ready (demo) | `/adviser/notifications` triage filters + mark-all-read |
+| Adviser notifications | Ready (demo) | `/adviser/notifications` unread pulse + mark read |
+| Adviser notification triage | Ready (demo) | Unread/kind filters + mark-all-read |
 
 ## Quality gates (this machine)
 
@@ -80,6 +81,7 @@
 - [x] Care receipts pack `v0.1.8` (`npm run pilot:freeze`)
 - [x] Care receipt close-loop pack `v0.1.9` (`npm run pilot:freeze`)
 - [x] Adviser notification centre pack `v0.1.10` (`npm run pilot:freeze`)
+- [x] Adviser notification triage pack `v0.1.11` (`npm run pilot:freeze`)
 - [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets + Postgres URL)
 - [ ] Hosted deploy smoke (`SMOKE_BASE_URL=… npm run smoke:hosted` — see [DEPLOY.md](./DEPLOY.md))
 - [ ] Human sign-off on `LAUNCH_REVIEW.md`

@@ -718,3 +718,10 @@ Adviser notification triage smoke:
 
 - Local smoke hits `?read=unread` / kind filters and `POST /api/notifications/mark-all-read`
 - Hosted smoke includes unread + care-receipt triage paths
+
+## Phase 18.2 delivered (14 Aug 2026)
+
+Adviser notification triage freeze pack **v0.1.11**:
+
+- `npm run pilot:freeze` checks triage helpers, mark-all-read API/UI, seed share, smoke filters
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

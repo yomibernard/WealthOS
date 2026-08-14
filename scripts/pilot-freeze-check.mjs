@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.10 (… + close-loop 16.x + adviser notifications 17.x).
+ * Current pack: v0.1.11 (… + adviser notifications 17.x + triage 18.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.10";
+const EXPECTED = "0.1.11";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -89,7 +89,7 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.10")) failures.push("CHANGELOG.md missing 0.1.10 section");
+if (!changelog.includes("0.1.11")) failures.push("CHANGELOG.md missing 0.1.11 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
 if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
@@ -121,7 +121,7 @@ if (!changelog.includes("Adviser notification") && !changelog.includes("adviser 
 const deploy = read("DEPLOY.md");
 if (!deploy.includes("smoke:hosted")) failures.push("DEPLOY.md missing smoke:hosted");
 if (!deploy.includes("safe pilot")) failures.push("DEPLOY.md missing safe pilot guidance");
-if (!deploy.includes("v0.1.10")) failures.push("DEPLOY.md missing v0.1.10 tag guidance");
+if (!deploy.includes("v0.1.11")) failures.push("DEPLOY.md missing v0.1.11 tag guidance");
 
 const demo = read("DEMO_SCRIPT.md");
 if (!demo.includes("/admin/ops")) failures.push("DEMO_SCRIPT.md missing /admin/ops");
@@ -147,7 +147,10 @@ if (!demo.includes("Adviser notifications") && !demo.includes("/adviser/notifica
 }
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.10")) failures.push("MVP_STATUS.md missing 0.1.10");
+if (!status.includes("0.1.11")) failures.push("MVP_STATUS.md missing 0.1.11");
+if (!status.includes("Adviser notification triage")) {
+  failures.push("MVP_STATUS.md missing Adviser notification triage");
+}
 if (!status.includes("Adviser notifications")) {
   failures.push("MVP_STATUS.md missing Adviser notifications");
 }
@@ -167,7 +170,7 @@ const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
 if (!launch.includes("/admin/flags")) failures.push("LAUNCH_REVIEW.md missing flag profiles path");
 if (!launch.includes("pilot:freeze")) failures.push("LAUNCH_REVIEW.md missing pilot:freeze");
-if (!launch.includes("0.1.10")) failures.push("LAUNCH_REVIEW.md missing 0.1.10 pack");
+if (!launch.includes("0.1.11")) failures.push("LAUNCH_REVIEW.md missing 0.1.11 pack");
 
 const notificationsPage = read("src/app/app/notifications/page.tsx");
 if (!notificationsPage.includes("resolveNotificationLink")) {
@@ -398,6 +401,36 @@ if (!smokeHosted.includes("/adviser/notifications")) {
 
 if (!seed.includes("marked your care update as seen")) {
   failures.push("seed missing adviser care-receipt notification");
+}
+
+// 18.x adviser notification triage
+if (
+  !adviserNotifyEngine.includes("filterAdviserNotifications") ||
+  !adviserNotifyEngine.includes("classifyAdviserNotificationKind")
+) {
+  failures.push("adviser-notifications engine missing triage helpers");
+}
+if (!notifyService.includes("markAllNotificationsRead")) {
+  failures.push("notifications service missing markAllNotificationsRead");
+}
+mustExist("src/app/api/notifications/mark-all-read/route.ts");
+if (!adviserNotifyPage.includes("Mark all as read") || !adviserNotifyPage.includes("mark-all-read")) {
+  failures.push("adviser notifications page missing mark-all-read UI");
+}
+if (!adviserNotifyPage.includes("Care receipts") || !adviserNotifyPage.includes("care_receipt")) {
+  failures.push("adviser notifications page missing triage kind chips");
+}
+if (!smokeLocal.includes("read=unread") || !smokeLocal.includes("mark-all-read")) {
+  failures.push("smoke-journeys missing triage / mark-all-read coverage");
+}
+if (!smokeHosted.includes("read=unread")) {
+  failures.push("smoke-hosted missing unread triage path");
+}
+if (!seed.includes("Customer shared wealth briefing")) {
+  failures.push("seed missing adviser share notification for triage demo");
+}
+if (!demo.includes("Mark all as read") && !demo.includes("triage")) {
+  failures.push("DEMO_SCRIPT.md missing notification triage beat");
 }
 
 if (failures.length) {
