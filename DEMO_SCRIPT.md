@@ -25,12 +25,13 @@ Presenter checklist UI: `/demo`
 ## Act 2 — Persona A depth (5 min)
 
 1. Sign in as Yomi
-2. **Home** — net worth, health, Wealth Inbox unread → `/app/inbox?status=unread` triage (**Recommendations** / **Adviser** / **Mark all as read**); optional **Fix data quality**
-3. **Wealth** — provenance, confidence, allocation
-4. **Property** — equity / LTV / concentration
-5. **Plan** — goals; open **Goal funding pulse**
-6. **Actions** — explain before accept; mention do-nothing is valid
-7. **WealthGuard** — paste a “guaranteed 30% WhatsApp” style offer (labels stay cautious)
+2. **Home** — net worth, health, **Needs your attention** next-steps (deep links) · Wealth Inbox unread → `/app/inbox?status=unread` triage; optional **Fix data quality**
+3. Optional: **WealthAI** — “What should I do next?” cites the same next-steps pulse with paths
+4. **Wealth** — provenance, confidence, allocation
+5. **Property** — equity / LTV / concentration
+6. **Plan** — goals; open **Goal funding pulse**
+7. **Actions** — explain before accept; mention do-nothing is valid
+8. **WealthGuard** — paste a “guaranteed 30% WhatsApp” style offer (labels stay cautious)
 
 ## Act 3 — Cadence tools (4 min)
 

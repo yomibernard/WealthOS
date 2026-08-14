@@ -769,3 +769,11 @@ Wealth Inbox triage freeze pack **v0.1.13**:
 
 - `npm run pilot:freeze` checks inbox triage engine, mark-all-read API/UI, Home unread link, smoke
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 21.0 delivered (14 Aug 2026)
+
+Home next-steps pulse:
+
+- Ranked deep-linked next steps on Home (care → support/privacy → data quality → profile → actions)
+- `GET /api/next-steps`; WealthAI actions intent uses the same pulse when available
+- Smoke hits `/api/next-steps`

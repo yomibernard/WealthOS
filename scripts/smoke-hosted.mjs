@@ -90,6 +90,7 @@ const appPaths = [
   "/api/care-updates?list=1",
   "/api/notifications",
   "/api/inbox",
+  "/api/next-steps",
 ];
 
 if (!base) {

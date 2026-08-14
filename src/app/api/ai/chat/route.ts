@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { loadCustomerContext } from "@/services/wealth";
+import { loadNextStepsPulse } from "@/services/next-steps";
 import { runWealthAI } from "@/ai/orchestrator";
 import { polishGroundedAnswer } from "@/ai/llm";
 import { clientKey, rateLimit } from "@/lib/rate-limit";
@@ -54,7 +55,8 @@ export async function POST(req: Request) {
       });
     }
 
-    const result = runWealthAI(body.message, ctx);
+    const nextSteps = await loadNextStepsPulse(user.id);
+    const result = runWealthAI(body.message, { ...ctx, nextSteps });
 
     const flags = getFeatureFlags();
     const polished = flags.llmPolish

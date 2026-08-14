@@ -19,6 +19,7 @@ import { analyseTaxLite } from "@/engines/tax";
 import { analyseCrypto } from "@/engines/crypto";
 import { analyseLending } from "@/engines/lending";
 import { formatCareUpdateAiContent } from "@/engines/adviser-care-ack";
+import { formatNextStepsAiContent } from "@/engines/next-steps";
 import type { FxRateRow } from "@/engines/fx";
 
 export type AgentName =
@@ -143,6 +144,20 @@ export type CustomerContext = {
       href: string;
       seen?: boolean;
       thanksPreview?: string | null;
+    }>;
+  } | null;
+  nextSteps?: {
+    count: number;
+    headline: string | null;
+    primaryHref: string;
+    summary: string;
+    items: Array<{
+      id: string;
+      kind: string;
+      priority: string;
+      title: string;
+      detail: string;
+      href: string;
     }>;
   } | null;
 };
@@ -706,6 +721,11 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
       break;
     }
     case "actions": {
+      if (ctx.nextSteps?.items?.length) {
+        toolsUsed.push("nextStepsPulse");
+        content = formatNextStepsAiContent(ctx.nextSteps);
+        break;
+      }
       const propertyPercent =
         nw.assetBreakdown.find((b) => b.category === "PROPERTY")?.percent ?? 0;
       const actions = topActions({

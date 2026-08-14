@@ -9,6 +9,7 @@ import { loadCustomerCasesPulse } from "@/services/customer-cases";
 import { loadPrivacyRequestsPulse } from "@/services/privacy";
 import { loadCareUpdatePulse } from "@/services/adviser-care-ack";
 import { loadCustomerNotificationPulse } from "@/services/notifications";
+import { loadNextStepsPulse } from "@/services/next-steps";
 import { formatNaira, greetingForHour } from "@/lib/format";
 import { getFeatureFlags } from "@/lib/feature-flags";
 
@@ -22,12 +23,13 @@ export default async function HomePage() {
 
   const flags = getFeatureFlags();
   const inbox = flags.wealthInbox ? await refreshInbox(user.id) : { unread: 0 };
-  const [profile, cases, privacyPulse, carePulse, notifyPulse] = await Promise.all([
+  const [profile, cases, privacyPulse, carePulse, notifyPulse, nextSteps] = await Promise.all([
     syncProfileCompleteness(user.id),
     loadCustomerCasesPulse(user.id),
     loadPrivacyRequestsPulse(user.id),
     loadCareUpdatePulse(user.id),
     loadCustomerNotificationPulse(user.id),
+    loadNextStepsPulse(user.id),
   ]);
 
   const hour = new Date().getHours();
@@ -127,13 +129,24 @@ export default async function HomePage() {
 
       <Panel className="mt-3">
         <p className="eyebrow">Needs your attention</p>
-        <ol className="mt-3 list-decimal space-y-2 pl-5">
-          {dash.attention.map((item) => (
-            <li key={item}>{item}</li>
+        <p className="muted mt-1 text-sm">{nextSteps.summary}</p>
+        <ol className="mt-3 list-decimal space-y-3 pl-5">
+          {nextSteps.items.map((item) => (
+            <li key={item.id}>
+              <Link href={item.href} className="font-semibold text-accent hover:underline">
+                {item.title}
+              </Link>
+              <p className="muted mt-1 text-sm">{item.detail}</p>
+            </li>
           ))}
         </ol>
-        <Link href="/app/actions" className="btn btn-primary mt-4 w-full">
-          Review my actions
+        <Link href={nextSteps.primaryHref} className="btn btn-primary mt-4 w-full">
+          {nextSteps.items[0]?.kind === "do_nothing"
+            ? "Review my actions"
+            : "Take the next step"}
+        </Link>
+        <Link href="/app/actions" className="btn btn-ghost mt-2 w-full">
+          All actions
         </Link>
       </Panel>
 

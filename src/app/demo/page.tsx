@@ -15,7 +15,8 @@ const acts = [
     title: "Act 2 — Persona A (Yomi)",
     mins: "5 min",
     steps: [
-      "Home → Inbox triage (Unread / Recommendations / Adviser) · Mark all as read",
+      "Home next-steps pulse (deep links) · Inbox triage · Fix data quality if shown",
+      "WealthAI: What should I do next? (same pulse)",
       "Property intelligence + Plan → Goal funding pulse",
       "Actions (explain before accept; do-nothing is valid)",
       "WealthGuard on a ‘guaranteed’ WhatsApp-style offer",

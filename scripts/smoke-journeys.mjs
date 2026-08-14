@@ -86,6 +86,18 @@ try {
       if (!ok) failures.push(`${path} status ${res.status}`);
     }
 
+    const nextStepsRes = await authedGet("/api/next-steps", login.cookie);
+    const nextStepsOk = nextStepsRes.status === 200;
+    console.log(`  [${nextStepsOk ? "OK" : "FAIL"}] GET /api/next-steps → ${nextStepsRes.status}`);
+    if (!nextStepsOk) {
+      failures.push(`/api/next-steps status ${nextStepsRes.status}`);
+    } else {
+      const pulse = await nextStepsRes.json().catch(() => ({}));
+      const hasItems = Array.isArray(pulse.items) && pulse.items.length > 0;
+      console.log(`  [${hasItems ? "OK" : "FAIL"}] next-steps items=${pulse.items?.length ?? 0}`);
+      if (!hasItems) failures.push("next-steps pulse missing items");
+    }
+
     const inboxRes = await authedGet("/api/inbox?refresh=1", login.cookie);
     const inboxOk = inboxRes.status === 200;
     console.log(`  [${inboxOk ? "OK" : "FAIL"}] GET /api/inbox?refresh=1 → ${inboxRes.status}`);

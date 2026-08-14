@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Phase 21.x — Home next-steps pulse
+
+- **21.0** Ranked Home next-steps with deep links; `GET /api/next-steps`; WealthAI “what should I do next?” grounded on the pulse
+
 ## 0.1.13 — 14 Aug 2026 (Wealth Inbox triage pack)
 
 Customer Wealth Inbox triage on top of the 0.1.12 customer notification triage pack.

@@ -100,5 +100,7 @@ describe("hosted smoke rules", () => {
     expect(hosted).toContain("kind=recommendation");
     expect(hosted).toContain("kind=adviser");
     expect(hosted).toContain("/api/inbox");
+    expect(local).toContain("/api/next-steps");
+    expect(hosted).toContain("/api/next-steps");
   });
 });
