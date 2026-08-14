@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.16 (… + adviser book next-steps 22.x + adviser WealthAI book 23.x).
+ * Current pack: v0.1.17 (… + adviser WealthAI book 23.x + admin/ops next-steps 24.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.16";
+const EXPECTED = "0.1.17";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -89,7 +89,7 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.16")) failures.push("CHANGELOG.md missing 0.1.16 section");
+if (!changelog.includes("0.1.17")) failures.push("CHANGELOG.md missing 0.1.17 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
 if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
@@ -121,7 +121,7 @@ if (!changelog.includes("Adviser notification") && !changelog.includes("adviser 
 const deploy = read("DEPLOY.md");
 if (!deploy.includes("smoke:hosted")) failures.push("DEPLOY.md missing smoke:hosted");
 if (!deploy.includes("safe pilot")) failures.push("DEPLOY.md missing safe pilot guidance");
-if (!deploy.includes("v0.1.16")) failures.push("DEPLOY.md missing v0.1.16 tag guidance");
+if (!deploy.includes("v0.1.17")) failures.push("DEPLOY.md missing v0.1.17 tag guidance");
 
 const demo = read("DEMO_SCRIPT.md");
 if (!demo.includes("/admin/ops")) failures.push("DEMO_SCRIPT.md missing /admin/ops");
@@ -147,7 +147,10 @@ if (!demo.includes("Adviser notifications") && !demo.includes("/adviser/notifica
 }
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.16")) failures.push("MVP_STATUS.md missing 0.1.16");
+if (!status.includes("0.1.17")) failures.push("MVP_STATUS.md missing 0.1.17");
+if (!status.includes("Admin/ops next-steps")) {
+  failures.push("MVP_STATUS.md missing Admin/ops next-steps");
+}
 if (!status.includes("Adviser WealthAI book")) {
   failures.push("MVP_STATUS.md missing Adviser WealthAI book");
 }
@@ -185,7 +188,7 @@ const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
 if (!launch.includes("/admin/flags")) failures.push("LAUNCH_REVIEW.md missing flag profiles path");
 if (!launch.includes("pilot:freeze")) failures.push("LAUNCH_REVIEW.md missing pilot:freeze");
-if (!launch.includes("0.1.16")) failures.push("LAUNCH_REVIEW.md missing 0.1.16 pack");
+if (!launch.includes("0.1.17")) failures.push("LAUNCH_REVIEW.md missing 0.1.17 pack");
 
 const notificationsPage = read("src/app/app/notifications/page.tsx");
 if (!notificationsPage.includes("resolveNotificationLink")) {
@@ -661,6 +664,53 @@ if (
   !demo.includes("What should I do next for my book?")
 ) {
   failures.push("DEMO_SCRIPT.md missing adviser WealthAI book beat");
+}
+
+// 24.x Admin/ops next-steps
+mustExist("src/engines/ops-next-steps.ts");
+mustExist("src/services/ops-next-steps.ts");
+mustExist("src/app/api/admin/next-steps/route.ts");
+const opsNextEngine = read("src/engines/ops-next-steps.ts");
+if (
+  !opsNextEngine.includes("buildOpsNextStepsPulse") ||
+  !opsNextEngine.includes("do_nothing") ||
+  !opsNextEngine.includes("complaints")
+) {
+  failures.push("ops-next-steps engine missing pulse / ranking helpers");
+}
+const opsNextService = read("src/services/ops-next-steps.ts");
+if (!opsNextService.includes("loadOpsNextStepsPulse")) {
+  failures.push("ops-next-steps service missing loadOpsNextStepsPulse");
+}
+const adminNextRoute = read("src/app/api/admin/next-steps/route.ts");
+if (!adminNextRoute.includes("loadOpsNextStepsPulse")) {
+  failures.push("admin next-steps route missing loadOpsNextStepsPulse");
+}
+if (
+  !adminOps.includes("loadOpsNextStepsPulse") ||
+  !adminOps.includes("Needs your attention")
+) {
+  failures.push("admin ops page missing next-steps pulse UI");
+}
+const adminHomePage = read("src/app/admin/page.tsx");
+if (
+  !adminHomePage.includes("loadOpsNextStepsPulse") ||
+  !adminHomePage.includes("Needs your attention")
+) {
+  failures.push("admin home missing ops next-steps pulse UI");
+}
+if (
+  !smokeLocal.includes("/api/admin/next-steps") ||
+  !smokeLocal.includes("ops next-steps first href") ||
+  !smokeLocal.includes("ops next-steps first item missing kind")
+) {
+  failures.push("smoke-journeys missing ops next-steps coverage");
+}
+if (!smokeHosted.includes("/api/admin/next-steps")) {
+  failures.push("smoke-hosted missing /api/admin/next-steps");
+}
+if (!demo.includes("ops next-steps") && !demo.includes("Needs your attention** ops")) {
+  failures.push("DEMO_SCRIPT.md missing admin/ops next-steps beat");
 }
 
 if (failures.length) {

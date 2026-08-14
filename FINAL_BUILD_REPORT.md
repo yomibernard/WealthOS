@@ -850,3 +850,10 @@ Admin/ops next-steps smoke:
 
 - Local smoke checks first item `kind` + admin/adviser-scoped `href` / `primaryHref`
 - Fixed missing brace in `smoke-journeys.mjs` admin block
+
+## Phase 24.2 delivered (14 Aug 2026)
+
+Admin/ops next-steps freeze pack **v0.1.17**:
+
+- `npm run pilot:freeze` checks ops next-steps engine/service/API, admin UI, smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

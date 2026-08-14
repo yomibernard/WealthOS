@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.1.17 — 14 Aug 2026 (Admin/ops next-steps pack)
+
+Admin/ops next-steps on top of the 0.1.16 adviser WealthAI book next-steps pack.
 
 ### Phase 24.x — Admin/ops next-steps
 
+- **24.2** Freeze pack `v0.1.17`; `pilot:freeze` covers 24.x admin/ops next-steps surface
 - **24.1** Smoke asserts ops next-steps kind + first href are admin/adviser paths (syntax fix)
 - **24.0** Ranked ops next-steps on `/admin` + `/admin/ops`; `GET /api/admin/next-steps`
 
