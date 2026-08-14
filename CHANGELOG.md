@@ -4,6 +4,7 @@
 
 ### Phase 25.x — Admin WealthAI ops next-steps
 
+- **25.1** Smoke asserts CoachAI + `opsNextStepsPulse` + `Path:`; hosted POST probe
 - **25.0** `/admin/ai` + `POST /api/admin/ai` grounds “What should I do next for ops?” on the daily board pulse
 
 ## 0.1.17 — 14 Aug 2026 (Admin/ops next-steps pack)

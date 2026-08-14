@@ -430,18 +430,30 @@ try {
       body: JSON.stringify({ message: "What should I do next for ops?" }),
     });
     const adminAiData = await adminAiRes.json().catch(() => ({}));
+    const adminAiContent =
+      typeof adminAiData.content === "string" ? adminAiData.content : "";
+    const adminAiHasPath = /Path:\s*\/(admin|adviser)(\/|\?|$| )/i.test(adminAiContent);
+    const adminAiTools = Array.isArray(adminAiData.toolsUsed) ? adminAiData.toolsUsed : [];
+    const adminAiToolOk = adminAiTools.includes("opsNextStepsPulse");
+    const adminAiAgentOk = adminAiData.agent === "CoachAI";
     const adminAiOk =
-      adminAiRes.status === 200 &&
-      typeof adminAiData.content === "string" &&
-      (/Path:\s*\/(admin|adviser)/i.test(adminAiData.content) ||
-        /ops|daily board|Needs your attention|\/admin(\/|\?)/i.test(adminAiData.content));
+      adminAiRes.status === 200 && adminAiHasPath && adminAiToolOk && adminAiAgentOk;
     console.log(
-      `  [${adminAiOk ? "OK" : "FAIL"}] POST /api/admin/ai ops_next_steps → ${adminAiRes.status}`,
+      `  [${adminAiOk ? "OK" : "FAIL"}] POST /api/admin/ai ops_next_steps agent=${adminAiData.agent ?? "n/a"} tools=${adminAiTools.join(",") || "n/a"} path=${adminAiHasPath ? "yes" : "no"} → ${adminAiRes.status}`,
     );
     if (!adminAiOk) {
       failures.push(
-        `admin ai ops_next_steps failed: ${adminAiRes.status} ${String(adminAiData.content ?? "").slice(0, 120)}`,
+        `admin ai ops_next_steps failed: status=${adminAiRes.status} agent=${adminAiData.agent ?? "n/a"} tools=${adminAiTools.join(",") || "n/a"} hasPath=${adminAiHasPath} ${adminAiContent.slice(0, 120)}`,
       );
+    }
+    if (adminAiRes.status === 200 && !adminAiHasPath) {
+      failures.push("admin ai ops_next_steps missing Path: /admin or /adviser");
+    }
+    if (adminAiRes.status === 200 && !adminAiToolOk) {
+      failures.push("admin ai ops_next_steps missing opsNextStepsPulse tool");
+    }
+    if (adminAiRes.status === 200 && !adminAiAgentOk) {
+      failures.push("admin ai ops_next_steps expected CoachAI agent");
     }
   }
 } catch (err) {

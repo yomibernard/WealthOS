@@ -219,6 +219,32 @@ try {
             );
           }
         }
+        if (label === "admin") {
+          const adminAiRes = await fetch(`${base}/api/admin/ai`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(roleCookie ? { cookie: roleCookie } : {}),
+            },
+            body: JSON.stringify({ message: "What should I do next for ops?" }),
+          });
+          const adminAiData = await adminAiRes.json().catch(() => ({}));
+          const adminAiContent =
+            typeof adminAiData.content === "string" ? adminAiData.content : "";
+          const adminAiOk =
+            adminAiRes.status === 200 &&
+            /Path:\s*\/(admin|adviser)/i.test(adminAiContent) &&
+            Array.isArray(adminAiData.toolsUsed) &&
+            adminAiData.toolsUsed.includes("opsNextStepsPulse");
+          console.log(
+            `  [${adminAiOk ? "OK" : "FAIL"}] POST /api/admin/ai ops_next_steps → ${adminAiRes.status}`,
+          );
+          if (!adminAiOk) {
+            failures.push(
+              `hosted admin ai ops_next_steps failed: ${adminAiRes.status} ${adminAiContent.slice(0, 120)}`,
+            );
+          }
+        }
       }
     }
   } else {

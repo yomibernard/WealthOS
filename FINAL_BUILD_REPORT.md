@@ -865,3 +865,10 @@ Admin WealthAI ops next-steps:
 - `/admin/ai` + `POST /api/admin/ai` — “What should I do next for ops?” grounded on daily board pulse
 - Paths stay under `/admin…` (or Care radar handoffs); queues remain authoritative
 - Smoke asserts admin AI reply cites ops next-steps / admin paths
+
+## Phase 25.1 delivered (14 Aug 2026)
+
+Admin WealthAI ops next-steps smoke:
+
+- Local smoke requires CoachAI, `opsNextStepsPulse`, and `Path: /admin` or `/adviser`
+- Hosted smoke POSTs `/api/admin/ai` ops next-steps probe
