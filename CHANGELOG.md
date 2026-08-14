@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.1.12 — 14 Aug 2026 (Customer notification triage pack)
+
+Customer-facing notification triage on top of the 0.1.11 adviser notification triage pack.
 
 ### Phase 19.x — Customer notification triage
 
+- **19.2** Freeze pack `v0.1.12`; `pilot:freeze` covers 19.x customer triage surface
 - **19.1** Smoke covers customer mark-all-read + cadence/care triage paths; hosted hits care_update/cadence filters
 - **19.0** Customer `/app/notifications` unread/kind triage + mark-read/mark-all; Home unread pulse; seed cadence + care mix
 

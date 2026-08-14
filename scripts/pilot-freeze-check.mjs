@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.11 (… + adviser notifications 17.x + triage 18.x).
+ * Current pack: v0.1.12 (… + adviser triage 18.x + customer triage 19.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.11";
+const EXPECTED = "0.1.12";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -89,7 +89,7 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.11")) failures.push("CHANGELOG.md missing 0.1.11 section");
+if (!changelog.includes("0.1.12")) failures.push("CHANGELOG.md missing 0.1.12 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
 if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
@@ -121,7 +121,7 @@ if (!changelog.includes("Adviser notification") && !changelog.includes("adviser 
 const deploy = read("DEPLOY.md");
 if (!deploy.includes("smoke:hosted")) failures.push("DEPLOY.md missing smoke:hosted");
 if (!deploy.includes("safe pilot")) failures.push("DEPLOY.md missing safe pilot guidance");
-if (!deploy.includes("v0.1.11")) failures.push("DEPLOY.md missing v0.1.11 tag guidance");
+if (!deploy.includes("v0.1.12")) failures.push("DEPLOY.md missing v0.1.12 tag guidance");
 
 const demo = read("DEMO_SCRIPT.md");
 if (!demo.includes("/admin/ops")) failures.push("DEMO_SCRIPT.md missing /admin/ops");
@@ -147,7 +147,10 @@ if (!demo.includes("Adviser notifications") && !demo.includes("/adviser/notifica
 }
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.11")) failures.push("MVP_STATUS.md missing 0.1.11");
+if (!status.includes("0.1.12")) failures.push("MVP_STATUS.md missing 0.1.12");
+if (!status.includes("Customer notification triage")) {
+  failures.push("MVP_STATUS.md missing Customer notification triage");
+}
 if (!status.includes("Adviser notification triage")) {
   failures.push("MVP_STATUS.md missing Adviser notification triage");
 }
@@ -170,7 +173,7 @@ const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
 if (!launch.includes("/admin/flags")) failures.push("LAUNCH_REVIEW.md missing flag profiles path");
 if (!launch.includes("pilot:freeze")) failures.push("LAUNCH_REVIEW.md missing pilot:freeze");
-if (!launch.includes("0.1.11")) failures.push("LAUNCH_REVIEW.md missing 0.1.11 pack");
+if (!launch.includes("0.1.12")) failures.push("LAUNCH_REVIEW.md missing 0.1.12 pack");
 
 const notificationsPage = read("src/app/app/notifications/page.tsx");
 if (!notificationsPage.includes("resolveNotificationLink")) {
@@ -431,6 +434,51 @@ if (!seed.includes("Customer shared wealth briefing")) {
 }
 if (!demo.includes("Mark all as read") && !demo.includes("triage")) {
   failures.push("DEMO_SCRIPT.md missing notification triage beat");
+}
+
+// 19.x customer notification triage
+mustExist("src/engines/customer-notifications.ts");
+const customerNotifyEngine = read("src/engines/customer-notifications.ts");
+if (
+  !customerNotifyEngine.includes("filterCustomerNotifications") ||
+  !customerNotifyEngine.includes("classifyCustomerNotificationKind") ||
+  !customerNotifyEngine.includes("buildCustomerNotificationPulse")
+) {
+  failures.push("customer-notifications engine missing triage / pulse helpers");
+}
+if (!notifyService.includes("loadCustomerNotificationPulse")) {
+  failures.push("notifications service missing loadCustomerNotificationPulse");
+}
+const customerNotifyPage = read("src/app/app/notifications/page.tsx");
+if (!customerNotifyPage.includes("Mark all as read") || !customerNotifyPage.includes("mark-all-read")) {
+  failures.push("customer notifications page missing mark-all-read UI");
+}
+if (!customerNotifyPage.includes("care_update") || !customerNotifyPage.includes("Cadence")) {
+  failures.push("customer notifications page missing triage kind chips");
+}
+const customerHome = read("src/app/app/page.tsx");
+if (!customerHome.includes("loadCustomerNotificationPulse")) {
+  failures.push("customer Home missing notification pulse");
+}
+if (
+  !smokeLocal.includes("/app/notifications") ||
+  !smokeLocal.includes("kind=care_update") ||
+  !smokeLocal.includes("mark-all-read (customer)")
+) {
+  failures.push("smoke-journeys missing customer notification triage coverage");
+}
+if (
+  !smokeHosted.includes("/app/notifications") ||
+  !smokeHosted.includes("kind=care_update") ||
+  !smokeHosted.includes("kind=cadence")
+) {
+  failures.push("smoke-hosted missing customer notification triage paths");
+}
+if (!seed.includes("Weekly wealth digest ready")) {
+  failures.push("seed missing customer cadence notification for triage demo");
+}
+if (!demo.includes("unread notifications") && !demo.includes("Notifications** triage")) {
+  failures.push("DEMO_SCRIPT.md missing customer notification triage beat");
 }
 
 if (failures.length) {

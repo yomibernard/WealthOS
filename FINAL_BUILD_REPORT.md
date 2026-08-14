@@ -740,3 +740,10 @@ Customer notification triage smoke:
 
 - Local smoke POSTs customer `mark-all-read` after single mark-read
 - Hosted smoke includes `kind=care_update` and `kind=cadence` triage paths
+
+## Phase 19.2 delivered (14 Aug 2026)
+
+Customer notification triage freeze pack **v0.1.12**:
+
+- `npm run pilot:freeze` checks customer triage engine, Home pulse, mark-all-read UI, seed cadence, smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
