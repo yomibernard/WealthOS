@@ -835,3 +835,11 @@ Adviser WealthAI book next-steps freeze pack **v0.1.16**:
 
 - `npm run pilot:freeze` checks adviser WealthAI engine helpers, `/adviser/ai`, API grounding, smoke
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 24.0 delivered (14 Aug 2026)
+
+Admin/ops next-steps pulse:
+
+- Ranked “Needs your attention” on `/admin` + `/admin/ops` (complaints → escalations → privacy → launch → care handoff → maker-checker → flags)
+- `GET /api/admin/next-steps`; wraps ops-daily counts without inventing case detail
+- Smoke hits admin next-steps API

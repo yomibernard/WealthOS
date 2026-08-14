@@ -120,5 +120,8 @@ describe("hosted smoke rules", () => {
     expect(hosted).toContain("/api/adviser/ai");
     expect(hosted).toContain("What should I do next for my book?");
     expect(hosted).toContain("adviserNextStepsPulse");
+    expect(local).toContain("/api/admin/next-steps");
+    expect(local).toContain("ops next-steps");
+    expect(hosted).toContain("/api/admin/next-steps");
   });
 });

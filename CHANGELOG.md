@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Phase 24.x — Admin/ops next-steps
+
+- **24.0** Ranked ops next-steps on `/admin` + `/admin/ops`; `GET /api/admin/next-steps`
+
 ## 0.1.16 — 14 Aug 2026 (Adviser WealthAI book next-steps pack)
 
 Adviser WealthAI book next-steps on top of the 0.1.15 adviser book next-steps pack.

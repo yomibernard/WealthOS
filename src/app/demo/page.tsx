@@ -55,6 +55,7 @@ const acts = [
       "Adviser notifications triage (Unread / Care receipts / Shares) → Care desk · Mark all as read",
       "WealthAI: ask where to see adviser care update",
       "Adviser sends nudge → customer Inbox deep link",
+      "Admin ops next-steps → care handoff + escalation/privacy queues",
       "Admin ops — care handoff + escalation/privacy care-ack cues",
       "Support case → resolve → Home / Inbox / Notifications link",
       "Optional: Privacy request → admin queue → deep-link back",

@@ -5,18 +5,20 @@ import { SignOutButton } from "@/components/SignOutButton";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { loadOpsDailyBoard } from "@/services/ops-daily";
+import { loadOpsNextStepsPulse } from "@/services/ops-next-steps";
 
 export default async function AdminPage() {
   const user = await getSessionUser();
   if (!user) redirect("/auth/sign-in");
   if (user.role !== "ADMIN") redirect("/app");
 
-  const [customers, products, audits, providers, daily] = await Promise.all([
+  const [customers, products, audits, providers, daily, nextSteps] = await Promise.all([
     prisma.user.count({ where: { role: "CUSTOMER" } }),
     prisma.product.count(),
     prisma.auditEvent.count(),
     prisma.provider.count(),
     loadOpsDailyBoard(),
+    loadOpsNextStepsPulse(),
   ]);
 
   return (
@@ -26,22 +28,29 @@ export default async function AdminPage() {
         subtitle="Operations with dual-control maker-checker for high-risk changes."
       />
       <Panel className="mb-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <p className="font-semibold">Daily ops</p>
-            <p className="muted text-sm">{daily.summary}</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge tone={daily.attentionScore === 0 ? "default" : "warn"}>
-              attention {daily.attentionScore}
-            </Badge>
-            {daily.counts.unackedCareCustomers > 0 ? (
-              <Badge tone="warn">{daily.counts.unackedCareCustomers} care unacked</Badge>
-            ) : null}
-            <Link href="/admin/ops" className="btn btn-soft text-sm">
-              Open ops board
-            </Link>
-          </div>
+        <p className="eyebrow">Needs your attention</p>
+        <p className="muted mt-1 text-sm">{nextSteps.summary}</p>
+        {nextSteps.headline ? (
+          <Link
+            href={nextSteps.primaryHref}
+            className="mt-2 inline-block font-semibold text-accent hover:underline"
+          >
+            {nextSteps.headline}
+          </Link>
+        ) : null}
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Badge tone={daily.attentionScore === 0 ? "default" : "warn"}>
+            attention {daily.attentionScore}
+          </Badge>
+          {daily.counts.unackedCareCustomers > 0 ? (
+            <Badge tone="warn">{daily.counts.unackedCareCustomers} care unacked</Badge>
+          ) : null}
+          <Link href={nextSteps.primaryHref} className="btn btn-primary text-sm">
+            {nextSteps.items[0]?.kind === "do_nothing" ? "Open ops board" : "Take the next step"}
+          </Link>
+          <Link href="/admin/ops" className="btn btn-soft text-sm">
+            Full ops board
+          </Link>
         </div>
       </Panel>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

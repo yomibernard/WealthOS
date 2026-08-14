@@ -388,7 +388,26 @@ try {
     const opsOk = opsRes.status === 200 || opsRes.status === 307 || opsRes.status === 308;
     console.log(`  [${opsOk ? "OK" : "FAIL"}] GET /admin/ops → ${opsRes.status}`);
     if (!opsOk) failures.push(`/admin/ops status ${opsRes.status}`);
-  }
+
+    const opsNextRes = await authedGet("/api/admin/next-steps", adminLogin.cookie);
+    const opsNextOk = opsNextRes.status === 200;
+    console.log(`  [${opsNextOk ? "OK" : "FAIL"}] GET /api/admin/next-steps → ${opsNextRes.status}`);
+    if (!opsNextOk) {
+      failures.push(`/api/admin/next-steps status ${opsNextRes.status}`);
+    } else {
+      const pulse = await opsNextRes.json().catch(() => ({}));
+      const hasItems = Array.isArray(pulse.items) && pulse.items.length > 0;
+      const hasHref =
+        typeof pulse.primaryHref === "string" &&
+        (/^\/(admin|adviser)(\/|\?|$)/.test(pulse.primaryHref) ||
+          pulse.primaryHref.startsWith("/admin/") ||
+          pulse.primaryHref.startsWith("/adviser"));
+      console.log(
+        `  [${hasItems && hasHref ? "OK" : "FAIL"}] ops next-steps items=${pulse.items?.length ?? 0} primaryHref=${pulse.primaryHref ?? "n/a"}`,
+      );
+      if (!hasItems) failures.push("ops next-steps pulse missing items");
+      if (!hasHref) failures.push("ops next-steps pulse missing primaryHref");
+    }
 } catch (err) {
   console.error("\nSmoke could not reach the server.");
   console.error("Start the app with `npm run dev`, then re-run `npm run smoke`.");
