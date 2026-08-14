@@ -74,3 +74,11 @@ export async function markNotificationRead(input: {
   });
   return { id: note.id, alreadyRead: false as const };
 }
+
+export async function markAllNotificationsRead(userId: string) {
+  const result = await prisma.notification.updateMany({
+    where: { userId, read: false },
+    data: { read: true },
+  });
+  return { updated: result.count };
+}

@@ -965,6 +965,32 @@ async function main() {
     },
   });
 
+  await prisma.adviserNote.create({
+    data: {
+      adviserId: adviser.id,
+      customerId: yomi.id,
+      kind: "customer_share",
+      title: "Customer shared wealth briefing",
+      body: [
+        `${yomi.name} shared a wealth briefing for human review.`,
+        "Suitability, consent, and doing-nothing remain valid.",
+      ].join("\n\n"),
+      sharedWithCustomer: true,
+      status: "open",
+    },
+  });
+
+  await prisma.notification.create({
+    data: {
+      userId: adviser.id,
+      category: "important",
+      title: "Customer shared wealth briefing",
+      body: `${yomi.name} shared a briefing. Open their customer 360 to review. Path: /adviser/customers/${yomi.id}`,
+      read: false,
+      createdAt: new Date("2026-08-12T14:00:00.000Z"),
+    },
+  });
+
   console.log("Seed complete.");
   console.log("Demo logins (password: WealthOSdemo1!):");
   console.log("  yomi@demo.wealthos.ng — Persona A executive");

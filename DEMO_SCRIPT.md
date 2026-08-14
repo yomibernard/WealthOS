@@ -54,7 +54,7 @@ Presenter checklist UI: `/demo`
 4. **Adviser** portal — **Care radar** filters (`Needs care` / **Unacked** / Complaints / Privacy / Support) → 360 **Care desk** (see **recent acks**, optional **acknowledge**) + **Insights**; send a **nudge**
 5. Back as Yomi — **Home** may show **care update** CTA (seeded after `db:setup`) → **Support** or **Privacy** lists the acknowledgment → **Mark as seen** (optional thanks); **Inbox** shows care/nudge deep links
 5b. Optional: **WealthAI** (`/app/ai`) — ask “Where do I see my adviser care update?” (grounded unseen pulse; ops still authoritative)
-5c. Back as Ada — **Adviser notifications** (`/adviser/notifications`) shows customer receipt → Care desk; 360 history **Seen** / **Unseen**; Care radar **Awaiting receipt**; Admin ops shows recent receipts
+5c. Back as Ada — **Adviser notifications** (`/adviser/notifications`) — triage **Unread** / **Care receipts** / **Shares**, open Care desk, optional **Mark all as read**; 360 history **Seen** / **Unseen**; Care radar **Awaiting receipt**; Admin ops shows recent receipts
 5d. Optional: `/adviser?care=awaiting` after Yomi marks seen (clears awaiting; ops lists receipt)
 6. **Admin** — daily ops board on `/admin` / `/admin/ops` (escalations, privacy, **care handoff**, maker-checker, flag risk)
 7. Optional: `/admin/escalations` + `/admin/privacy` — note **care-ack** badges + Care desk links; `/admin/flags` safe pilot; `/admin/audit` filter + download

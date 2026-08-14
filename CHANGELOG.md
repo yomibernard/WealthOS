@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Phase 18.x — Adviser notification triage
+
+- **18.0** Unread/kind filters + mark-all-read on `/adviser/notifications`; seed share + care receipt for Ada
+
 ## 0.1.10 — 14 Aug 2026 (Adviser notification centre pack)
 
 Adviser-facing notification centre on top of the 0.1.9 care receipt close-loop pack.

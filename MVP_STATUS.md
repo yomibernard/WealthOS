@@ -58,7 +58,7 @@
 | WealthAI care update | Ready (demo) | `care_update` intent grounded + smoke/demo |
 | Care receipts | Ready (demo) | Mark-as-seen + thanks; Home unseen pulse; 360 Seen/Unseen |
 | Care receipt close-loop | Ready (demo) | Adviser notify; ops receipts; `?care=awaiting` |
-| Adviser notifications | Ready (demo) | `/adviser/notifications` unread pulse + mark read |
+| Adviser notifications | Ready (demo) | `/adviser/notifications` triage filters + mark-all-read |
 
 ## Quality gates (this machine)
 

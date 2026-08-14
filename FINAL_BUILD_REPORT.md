@@ -703,3 +703,11 @@ Adviser notification centre freeze pack **v0.1.10**:
 
 - `npm run pilot:freeze` checks `/adviser/notifications`, mark-as-read API, unread pulse, seed + smoke
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 18.0 delivered (14 Aug 2026)
+
+Adviser notification triage:
+
+- Unread / All + Care receipts / Shares chips on `/adviser/notifications`
+- `POST /api/notifications/mark-all-read`; unread pulse deep-links to `?read=unread`
+- Seed leaves Ada an unread care receipt and an unread Yomi share for demo filters

@@ -1,9 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Badge, Button, PageHeader, Panel } from "@/components/ui";
 import { resolveNotificationLink } from "@/lib/notification-links";
+import {
+  adviserNotificationKindLabel,
+  classifyAdviserNotificationKind,
+  filterAdviserNotifications,
+  type AdviserNotificationKind,
+  type AdviserNotificationReadFilter,
+} from "@/engines/adviser-notifications";
 
 type Note = {
   id: string;
@@ -14,7 +22,36 @@ type Note = {
   createdAt: string;
 };
 
-export default function AdviserNotificationsPage() {
+const READ_CHIPS: { id: AdviserNotificationReadFilter; label: string }[] = [
+  { id: "unread", label: "Unread" },
+  { id: "all", label: "All" },
+];
+
+const KIND_CHIPS: { id: AdviserNotificationKind | "all"; label: string }[] = [
+  { id: "all", label: "All kinds" },
+  { id: "care_receipt", label: "Care receipts" },
+  { id: "share", label: "Shares" },
+];
+
+function triageHref(read: AdviserNotificationReadFilter, kind: AdviserNotificationKind | "all") {
+  const params = new URLSearchParams();
+  if (read !== "all") params.set("read", read);
+  if (kind !== "all") params.set("kind", kind);
+  const q = params.toString();
+  return q ? `/adviser/notifications?${q}` : "/adviser/notifications";
+}
+
+function AdviserNotificationsInner() {
+  const searchParams = useSearchParams();
+  const readRaw = searchParams.get("read");
+  const kindRaw = searchParams.get("kind");
+  const readFilter: AdviserNotificationReadFilter =
+    readRaw === "unread" || readRaw === "read" ? readRaw : "all";
+  const kindFilter: AdviserNotificationKind | "all" =
+    kindRaw === "care_receipt" || kindRaw === "share" || kindRaw === "other"
+      ? kindRaw
+      : "all";
+
   const [notes, setNotes] = useState<Note[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -44,13 +81,35 @@ export default function AdviserNotificationsPage() {
     await load();
   }
 
+  async function markAllRead() {
+    setBusyId("all");
+    setMessage(null);
+    const res = await fetch("/api/notifications/mark-all-read", { method: "POST" });
+    setBusyId(null);
+    if (!res.ok) {
+      setMessage("Could not mark all notifications as read.");
+      return;
+    }
+    const data = (await res.json()) as { updated?: number };
+    setMessage(
+      data.updated
+        ? `Marked ${data.updated} notification${data.updated === 1 ? "" : "s"} as read.`
+        : "Nothing left to mark as read.",
+    );
+    await load();
+  }
+
   const unread = notes.filter((n) => !n.read).length;
+  const visible = useMemo(
+    () => filterAdviserNotifications(notes, { read: readFilter, kind: kindFilter }),
+    [notes, readFilter, kindFilter],
+  );
 
   return (
     <main className="page-wide">
       <PageHeader
         title="Adviser notifications"
-        subtitle="Care receipts and customer shares land here — open the Care desk without leaving the adviser portal."
+        subtitle="Triage care receipts and customer shares — filter, open the Care desk, or clear the unread desk."
         action={
           <Link href="/adviser" className="btn btn-soft">
             Care radar
@@ -64,16 +123,65 @@ export default function AdviserNotificationsPage() {
         </p>
       ) : null}
 
-      <div className="mb-3 flex flex-wrap gap-2">
-        <Badge tone={unread > 0 ? "warn" : "default"}>
-          {unread} unread
-        </Badge>
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <Badge tone={unread > 0 ? "warn" : "default"}>{unread} unread</Badge>
         <Badge>{notes.length} total</Badge>
+        {unread > 0 ? (
+          <Button
+            type="button"
+            variant="soft"
+            className="!min-h-0 px-3 py-1 text-sm"
+            disabled={busyId === "all"}
+            onClick={() => void markAllRead()}
+          >
+            {busyId === "all" ? "Saving…" : "Mark all as read"}
+          </Button>
+        ) : null}
+      </div>
+
+      <div className="mb-2 flex flex-wrap gap-2" aria-label="Read filters">
+        {READ_CHIPS.map((chip) => {
+          const active = readFilter === chip.id;
+          return (
+            <Link
+              key={chip.id}
+              href={triageHref(chip.id, kindFilter)}
+              className={
+                active
+                  ? "rounded-md border border-accent bg-accent-soft px-3 py-1 text-sm font-medium"
+                  : "muted rounded-md border border-line px-3 py-1 text-sm hover:border-accent"
+              }
+              aria-current={active ? "true" : undefined}
+            >
+              {chip.label}
+            </Link>
+          );
+        })}
+      </div>
+      <div className="mb-4 flex flex-wrap gap-2" aria-label="Kind filters">
+        {KIND_CHIPS.map((chip) => {
+          const active = kindFilter === chip.id;
+          return (
+            <Link
+              key={chip.id}
+              href={triageHref(readFilter, chip.id)}
+              className={
+                active
+                  ? "rounded-md border border-accent bg-accent-soft px-3 py-1 text-sm font-medium"
+                  : "muted rounded-md border border-line px-3 py-1 text-sm hover:border-accent"
+              }
+              aria-current={active ? "true" : undefined}
+            >
+              {chip.label}
+            </Link>
+          );
+        })}
       </div>
 
       <div className="space-y-3">
-        {notes.map((n) => {
+        {visible.map((n) => {
           const link = resolveNotificationLink(n);
+          const kind = classifyAdviserNotificationKind(n);
           return (
             <Panel key={n.id}>
               <div className="flex flex-wrap items-center gap-2">
@@ -87,6 +195,7 @@ export default function AdviserNotificationsPage() {
                 >
                   {n.category}
                 </Badge>
+                <Badge>{adviserNotificationKindLabel(kind)}</Badge>
                 <Badge tone={n.read ? "default" : "warn"}>
                   {n.read ? "Read" : "Unread"}
                 </Badge>
@@ -127,7 +236,31 @@ export default function AdviserNotificationsPage() {
             </p>
           </Panel>
         ) : null}
+        {notes.length && !visible.length ? (
+          <Panel>
+            <p className="muted text-sm">
+              No notifications match this triage filter.{" "}
+              <Link href="/adviser/notifications" className="font-semibold text-accent">
+                Show all
+              </Link>
+            </p>
+          </Panel>
+        ) : null}
       </div>
     </main>
+  );
+}
+
+export default function AdviserNotificationsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="page-wide">
+          <PageHeader title="Adviser notifications" subtitle="Loading triage desk…" />
+        </main>
+      }
+    >
+      <AdviserNotificationsInner />
+    </Suspense>
   );
 }

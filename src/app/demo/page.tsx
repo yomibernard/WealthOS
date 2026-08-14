@@ -48,7 +48,7 @@ const acts = [
       "Adviser care radar (unacked cues) → 360 care desk + history/ack + insights",
       "Customer Home care-update pulse → Support/Privacy mark as seen",
       "Adviser notified + ops recent receipts · ?care=awaiting",
-      "Adviser notifications → Care desk deep link",
+      "Adviser notifications triage (Unread / Care receipts / Shares) → Care desk · Mark all as read",
       "WealthAI: ask where to see adviser care update",
       "Adviser sends nudge → customer Inbox deep link",
       "Admin ops — care handoff + escalation/privacy care-ack cues",
