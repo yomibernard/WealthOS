@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.1.16 — 14 Aug 2026 (Adviser WealthAI book next-steps pack)
+
+Adviser WealthAI book next-steps on top of the 0.1.15 adviser book next-steps pack.
 
 ### Phase 23.x — Adviser WealthAI book next-steps
 
+- **23.2** Freeze pack `v0.1.16`; `pilot:freeze` covers 23.x adviser WealthAI book surface
 - **23.1** Smoke asserts CoachAI + `adviserNextStepsPulse` + `Path: /adviser`; hosted POST probe
 - **23.0** `/adviser/ai` + `POST /api/adviser/ai` grounds “What should I do next for my book?” on the Care radar pulse
 

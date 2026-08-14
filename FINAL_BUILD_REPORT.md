@@ -828,3 +828,10 @@ Adviser WealthAI book next-steps smoke:
 
 - Local smoke requires CoachAI, `adviserNextStepsPulse`, and `Path: /adviser`
 - Hosted smoke POSTs `/api/adviser/ai` book next-steps probe
+
+## Phase 23.2 delivered (14 Aug 2026)
+
+Adviser WealthAI book next-steps freeze pack **v0.1.16**:
+
+- `npm run pilot:freeze` checks adviser WealthAI engine helpers, `/adviser/ai`, API grounding, smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

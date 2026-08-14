@@ -1,8 +1,8 @@
 # WealthOS MVP status freeze
 
-**Version:** 0.1.15  
+**Version:** 0.1.16  
 **Date:** 14 August 2026  
-**Verdict:** Feature-complete for local/pilot demo through adviser book next-steps (ops + trust + adviser care + care UX + ops care handoff + customer care updates + WealthAI care_update + mark-as-seen + receipt close-loop + adviser notifications + adviser triage + customer triage + inbox triage + Home next-steps + adviser book next-steps). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
+**Verdict:** Feature-complete for local/pilot demo through adviser WealthAI book next-steps (ops + trust + adviser care + care UX + ops care handoff + customer care updates + WealthAI care_update + mark-as-seen + receipt close-loop + adviser notifications + adviser triage + customer triage + inbox triage + Home next-steps + adviser book next-steps + adviser WealthAI book). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
 
 ## Promise
 
@@ -91,6 +91,7 @@
 - [x] Wealth Inbox triage pack `v0.1.13` (`npm run pilot:freeze`)
 - [x] Home next-steps pulse pack `v0.1.14` (`npm run pilot:freeze`)
 - [x] Adviser book next-steps pack `v0.1.15` (`npm run pilot:freeze`)
+- [x] Adviser WealthAI book next-steps pack `v0.1.16` (`npm run pilot:freeze`)
 - [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets + Postgres URL)
 - [ ] Hosted deploy smoke (`SMOKE_BASE_URL=… npm run smoke:hosted` — see [DEPLOY.md](./DEPLOY.md))
 - [ ] Human sign-off on `LAUNCH_REVIEW.md`
