@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.18 (… + admin/ops next-steps 24.x + admin WealthAI ops 25.x).
+ * Current pack: v0.1.19 (… + admin WealthAI ops 25.x + ops care remind 26.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.18";
+const EXPECTED = "0.1.19";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -89,7 +89,7 @@ for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"
 }
 
 const changelog = read("CHANGELOG.md");
-if (!changelog.includes("0.1.18")) failures.push("CHANGELOG.md missing 0.1.18 section");
+if (!changelog.includes("0.1.19")) failures.push("CHANGELOG.md missing 0.1.19 section");
 if (!changelog.includes("smoke:hosted")) failures.push("CHANGELOG.md missing smoke:hosted mention");
 if (!changelog.includes("notification")) failures.push("CHANGELOG.md missing notification deep-link mention");
 if (!changelog.includes("care")) failures.push("CHANGELOG.md missing care pack mention");
@@ -121,7 +121,7 @@ if (!changelog.includes("Adviser notification") && !changelog.includes("adviser 
 const deploy = read("DEPLOY.md");
 if (!deploy.includes("smoke:hosted")) failures.push("DEPLOY.md missing smoke:hosted");
 if (!deploy.includes("safe pilot")) failures.push("DEPLOY.md missing safe pilot guidance");
-if (!deploy.includes("v0.1.18")) failures.push("DEPLOY.md missing v0.1.18 tag guidance");
+if (!deploy.includes("v0.1.19")) failures.push("DEPLOY.md missing v0.1.19 tag guidance");
 
 const demo = read("DEMO_SCRIPT.md");
 if (!demo.includes("/admin/ops")) failures.push("DEMO_SCRIPT.md missing /admin/ops");
@@ -147,12 +147,12 @@ if (!demo.includes("Adviser notifications") && !demo.includes("/adviser/notifica
 }
 
 const status = read("MVP_STATUS.md");
-if (!status.includes("0.1.18")) failures.push("MVP_STATUS.md missing 0.1.18");
+if (!status.includes("0.1.19")) failures.push("MVP_STATUS.md missing 0.1.19");
+if (!status.includes("Ops care remind")) {
+  failures.push("MVP_STATUS.md missing Ops care remind");
+}
 if (!status.includes("Admin WealthAI ops")) {
   failures.push("MVP_STATUS.md missing Admin WealthAI ops");
-}
-if (!status.includes("Admin/ops next-steps")) {
-  failures.push("MVP_STATUS.md missing Admin/ops next-steps");
 }
 if (!status.includes("Adviser book next-steps")) {
   failures.push("MVP_STATUS.md missing Adviser book next-steps");
@@ -188,7 +188,7 @@ const launch = read("LAUNCH_REVIEW.md");
 if (!launch.includes("smoke:hosted")) failures.push("LAUNCH_REVIEW.md missing smoke:hosted");
 if (!launch.includes("/admin/flags")) failures.push("LAUNCH_REVIEW.md missing flag profiles path");
 if (!launch.includes("pilot:freeze")) failures.push("LAUNCH_REVIEW.md missing pilot:freeze");
-if (!launch.includes("0.1.18")) failures.push("LAUNCH_REVIEW.md missing 0.1.18 pack");
+if (!launch.includes("0.1.19")) failures.push("LAUNCH_REVIEW.md missing 0.1.19 pack");
 
 const notificationsPage = read("src/app/app/notifications/page.tsx");
 if (!notificationsPage.includes("resolveNotificationLink")) {
@@ -765,6 +765,58 @@ if (
   !demo.includes("What should I do next for ops?")
 ) {
   failures.push("DEMO_SCRIPT.md missing admin WealthAI ops beat");
+}
+
+// 26.x Ops care remind
+mustExist("src/engines/ops-care-remind.ts");
+mustExist("src/services/ops-care-remind.ts");
+mustExist("src/app/api/admin/care-remind/route.ts");
+mustExist("src/components/OpsCareRemindButton.tsx");
+const opsCareRemindEngine = read("src/engines/ops-care-remind.ts");
+if (
+  !opsCareRemindEngine.includes("buildOpsCareRemindDraft") ||
+  !opsCareRemindEngine.includes("queues stay open")
+) {
+  failures.push("ops-care-remind engine missing draft / queues-stay-open copy");
+}
+const opsCareRemindService = read("src/services/ops-care-remind.ts");
+if (
+  !opsCareRemindService.includes("sendOpsCareReminds") ||
+  !opsCareRemindService.includes("OPS_CARE_REMIND")
+) {
+  failures.push("ops-care-remind service missing send / audit");
+}
+const careRemindRoute = read("src/app/api/admin/care-remind/route.ts");
+if (!careRemindRoute.includes("sendOpsCareReminds")) {
+  failures.push("care-remind route missing sendOpsCareReminds");
+}
+if (
+  !adminOps.includes("OpsCareRemindButton") ||
+  !adminOps.includes("unackedCareCustomers")
+) {
+  failures.push("admin ops page missing care remind CTA");
+}
+if (
+  !adviserNotifyEngine.includes("care_handoff") ||
+  !adviserNotifyPage.includes("care_handoff")
+) {
+  failures.push("adviser notifications missing Care handoff kind");
+}
+if (
+  !smokeLocal.includes("/api/admin/care-remind") ||
+  !smokeLocal.includes("admin care-remind missing queues-stay-open note") ||
+  !smokeLocal.includes("adviser care_handoff notification missing after ops care-remind")
+) {
+  failures.push("smoke-journeys missing ops care remind coverage");
+}
+if (
+  !smokeHosted.includes("/api/admin/care-remind") ||
+  !smokeHosted.includes("kind=care_handoff")
+) {
+  failures.push("smoke-hosted missing ops care remind coverage");
+}
+if (!demo.includes("Remind linked advisers") && !demo.includes("Care handoff")) {
+  failures.push("DEMO_SCRIPT.md missing ops care remind beat");
 }
 
 if (failures.length) {

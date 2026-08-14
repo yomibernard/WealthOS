@@ -894,3 +894,10 @@ Ops care remind smoke:
 
 - Local smoke asserts queues-stay-open note + adviser Care handoff notification after remind
 - Hosted smoke POSTs `/api/admin/care-remind`
+
+## Phase 26.2 delivered (14 Aug 2026)
+
+Ops care remind freeze pack **v0.1.19**:
+
+- `npm run pilot:freeze` checks ops care remind engine/service/API, admin CTA, Care handoff kind, smoke
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

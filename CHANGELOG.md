@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.1.19 — 14 Aug 2026 (Ops care remind pack)
+
+Ops care remind on top of the 0.1.18 admin WealthAI ops next-steps pack.
 
 ### Phase 26.x — Ops care remind
 
+- **26.2** Freeze pack `v0.1.19`; `pilot:freeze` covers 26.x ops care remind surface
 - **26.1** Smoke asserts queues-stay-open note + adviser Care handoff notification; hosted POST probe
 - **26.0** Admin “Remind linked advisers” on Care handoff; adviser notifications **Care handoff** kind; queues stay open
 
