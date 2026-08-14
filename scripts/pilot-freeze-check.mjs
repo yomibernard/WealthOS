@@ -618,7 +618,6 @@ if (
 ) {
   failures.push("adviser-next-steps engine missing AI format helpers");
 }
-const orchestrator = read("src/ai/orchestrator.ts");
 if (
   !orchestrator.includes("runAdviserWealthAI") ||
   !orchestrator.includes("adviserNextStepsPulse")
