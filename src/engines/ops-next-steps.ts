@@ -176,3 +176,26 @@ export function buildOpsNextStepsPulse(input: OpsNextStepsInput): OpsNextStepsPu
     summary: `${items.length} next step${items.length === 1 ? "" : "s"} for ops today.`,
   };
 }
+
+export function formatOpsNextStepsAiContent(
+  pulse: OpsNextStepsPulse | null | undefined,
+): string {
+  if (!pulse?.items.length) {
+    return "I do not see a ranked ops next-steps pulse yet. Open the daily board on /admin/ops — doing nothing can still be valid when queues are quiet.";
+  }
+  const lines = pulse.items.map(
+    (s, i) => `${i + 1}. ${s.title} — ${s.detail} Path: ${s.href}`,
+  );
+  return [
+    "Here is what to do next for ops from the live daily board pulse (complaints and launch blockers first):",
+    ...lines,
+    "Admin queues stay authoritative; care acks and receipts never close escalation or privacy queues.",
+  ].join("\n");
+}
+
+export function wantsOpsNextSteps(message: string): boolean {
+  const m = message.toLowerCase();
+  return /what should i do|next (step|best)|priority|ops (board|queue|next)|for ops|daily ops|needs (my|your) attention|launch gate|care handoff/.test(
+    m,
+  );
+}

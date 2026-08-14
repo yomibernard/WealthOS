@@ -124,6 +124,11 @@ describe("hosted smoke rules", () => {
     expect(local).toContain("ops next-steps");
     expect(local).toContain("ops next-steps first href not admin/adviser path");
     expect(local).toContain("ops next-steps first item missing kind");
+    expect(local).toContain("/api/admin/ai");
+    expect(local).toContain("What should I do next for ops?");
+    expect(local).toContain("ops_next_steps");
+    expect(local).toContain("/admin/ai");
     expect(hosted).toContain("/api/admin/next-steps");
+    expect(hosted).toContain("/admin/ai");
   });
 });

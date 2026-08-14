@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildOpsNextStepsPulse } from "@/engines/ops-next-steps";
+import {
+  buildOpsNextStepsPulse,
+  formatOpsNextStepsAiContent,
+  wantsOpsNextSteps,
+} from "@/engines/ops-next-steps";
+import { runAdminWealthAI } from "@/ai/orchestrator";
 
 describe("ops next-steps pulse", () => {
   it("ranks complaints before escalations and privacy", () => {
@@ -57,5 +62,21 @@ describe("ops next-steps pulse", () => {
     expect(pulse.items.some((i) => i.kind === "flag_risk" && i.href === "/admin/flags")).toBe(
       true,
     );
+  });
+
+  it("formats AI content with Path links", () => {
+    const pulse = buildOpsNextStepsPulse({
+      openComplaints: 1,
+    });
+    const text = formatOpsNextStepsAiContent(pulse);
+    expect(text).toMatch(/Path:\s*\/admin/);
+    expect(text).toMatch(/ops|daily board/i);
+    expect(wantsOpsNextSteps("What should I do next for ops?")).toBe(true);
+    expect(wantsOpsNextSteps("Hello")).toBe(false);
+
+    const ai = runAdminWealthAI("What should I do next for ops?", pulse);
+    expect(ai.toolsUsed).toContain("opsNextStepsPulse");
+    expect(ai.content).toMatch(/Path:\s*\/admin/);
+    expect(ai.agent).toBe("CoachAI");
   });
 });

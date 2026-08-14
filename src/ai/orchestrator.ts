@@ -25,6 +25,11 @@ import {
   wantsAdviserBookNextSteps,
   type AdviserNextStepsPulse,
 } from "@/engines/adviser-next-steps";
+import {
+  formatOpsNextStepsAiContent,
+  wantsOpsNextSteps,
+  type OpsNextStepsPulse,
+} from "@/engines/ops-next-steps";
 import type { FxRateRow } from "@/engines/fx";
 
 export type AgentName =
@@ -1009,6 +1014,41 @@ export function runAdviserWealthAI(
     ].join(" "),
     confidence: 0.7,
     toolsUsed: ["adviserNextStepsPulse"],
+    assumptions: [],
+    missingInformation: [],
+    escalate: false,
+  };
+}
+
+/** Thin WealthAI for admins — ops next-steps only; no customer Wealth Graph. */
+export function runAdminWealthAI(
+  message: string,
+  pulse: OpsNextStepsPulse,
+): AiResponse {
+  if (wantsOpsNextSteps(message)) {
+    return {
+      intent: "actions",
+      agent: "CoachAI",
+      content: formatOpsNextStepsAiContent(pulse),
+      confidence: 0.88,
+      toolsUsed: ["opsNextStepsPulse"],
+      assumptions: [],
+      missingInformation: [],
+      escalate: false,
+    };
+  }
+
+  return {
+    intent: "general",
+    agent: "ConciergeAI",
+    content: [
+      "I’m WealthAI for ops — queues and care handoff first.",
+      "Ask “What should I do next for ops?” to ground on the live daily board pulse (paths stay under /admin or Care radar handoffs).",
+      "Customer Wealth Graph and personal balances stay on the customer side.",
+      `Right now: ${pulse.summary}`,
+    ].join(" "),
+    confidence: 0.7,
+    toolsUsed: ["opsNextStepsPulse"],
     assumptions: [],
     missingInformation: [],
     escalate: false,

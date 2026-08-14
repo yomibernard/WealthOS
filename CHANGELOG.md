@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Phase 25.x — Admin WealthAI ops next-steps
+
+- **25.0** `/admin/ai` + `POST /api/admin/ai` grounds “What should I do next for ops?” on the daily board pulse
+
 ## 0.1.17 — 14 Aug 2026 (Admin/ops next-steps pack)
 
 Admin/ops next-steps on top of the 0.1.16 adviser WealthAI book next-steps pack.

@@ -857,3 +857,11 @@ Admin/ops next-steps freeze pack **v0.1.17**:
 
 - `npm run pilot:freeze` checks ops next-steps engine/service/API, admin UI, smoke
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 25.0 delivered (14 Aug 2026)
+
+Admin WealthAI ops next-steps:
+
+- `/admin/ai` + `POST /api/admin/ai` — “What should I do next for ops?” grounded on daily board pulse
+- Paths stay under `/admin…` (or Care radar handoffs); queues remain authoritative
+- Smoke asserts admin AI reply cites ops next-steps / admin paths

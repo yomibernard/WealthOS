@@ -56,6 +56,9 @@ export default async function AdminOpsPage() {
         <Link href={nextSteps.primaryHref} className="btn btn-primary mt-4 w-full sm:w-auto">
           {nextSteps.items[0]?.kind === "do_nothing" ? "Open ops board" : "Take the next step"}
         </Link>
+        <Link href="/admin/ai" className="btn btn-soft mt-2 w-full sm:w-auto sm:ml-2">
+          Ask WealthAI what to do next
+        </Link>
       </Panel>
 
       <Panel className="mb-4">

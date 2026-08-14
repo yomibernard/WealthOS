@@ -169,7 +169,7 @@ try {
           "/api/notifications",
           "/api/adviser/next-steps",
         ]],
-        ["admin", adminEmail, ["/admin/ops", "/api/admin/next-steps"]],
+        ["admin", adminEmail, ["/admin/ops", "/admin/ai", "/api/admin/next-steps"]],
       ]) {
         const roleLogin = await fetch(`${base}/api/auth/sign-in`, {
           method: "POST",

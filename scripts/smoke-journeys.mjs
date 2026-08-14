@@ -384,10 +384,12 @@ try {
     console.log(`  [FAIL] sign-in admin → ${adminLogin.res.status}`);
   } else {
     console.log("  [OK] sign-in admin");
-    const opsRes = await authedGet("/admin/ops", adminLogin.cookie);
-    const opsOk = opsRes.status === 200 || opsRes.status === 307 || opsRes.status === 308;
-    console.log(`  [${opsOk ? "OK" : "FAIL"}] GET /admin/ops → ${opsRes.status}`);
-    if (!opsOk) failures.push(`/admin/ops status ${opsRes.status}`);
+    for (const path of ["/admin/ops", "/admin/ai"]) {
+      const res = await authedGet(path, adminLogin.cookie);
+      const ok = res.status === 200 || res.status === 307 || res.status === 308;
+      console.log(`  [${ok ? "OK" : "FAIL"}] GET ${path} → ${res.status}`);
+      if (!ok) failures.push(`${path} status ${res.status}`);
+    }
 
     const opsNextRes = await authedGet("/api/admin/next-steps", adminLogin.cookie);
     const opsNextOk = opsNextRes.status === 200;
@@ -417,6 +419,29 @@ try {
       if (!hasHref) failures.push("ops next-steps pulse missing primaryHref");
       if (!firstHrefOk) failures.push("ops next-steps first href not admin/adviser path");
       if (!firstKindOk) failures.push("ops next-steps first item missing kind");
+    }
+
+    const adminAiRes = await fetch(`${base}/api/admin/ai`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(adminLogin.cookie ? { cookie: adminLogin.cookie } : {}),
+      },
+      body: JSON.stringify({ message: "What should I do next for ops?" }),
+    });
+    const adminAiData = await adminAiRes.json().catch(() => ({}));
+    const adminAiOk =
+      adminAiRes.status === 200 &&
+      typeof adminAiData.content === "string" &&
+      (/Path:\s*\/(admin|adviser)/i.test(adminAiData.content) ||
+        /ops|daily board|Needs your attention|\/admin(\/|\?)/i.test(adminAiData.content));
+    console.log(
+      `  [${adminAiOk ? "OK" : "FAIL"}] POST /api/admin/ai ops_next_steps → ${adminAiRes.status}`,
+    );
+    if (!adminAiOk) {
+      failures.push(
+        `admin ai ops_next_steps failed: ${adminAiRes.status} ${String(adminAiData.content ?? "").slice(0, 120)}`,
+      );
     }
   }
 } catch (err) {

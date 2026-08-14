@@ -59,6 +59,7 @@ Presenter checklist UI: `/demo`
 5c. Back as Ada — **Adviser notifications** (`/adviser/notifications`) — triage **Unread** / **Care receipts** / **Shares**, open Care desk, optional **Mark all as read**; 360 history **Seen** / **Unseen**; Care radar **Awaiting receipt**; Admin ops shows recent receipts
 5d. Optional: `/adviser?care=awaiting` after Yomi marks seen (clears awaiting; ops lists receipt)
 6. **Admin** — **Needs your attention** ops next-steps on `/admin` / `/admin/ops` (escalations, privacy, **care handoff**, maker-checker, flag risk)
+6b. Optional: **WealthAI (ops)** (`/admin/ai`) — “What should I do next for ops?” cites the same daily board pulse with `/admin…` paths
 7. Optional: `/admin/escalations` + `/admin/privacy` — note **care-ack** badges + Care desk links; `/admin/flags` safe pilot; `/admin/audit` filter + download
 8. Trust loop (optional, ~2 min): Yomi `/app/support` → case; admin resolve → Yomi **Home** / **Inbox** / **Notifications** deep-link back to Support; optional WealthAI “care update” question
 9. Privacy loop (optional): Yomi Privacy Centre request → admin `/admin/privacy` → Yomi Inbox/Notifications → `/app/privacy` (care updates if acked)
