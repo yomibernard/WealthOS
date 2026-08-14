@@ -4,6 +4,7 @@
 
 ### Phase 24.x — Admin/ops next-steps
 
+- **24.1** Smoke asserts ops next-steps kind + first href are admin/adviser paths (syntax fix)
 - **24.0** Ranked ops next-steps on `/admin` + `/admin/ops`; `GET /api/admin/next-steps`
 
 ## 0.1.16 — 14 Aug 2026 (Adviser WealthAI book next-steps pack)

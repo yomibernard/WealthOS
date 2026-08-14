@@ -402,12 +402,23 @@ try {
         (/^\/(admin|adviser)(\/|\?|$)/.test(pulse.primaryHref) ||
           pulse.primaryHref.startsWith("/admin/") ||
           pulse.primaryHref.startsWith("/adviser"));
+      const first = hasItems ? pulse.items[0] : null;
+      const firstHrefOk =
+        first &&
+        typeof first.href === "string" &&
+        (/^\/(admin|adviser)(\/|\?|$)/.test(first.href) ||
+          first.href.startsWith("/admin/") ||
+          first.href.startsWith("/adviser"));
+      const firstKindOk = first && typeof first.kind === "string" && first.kind.length > 0;
       console.log(
-        `  [${hasItems && hasHref ? "OK" : "FAIL"}] ops next-steps items=${pulse.items?.length ?? 0} primaryHref=${pulse.primaryHref ?? "n/a"}`,
+        `  [${hasItems && hasHref && firstHrefOk && firstKindOk ? "OK" : "FAIL"}] ops next-steps items=${pulse.items?.length ?? 0} kind=${first?.kind ?? "n/a"} primaryHref=${pulse.primaryHref ?? "n/a"}`,
       );
       if (!hasItems) failures.push("ops next-steps pulse missing items");
       if (!hasHref) failures.push("ops next-steps pulse missing primaryHref");
+      if (!firstHrefOk) failures.push("ops next-steps first href not admin/adviser path");
+      if (!firstKindOk) failures.push("ops next-steps first item missing kind");
     }
+  }
 } catch (err) {
   console.error("\nSmoke could not reach the server.");
   console.error("Start the app with `npm run dev`, then re-run `npm run smoke`.");

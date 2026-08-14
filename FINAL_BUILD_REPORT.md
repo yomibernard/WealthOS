@@ -843,3 +843,10 @@ Admin/ops next-steps pulse:
 - Ranked “Needs your attention” on `/admin` + `/admin/ops` (complaints → escalations → privacy → launch → care handoff → maker-checker → flags)
 - `GET /api/admin/next-steps`; wraps ops-daily counts without inventing case detail
 - Smoke hits admin next-steps API
+
+## Phase 24.1 delivered (14 Aug 2026)
+
+Admin/ops next-steps smoke:
+
+- Local smoke checks first item `kind` + admin/adviser-scoped `href` / `primaryHref`
+- Fixed missing brace in `smoke-journeys.mjs` admin block
