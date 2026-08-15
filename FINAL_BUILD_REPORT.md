@@ -931,3 +931,10 @@ Adviser ops-remind cues:
 - Care radar `?care=ops_reminded` + **Ops reminded** badge/cue while still unacked
 - Care desk durable banner from `OPS_CARE_REMIND` audit
 - Book next-steps elevates ops-reminded unacked customers
+
+## Phase 28.1 delivered (15 Aug 2026)
+
+Adviser ops-remind smoke:
+
+- Local smoke asserts Ops reminded radar cue, Care desk banner, next-steps `ops_reminded` kind
+- Hosted smoke probes adviser ops_reminded radar + next-steps after care-remind

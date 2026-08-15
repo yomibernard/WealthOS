@@ -88,6 +88,11 @@ describe("hosted smoke rules", () => {
     expect(local).toContain("admin care-remind customerId");
     expect(local).toContain("care=ops_reminded");
     expect(local).toContain("adviser ops_reminded radar");
+    expect(local).toContain("adviser ops_reminded radar missing Ops reminded cue after care-remind");
+    expect(local).toContain("adviser Care desk missing ops-remind banner after ops care-remind");
+    expect(local).toContain("adviser next-steps missing ops_reminded kind after ops care-remind");
+    expect(hosted).toContain("hosted adviser ops_reminded radar");
+    expect(hosted).toContain("hosted adviser next-steps missing ops_reminded kind");
     expect(local).toContain("ops care remind trail");
     expect(local).toContain("recentReminds");
     expect(hosted).toContain("hosted ops care remind trail");

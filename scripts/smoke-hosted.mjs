@@ -289,6 +289,51 @@ try {
             if (!trailOk) {
               failures.push("hosted ops care remind trail missing recentReminds");
             }
+
+            const adviserEmail = process.env.SMOKE_ADVISER_EMAIL || "adviser@demo.wealthos.ng";
+            const adviserAfter = await fetch(`${base}/api/auth/sign-in`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: adviserEmail, password }),
+            });
+            if (adviserAfter.ok) {
+              const setCookie = adviserAfter.headers.getSetCookie?.() ?? [];
+              const adviserCookie = setCookie.map((c) => c.split(";")[0]).join("; ");
+              const radarRes = await fetch(`${base}/adviser?care=ops_reminded`, {
+                headers: adviserCookie ? { cookie: adviserCookie } : {},
+                redirect: "manual",
+              });
+              const radarHtml =
+                radarRes.status === 200 ? await radarRes.text().catch(() => "") : "";
+              const radarOk =
+                (radarRes.status === 200 ||
+                  radarRes.status === 307 ||
+                  radarRes.status === 308) &&
+                (radarRes.status !== 200 ||
+                  /\d+\s+ops reminded/i.test(radarHtml) ||
+                  /ops-reminded and still unacked/i.test(radarHtml));
+              console.log(
+                `  [${radarOk ? "OK" : "FAIL"}] hosted adviser ops_reminded radar → ${radarRes.status}`,
+              );
+              if (!radarOk) {
+                failures.push("hosted adviser ops_reminded radar missing Ops reminded cue");
+              }
+
+              const nextRes = await fetch(`${base}/api/adviser/next-steps`, {
+                headers: adviserCookie ? { cookie: adviserCookie } : {},
+              });
+              const nextPulse = nextRes.status === 200 ? await nextRes.json().catch(() => ({})) : {};
+              const nextItems = Array.isArray(nextPulse.items) ? nextPulse.items : [];
+              const opsStepOk = nextItems.some((i) => i && i.kind === "ops_reminded");
+              console.log(
+                `  [${nextRes.status === 200 && opsStepOk ? "OK" : "FAIL"}] hosted adviser next-steps ops_reminded → ${nextRes.status}`,
+              );
+              if (nextRes.status !== 200 || !opsStepOk) {
+                failures.push("hosted adviser next-steps missing ops_reminded kind after care-remind");
+              }
+            } else if (strict) {
+              failures.push(`hosted adviser re-sign-in after care-remind failed: ${adviserAfter.status}`);
+            }
           }
 
           const adminAiRes = await fetch(`${base}/api/admin/ai`, {

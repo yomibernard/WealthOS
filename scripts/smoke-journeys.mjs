@@ -517,15 +517,72 @@ try {
         }
 
         const opsRadarRes = await authedGet("/adviser?care=ops_reminded", adviserRecheck.cookie);
-        const opsRadarOk =
+        const opsRadarStatusOk =
           opsRadarRes.status === 200 ||
           opsRadarRes.status === 307 ||
           opsRadarRes.status === 308;
+        const opsRadarHtml = opsRadarStatusOk ? await opsRadarRes.text().catch(() => "") : "";
+        const opsRadarCueOk =
+          /\d+\s+ops reminded/i.test(opsRadarHtml) ||
+          /ops-reminded and still unacked/i.test(opsRadarHtml);
+        const opsRadarOk = opsRadarStatusOk && opsRadarCueOk;
         console.log(
-          `  [${opsRadarOk ? "OK" : "FAIL"}] adviser ops_reminded radar after remind → ${opsRadarRes.status}`,
+          `  [${opsRadarOk ? "OK" : "FAIL"}] adviser ops_reminded radar cue after remind → ${opsRadarRes.status}`,
         );
-        if (!opsRadarOk) {
+        if (!opsRadarStatusOk) {
           failures.push("adviser ops_reminded radar missing after ops care-remind");
+        } else if (!opsRadarCueOk) {
+          failures.push("adviser ops_reminded radar missing Ops reminded cue after care-remind");
+        }
+
+        const remindedCustomerId =
+          Array.isArray(careRemindData.results) &&
+          careRemindData.results.find(
+            (r) => r && r.created === true && typeof r.customerId === "string",
+          )?.customerId;
+        if (remindedCustomerId) {
+          const deskRes = await authedGet(
+            `/adviser/customers/${remindedCustomerId}`,
+            adviserRecheck.cookie,
+          );
+          const deskStatusOk =
+            deskRes.status === 200 || deskRes.status === 307 || deskRes.status === 308;
+          const deskHtml = deskStatusOk ? await deskRes.text().catch(() => "") : "";
+          const deskBannerOk =
+            /Ops reminded/i.test(deskHtml) &&
+            /still needs a care acknowledgment/i.test(deskHtml) &&
+            /Queues stay open/i.test(deskHtml);
+          console.log(
+            `  [${deskStatusOk && deskBannerOk ? "OK" : "FAIL"}] adviser Care desk ops-remind banner → ${deskRes.status}`,
+          );
+          if (!deskStatusOk || !deskBannerOk) {
+            failures.push(
+              "adviser Care desk missing ops-remind banner after ops care-remind",
+            );
+          }
+        }
+
+        const nextAfterRemind = await authedGet(
+          "/api/adviser/next-steps",
+          adviserRecheck.cookie,
+        );
+        if (nextAfterRemind.status === 200) {
+          const pulse = await nextAfterRemind.json().catch(() => ({}));
+          const items = Array.isArray(pulse.items) ? pulse.items : [];
+          const opsStep = items.find((i) => i && i.kind === "ops_reminded");
+          const opsStepOk = Boolean(opsStep);
+          console.log(
+            `  [${opsStepOk ? "OK" : "FAIL"}] adviser next-steps ops_reminded kind after remind`,
+          );
+          if (!opsStepOk) {
+            failures.push(
+              "adviser next-steps missing ops_reminded kind after ops care-remind",
+            );
+          }
+        } else {
+          failures.push(
+            `adviser next-steps after care-remind status ${nextAfterRemind.status}`,
+          );
         }
       } else {
         failures.push(`adviser re-sign-in after care-remind failed: ${adviserRecheck.res.status}`);
