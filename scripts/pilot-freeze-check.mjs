@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.20 (… + ops care remind 26.x + ops queue care remind 27.x).
+ * Current pack: v0.1.21 (… + ops queue care remind 27.x + adviser ops-remind cues 28.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.20";
+const EXPECTED = "0.1.21";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -877,6 +877,60 @@ if (
   !demo.includes("Recent ops reminds")
 ) {
   failures.push("DEMO_SCRIPT.md missing ops queue care remind beat");
+}
+
+// 28.x Adviser ops-remind cues
+if (
+  !opsCareRemindEngine.includes("formatOpsRemindCue") ||
+  !opsCareRemindEngine.includes("buildOpsRemindCareDeskBanner") ||
+  !opsCareRemindService.includes("loadLastOpsCareRemind")
+) {
+  failures.push("ops-care-remind missing adviser cue / Care desk banner helpers");
+}
+if (
+  !portfolioEngine.includes("ops_reminded") ||
+  !portfolioEngine.includes("opsReminded") ||
+  !portfolioEngine.includes("lastOpsRemindAt")
+) {
+  failures.push("adviser-portfolio missing ops_reminded filter / cues");
+}
+if (
+  !adviserHome.includes("ops_reminded") ||
+  !adviserHome.includes("Ops reminded")
+) {
+  failures.push("adviser home missing Ops reminded Care radar filter");
+}
+if (
+  !customer360.includes("buildOpsRemindCareDeskBanner") ||
+  !customer360.includes("loadLastOpsCareRemind")
+) {
+  failures.push("adviser Care desk missing ops-remind banner wiring");
+}
+if (
+  !adviserNextEngine.includes("ops_reminded") ||
+  !adviserNextEngine.includes("Ops nudged")
+) {
+  failures.push("adviser-next-steps missing ops_reminded elevation");
+}
+if (
+  !smokeLocal.includes("adviser ops_reminded radar missing Ops reminded cue after care-remind") ||
+  !smokeLocal.includes("adviser Care desk missing ops-remind banner after ops care-remind") ||
+  !smokeLocal.includes("adviser next-steps missing ops_reminded kind after ops care-remind")
+) {
+  failures.push("smoke-journeys missing adviser ops-remind cues coverage");
+}
+if (
+  !smokeHosted.includes("care=ops_reminded") ||
+  !smokeHosted.includes("hosted adviser ops_reminded radar") ||
+  !smokeHosted.includes("hosted adviser next-steps missing ops_reminded kind")
+) {
+  failures.push("smoke-hosted missing adviser ops-remind cues coverage");
+}
+if (
+  !demo.includes("Ops reminded") ||
+  !demo.includes("care=ops_reminded")
+) {
+  failures.push("DEMO_SCRIPT.md missing adviser Ops reminded beat");
 }
 
 if (failures.length) {

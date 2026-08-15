@@ -1,13 +1,18 @@
 # Changelog
 
+## 0.1.21 — 15 Aug 2026 (Adviser ops-remind cues pack)
+
+Adviser ops-remind cues on top of the 0.1.20 ops queue care remind pack.
+
+### Phase 28.x — Adviser ops-remind cues
+
+- **28.2** Freeze pack `v0.1.21`; `pilot:freeze` covers 28.x Ops reminded radar/desk/next-steps surface
+- **28.1** Smoke asserts Ops reminded radar cue, Care desk banner, next-steps `ops_reminded` kind
+- **28.0** Care radar **Ops reminded** filter/cues + Care desk banner; next-steps elevates ops-reminded unacked
+
 ## 0.1.20 — 14 Aug 2026 (Ops queue care remind pack)
 
 Ops queue care remind on top of the 0.1.19 ops care remind pack.
-
-### Phase 28.x — Adviser ops-remind cues (in progress)
-
-- **28.1** Smoke asserts Ops reminded radar cue, Care desk banner, next-steps `ops_reminded` kind
-- **28.0** Care radar **Ops reminded** filter/cues + Care desk banner; next-steps elevates ops-reminded unacked
 
 ### Phase 27.x — Ops queue care remind
 

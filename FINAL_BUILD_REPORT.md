@@ -938,3 +938,10 @@ Adviser ops-remind smoke:
 
 - Local smoke asserts Ops reminded radar cue, Care desk banner, next-steps `ops_reminded` kind
 - Hosted smoke probes adviser ops_reminded radar + next-steps after care-remind
+
+## Phase 28.2 delivered (15 Aug 2026)
+
+Adviser ops-remind cues freeze pack **v0.1.21**:
+
+- `npm run pilot:freeze` checks Ops reminded radar/desk/next-steps, smoke, DEMO
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
