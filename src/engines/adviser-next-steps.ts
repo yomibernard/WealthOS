@@ -6,6 +6,7 @@ export type AdviserNextStepKind =
   | "complaints"
   | "privacy"
   | "unacked"
+  | "ops_reminded"
   | "awaiting"
   | "support"
   | "notifications"
@@ -38,6 +39,7 @@ export type AdviserNextStepsCustomer = {
   openSupport: number;
   needsFirstAck: boolean;
   awaitingReceipt: boolean;
+  opsReminded: boolean;
   sortScore: number;
 };
 
@@ -47,6 +49,7 @@ export type AdviserNextStepsInput = {
   totalSupport?: number;
   unackedCareCount?: number;
   awaitingReceiptCount?: number;
+  opsRemindedCount?: number;
   customers?: AdviserNextStepsCustomer[];
   notifyUnreadCount?: number;
   notifyHeadline?: string | null;
@@ -100,17 +103,32 @@ export function buildAdviserNextStepsPulse(
   }
 
   const unacked = input.unackedCareCount ?? 0;
+  const opsRemindedCount = input.opsRemindedCount ?? 0;
   if (unacked > 0) {
-    const top = pickTop(customers, (c) => c.needsFirstAck);
+    const top =
+      opsRemindedCount > 0
+        ? pickTop(customers, (c) => c.opsReminded)
+        : pickTop(customers, (c) => c.needsFirstAck);
+    const reminded = opsRemindedCount > 0;
     candidates.push({
-      id: "unacked",
-      kind: "unacked",
+      id: reminded ? "ops_reminded" : "unacked",
+      kind: reminded ? "ops_reminded" : "unacked",
       priority: "important",
       title: top
-        ? `Send a care acknowledgment to ${top.name}`
-        : `${unacked} customer${unacked === 1 ? "" : "s"} still need a care ack`,
-      detail: "Reassure in Inbox — does not close the ops queue.",
-      href: top ? `/adviser/customers/${top.id}` : "/adviser?care=unacked",
+        ? reminded
+          ? `Ops reminded you about ${top.name} — send a care ack`
+          : `Send a care acknowledgment to ${top.name}`
+        : reminded
+          ? `${opsRemindedCount} ops-reminded customer${opsRemindedCount === 1 ? "" : "s"} still need a care ack`
+          : `${unacked} customer${unacked === 1 ? "" : "s"} still need a care ack`,
+      detail: reminded
+        ? "Ops nudged you — open Care desk before product talk. Queues stay open until formally resolved."
+        : "Reassure in Inbox — does not close the ops queue.",
+      href: top
+        ? `/adviser/customers/${top.id}`
+        : reminded
+          ? "/adviser?care=ops_reminded"
+          : "/adviser?care=unacked",
     });
   }
 

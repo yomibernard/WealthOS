@@ -31,7 +31,7 @@ export async function loadAdviserPortfolioCareRadar(input: {
     return buildPortfolioCareRadar([]);
   }
 
-  const [customers, escalations, privacy, careAcks] = await Promise.all([
+  const [customers, escalations, privacy, careAcks, opsReminds] = await Promise.all([
     prisma.user.findMany({
       where: { id: { in: customerIds } },
       select: {
@@ -64,6 +64,14 @@ export async function loadAdviserPortfolioCareRadar(input: {
       select: { customerId: true, createdAt: true, status: true, sharedWithCustomer: true },
       orderBy: { createdAt: "desc" },
     }),
+    prisma.auditEvent.findMany({
+      where: {
+        eventType: "OPS_CARE_REMIND",
+        entityId: { in: customerIds },
+      },
+      select: { entityId: true, createdAt: true },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   const escByUser = new Map<string, { open: number; complaints: number }>();
@@ -90,6 +98,12 @@ export async function loadAdviserPortfolioCareRadar(input: {
     }
   }
 
+  const lastOpsRemindByUser = new Map<string, string>();
+  for (const e of opsReminds) {
+    if (!e.entityId || lastOpsRemindByUser.has(e.entityId)) continue;
+    lastOpsRemindByUser.set(e.entityId, e.createdAt.toISOString());
+  }
+
   const rows: PortfolioCustomerInput[] = customers.map((c) => {
     const esc = escByUser.get(c.id) ?? { open: 0, complaints: 0 };
     return {
@@ -102,6 +116,7 @@ export async function loadAdviserPortfolioCareRadar(input: {
       openPrivacy: privacyByUser.get(c.id) ?? 0,
       lastCareAckAt: lastAckByUser.get(c.id) ?? null,
       unseenCareAckCount: unseenByUser.get(c.id) ?? 0,
+      lastOpsRemindAt: lastOpsRemindByUser.get(c.id) ?? null,
     };
   });
 

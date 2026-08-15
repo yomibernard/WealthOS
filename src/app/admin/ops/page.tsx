@@ -181,6 +181,7 @@ export default async function AdminOpsPage() {
           <div className="mt-2 flex flex-wrap gap-3 text-sm font-semibold text-accent">
             <Link href="/admin/escalations">Remind from escalations</Link>
             <Link href="/adviser?care=unacked">Open unacked care radar</Link>
+            <Link href="/adviser?care=ops_reminded">Open ops-reminded radar</Link>
             <Link href="/adviser?care=awaiting">Open awaiting receipt</Link>
           </div>
           <OpsCareRemindButton unackedCount={daily.careHandoff.unackedCareCustomers} />

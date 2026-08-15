@@ -20,6 +20,7 @@ export async function loadAdviserNextStepsPulse(input: {
     totalSupport: radar.totalSupport,
     unackedCareCount: radar.unackedCareCount,
     awaitingReceiptCount: radar.awaitingReceiptCount,
+    opsRemindedCount: radar.opsRemindedCount,
     customers: radar.customers.map((c) => ({
       id: c.id,
       name: c.name,
@@ -28,6 +29,7 @@ export async function loadAdviserNextStepsPulse(input: {
       openSupport: c.openSupport,
       needsFirstAck: c.needsFirstAck,
       awaitingReceipt: c.awaitingReceipt,
+      opsReminded: c.opsReminded,
       sortScore: c.sortScore,
     })),
     notifyUnreadCount: notify.unreadCount,

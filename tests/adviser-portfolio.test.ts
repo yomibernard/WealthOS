@@ -5,6 +5,10 @@ import {
   formatCareAckCue,
   parsePortfolioCareFilter,
 } from "@/engines/adviser-portfolio";
+import {
+  buildOpsRemindCareDeskBanner,
+  formatOpsRemindCue,
+} from "@/engines/ops-care-remind";
 
 const sample = [
   {
@@ -57,7 +61,7 @@ describe("adviser portfolio care radar", () => {
     expect(radar.customers[0]?.careLabel).toBe("Clear");
   });
 
-  it("filters the book by care slice including unacked and awaiting", () => {
+  it("filters the book by care slice including unacked, awaiting, and ops_reminded", () => {
     const radar = buildPortfolioCareRadar([
       ...sample,
       {
@@ -71,13 +75,28 @@ describe("adviser portfolio care radar", () => {
         lastCareAckAt: "2026-08-12T10:00:00.000Z",
         unseenCareAckCount: 1,
       },
+      {
+        id: "o",
+        name: "OpsCue",
+        email: "o@demo.wealthos.ng",
+        profileCompleteness: 60,
+        openEscalations: 1,
+        openComplaints: 0,
+        openPrivacy: 0,
+        lastOpsRemindAt: "2026-08-14T09:00:00.000Z",
+      },
     ]);
     expect(filterPortfolioCareRadar(radar, "care").customers.map((c) => c.name)).toEqual([
       "Yomi",
+      "OpsCue",
       "Chioma",
     ]);
     expect(filterPortfolioCareRadar(radar, "unacked").customers.map((c) => c.name)).toEqual([
+      "OpsCue",
       "Chioma",
+    ]);
+    expect(filterPortfolioCareRadar(radar, "ops_reminded").customers.map((c) => c.name)).toEqual([
+      "OpsCue",
     ]);
     expect(filterPortfolioCareRadar(radar, "awaiting").customers.map((c) => c.name)).toEqual([
       "Receipt",
@@ -86,9 +105,16 @@ describe("adviser portfolio care radar", () => {
       "Yomi",
     ]);
     expect(radar.awaitingReceiptCount).toBe(1);
+    expect(radar.opsRemindedCount).toBe(1);
+    expect(radar.summary).toMatch(/ops-reminded/i);
     expect(parsePortfolioCareFilter("awaiting")).toBe("awaiting");
     expect(parsePortfolioCareFilter("unacked")).toBe("unacked");
+    expect(parsePortfolioCareFilter("ops_reminded")).toBe("ops_reminded");
     expect(parsePortfolioCareFilter("bogus")).toBe("all");
+
+    const opsRow = radar.customers.find((c) => c.id === "o");
+    expect(opsRow?.opsReminded).toBe(true);
+    expect(opsRow?.ackCue).toMatch(/Ops reminded/i);
   });
 
   it("formats care ack cues with awaiting receipt", () => {
@@ -100,5 +126,26 @@ describe("adviser portfolio care radar", () => {
     expect(formatCareAckCue("2026-08-13T08:00:00.000Z", now, true)).toBe(
       "Acked today · awaiting receipt",
     );
+  });
+
+  it("formats ops remind cues and Care desk banner", () => {
+    const now = new Date("2026-08-14T12:00:00.000Z");
+    expect(formatOpsRemindCue("2026-08-14T08:00:00.000Z", now)).toBe("Ops reminded today");
+    expect(formatOpsRemindCue("2026-08-13T08:00:00.000Z", now)).toBe("Ops reminded yesterday");
+    expect(
+      buildOpsRemindCareDeskBanner({
+        lastOpsRemindAt: "2026-08-14T08:00:00.000Z",
+        adminName: "Admin",
+        needsFirstAck: true,
+        now,
+      }),
+    ).toMatch(/Ops reminded today \(Admin\).*Queues stay open/i);
+    expect(
+      buildOpsRemindCareDeskBanner({
+        lastOpsRemindAt: "2026-08-14T08:00:00.000Z",
+        needsFirstAck: false,
+        now,
+      }),
+    ).toBeNull();
   });
 });

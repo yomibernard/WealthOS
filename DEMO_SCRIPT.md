@@ -59,7 +59,7 @@ Presenter checklist UI: `/demo`
 5c. Back as Ada — **Adviser notifications** (`/adviser/notifications`) — triage **Unread** / **Care receipts** / **Shares**, open Care desk, optional **Mark all as read**; 360 history **Seen** / **Unseen**; Care radar **Awaiting receipt**; Admin ops shows recent receipts
 5d. Optional: `/adviser?care=awaiting` after Yomi marks seen (clears awaiting; ops lists receipt)
 6. **Admin** — **Needs your attention** ops next-steps on `/admin` / `/admin/ops` (escalations, privacy, **care handoff**, maker-checker, flag risk)
-6a. Optional: **Remind linked advisers** on Care handoff (unacked) → Ada **notifications** (**Care handoff** filter) → Care desk ack; ops board shows **Recent ops reminds** (queues stay open)
+6a. Optional: **Remind linked advisers** on Care handoff (unacked) → Ada **notifications** (**Care handoff** filter) + Care radar **Ops reminded** (`?care=ops_reminded`) / Care desk banner → ack; ops board shows **Recent ops reminds** (queues stay open)
 6b. Optional: on `/admin/escalations` or `/admin/privacy`, **Remind adviser** on a **No care ack** row (same notify; queues stay open)
 6c. Optional: **WealthAI (ops)** (`/admin/ai`) — “What should I do next for ops?” cites the same daily board pulse with `/admin…` paths
 7. Optional: `/admin/escalations` + `/admin/privacy` — note **care-ack** badges + Care desk links + per-row Remind; `/admin/flags` safe pilot; `/admin/audit` filter + download

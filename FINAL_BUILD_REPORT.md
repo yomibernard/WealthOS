@@ -923,3 +923,11 @@ Ops queue care remind freeze pack **v0.1.20**:
 
 - `npm run pilot:freeze` checks per-queue Remind, recent reminds trail, smoke, DEMO
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 28.0 delivered (15 Aug 2026)
+
+Adviser ops-remind cues:
+
+- Care radar `?care=ops_reminded` + **Ops reminded** badge/cue while still unacked
+- Care desk durable banner from `OPS_CARE_REMIND` audit
+- Book next-steps elevates ops-reminded unacked customers

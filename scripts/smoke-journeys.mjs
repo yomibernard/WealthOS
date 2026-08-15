@@ -264,6 +264,7 @@ try {
       "/adviser",
       "/adviser?care=awaiting",
       "/adviser?care=unacked",
+      "/adviser?care=ops_reminded",
       "/adviser/ai",
       "/adviser/notifications",
       "/adviser/notifications?read=unread",
@@ -513,6 +514,18 @@ try {
         );
         if (!handoffOk) {
           failures.push("adviser care_handoff notification missing after ops care-remind");
+        }
+
+        const opsRadarRes = await authedGet("/adviser?care=ops_reminded", adviserRecheck.cookie);
+        const opsRadarOk =
+          opsRadarRes.status === 200 ||
+          opsRadarRes.status === 307 ||
+          opsRadarRes.status === 308;
+        console.log(
+          `  [${opsRadarOk ? "OK" : "FAIL"}] adviser ops_reminded radar after remind → ${opsRadarRes.status}`,
+        );
+        if (!opsRadarOk) {
+          failures.push("adviser ops_reminded radar missing after ops care-remind");
         }
       } else {
         failures.push(`adviser re-sign-in after care-remind failed: ${adviserRecheck.res.status}`);

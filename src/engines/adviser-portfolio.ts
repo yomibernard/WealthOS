@@ -2,6 +2,8 @@
  * Adviser portfolio care radar — rank customers by open care load.
  */
 
+import { formatOpsRemindCue } from "@/engines/ops-care-remind";
+
 export type PortfolioCustomerInput = {
   id: string;
   name: string;
@@ -13,6 +15,8 @@ export type PortfolioCustomerInput = {
   lastCareAckAt?: string | null;
   /** Shared care_ack notes not yet marked seen by the customer */
   unseenCareAckCount?: number;
+  /** Latest OPS_CARE_REMIND audit time for this customer (if any) */
+  lastOpsRemindAt?: string | null;
 };
 
 export type PortfolioCustomerRow = PortfolioCustomerInput & {
@@ -23,6 +27,7 @@ export type PortfolioCustomerRow = PortfolioCustomerInput & {
   ackCue: string;
   needsFirstAck: boolean;
   awaitingReceipt: boolean;
+  opsReminded: boolean;
   sortScore: number;
 };
 
@@ -33,7 +38,8 @@ export type PortfolioCareFilter =
   | "privacy"
   | "support"
   | "unacked"
-  | "awaiting";
+  | "awaiting"
+  | "ops_reminded";
 
 export const PORTFOLIO_CARE_FILTERS: PortfolioCareFilter[] = [
   "all",
@@ -43,6 +49,7 @@ export const PORTFOLIO_CARE_FILTERS: PortfolioCareFilter[] = [
   "support",
   "unacked",
   "awaiting",
+  "ops_reminded",
 ];
 
 export type PortfolioCareRadar = {
@@ -50,6 +57,7 @@ export type PortfolioCareRadar = {
   withCareCount: number;
   unackedCareCount: number;
   awaitingReceiptCount: number;
+  opsRemindedCount: number;
   totalComplaints: number;
   totalPrivacy: number;
   totalSupport: number;
@@ -81,14 +89,17 @@ export function scorePortfolioCare(
   const openSupport = Math.max(0, input.openEscalations - input.openComplaints);
   const careCount = input.openEscalations + input.openPrivacy;
   const lastCareAckAt = input.lastCareAckAt ?? null;
+  const lastOpsRemindAt = input.lastOpsRemindAt ?? null;
   const unseenCareAckCount = Math.max(0, input.unseenCareAckCount ?? 0);
   const needsFirstAck = careCount > 0 && !lastCareAckAt;
   const awaitingReceipt = unseenCareAckCount > 0;
+  const opsReminded = needsFirstAck && Boolean(lastOpsRemindAt);
   const sortScore =
     input.openComplaints * 10 +
     input.openPrivacy * 5 +
     input.openEscalations * 2 +
     (needsFirstAck ? 1 : 0) +
+    (opsReminded ? 3 : 0) +
     (awaitingReceipt ? 0.5 : 0);
 
   let careTone: "ok" | "warn" | "danger" = "ok";
@@ -104,20 +115,26 @@ export function scorePortfolioCare(
     careLabel = `${input.openEscalations} case${input.openEscalations === 1 ? "" : "s"}`;
   }
 
+  let ackCue = "—";
+  if (careCount > 0 || awaitingReceipt) {
+    ackCue = formatCareAckCue(lastCareAckAt, now, awaitingReceipt);
+    const opsCue = opsReminded ? formatOpsRemindCue(lastOpsRemindAt, now) : null;
+    if (opsCue) ackCue = `${ackCue} · ${opsCue}`;
+  }
+
   return {
     ...input,
     lastCareAckAt,
+    lastOpsRemindAt,
     unseenCareAckCount,
     careCount,
     openSupport,
     careTone,
     careLabel,
-    ackCue:
-      careCount > 0 || awaitingReceipt
-        ? formatCareAckCue(lastCareAckAt, now, awaitingReceipt)
-        : "—",
+    ackCue,
     needsFirstAck,
     awaitingReceipt,
+    opsReminded,
     sortScore,
   };
 }
@@ -146,6 +163,8 @@ export function customerMatchesCareFilter(
       return row.needsFirstAck;
     case "awaiting":
       return row.awaitingReceipt;
+    case "ops_reminded":
+      return row.opsReminded;
     case "all":
     default:
       return true;
@@ -162,6 +181,7 @@ export function filterPortfolioCareRadar(
   const withCareCount = customers.filter((r) => r.careCount > 0).length;
   const unackedCareCount = customers.filter((r) => r.needsFirstAck).length;
   const awaitingReceiptCount = customers.filter((r) => r.awaitingReceipt).length;
+  const opsRemindedCount = customers.filter((r) => r.opsReminded).length;
   const totalComplaints = customers.reduce((n, r) => n + r.openComplaints, 0);
   const totalPrivacy = customers.reduce((n, r) => n + r.openPrivacy, 0);
   const totalSupport = customers.reduce((n, r) => n + r.openSupport, 0);
@@ -173,6 +193,7 @@ export function filterPortfolioCareRadar(
     support: "with routine support cases",
     unacked: "needing a first care acknowledgment",
     awaiting: "awaiting a customer care receipt",
+    ops_reminded: "ops-reminded and still unacked",
   };
 
   let summary: string;
@@ -187,6 +208,7 @@ export function filterPortfolioCareRadar(
     withCareCount,
     unackedCareCount,
     awaitingReceiptCount,
+    opsRemindedCount,
     totalComplaints,
     totalPrivacy,
     totalSupport,
@@ -201,6 +223,7 @@ export function buildPortfolioCareRadar(
 ): PortfolioCareRadar {
   const rows = customers.map((c) => scorePortfolioCare(c, now)).sort((a, b) => {
     if (b.sortScore !== a.sortScore) return b.sortScore - a.sortScore;
+    if (a.opsReminded !== b.opsReminded) return a.opsReminded ? -1 : 1;
     if (a.needsFirstAck !== b.needsFirstAck) return a.needsFirstAck ? -1 : 1;
     if (a.awaitingReceipt !== b.awaitingReceipt) return a.awaitingReceipt ? -1 : 1;
     const aAck = a.lastCareAckAt ?? "";
@@ -212,6 +235,7 @@ export function buildPortfolioCareRadar(
   const withCareCount = rows.filter((r) => r.careCount > 0).length;
   const unackedCareCount = rows.filter((r) => r.needsFirstAck).length;
   const awaitingReceiptCount = rows.filter((r) => r.awaitingReceipt).length;
+  const opsRemindedCount = rows.filter((r) => r.opsReminded).length;
   const totalComplaints = rows.reduce((n, r) => n + r.openComplaints, 0);
   const totalPrivacy = rows.reduce((n, r) => n + r.openPrivacy, 0);
   const totalSupport = rows.reduce((n, r) => n + r.openSupport, 0);
@@ -221,6 +245,8 @@ export function buildPortfolioCareRadar(
     summary = "No customers linked yet.";
   } else if (withCareCount === 0 && awaitingReceiptCount === 0) {
     summary = "Care queues look clear across your book.";
+  } else if (opsRemindedCount > 0) {
+    summary = `${withCareCount} customer(s) need care — ${opsRemindedCount} ops-reminded and still unacked.`;
   } else if (unackedCareCount > 0) {
     summary = `${withCareCount} customer(s) need care — ${unackedCareCount} still need a first acknowledgment.`;
   } else if (awaitingReceiptCount > 0) {
@@ -236,6 +262,7 @@ export function buildPortfolioCareRadar(
     withCareCount,
     unackedCareCount,
     awaitingReceiptCount,
+    opsRemindedCount,
     totalComplaints,
     totalPrivacy,
     totalSupport,

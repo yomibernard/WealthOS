@@ -67,7 +67,7 @@
 | Adviser WealthAI book | Ready (demo) | `/adviser/ai` grounded on book next-steps pulse |
 | Admin/ops next-steps | Ready (demo) | Ranked ops next steps on `/admin` + `/admin/ops` |
 | Admin WealthAI ops | Ready (demo) | `/admin/ai` grounded on ops next-steps pulse |
-| Ops care remind | Ready (demo) | Bulk + per-queue Remind → adviser Care handoff; recent ops reminds trail |
+| Ops care remind | Ready (demo) | Bulk + per-queue Remind; adviser Ops reminded radar/desk cues |
 
 ## Quality gates (this machine)
 

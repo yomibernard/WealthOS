@@ -6,6 +6,8 @@ import { buildHomeDashboard } from "@/services/wealth";
 import { getAdviserInsightsPack } from "@/services/adviser-insights";
 import { loadAdviserCareDesk } from "@/services/adviser-care";
 import { loadCareAckHistory } from "@/services/adviser-care-ack";
+import { loadLastOpsCareRemind } from "@/services/ops-care-remind";
+import { buildOpsRemindCareDeskBanner } from "@/engines/ops-care-remind";
 import { formatNaira } from "@/lib/format";
 import { AdviserCopilot } from "@/components/AdviserCopilot";
 import { AdviserNotesPanel } from "@/components/AdviserNotesPanel";
@@ -46,12 +48,22 @@ export default async function AdviserCustomerPage({
   }
 
   const dash = await buildHomeDashboard(customer.id);
-  const [insights, care, careHistory] = await Promise.all([
+  const [insights, care, careHistory, lastOpsRemind] = await Promise.all([
     getAdviserInsightsPack(customer.id),
     loadAdviserCareDesk(customer.id),
     loadCareAckHistory(customer.id),
+    loadLastOpsCareRemind(customer.id),
   ]);
   const flags = getFeatureFlags();
+  const needsFirstAck = care.openCount > 0 && careHistory.count === 0;
+  const opsRemindBanner =
+    lastOpsRemind && needsFirstAck
+      ? buildOpsRemindCareDeskBanner({
+          lastOpsRemindAt: lastOpsRemind.createdAt,
+          adminName: lastOpsRemind.adminName,
+          needsFirstAck: true,
+        })
+      : null;
 
   return (
     <main className="page-wide">
@@ -97,6 +109,11 @@ export default async function AdviserCustomerPage({
           <Badge tone={care.openCount > 0 ? "warn" : "default"}>{care.openCount} open</Badge>
         </div>
         <p className="text-sm">{care.summary}</p>
+        {opsRemindBanner ? (
+          <p className="rounded-xl border border-line bg-accent-soft/50 px-3 py-2 text-sm">
+            {opsRemindBanner}
+          </p>
+        ) : null}
         {care.items.length ? (
           <ul className="space-y-2">
             {care.items.map((item) => (

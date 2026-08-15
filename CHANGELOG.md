@@ -4,6 +4,10 @@
 
 Ops queue care remind on top of the 0.1.19 ops care remind pack.
 
+### Phase 28.x — Adviser ops-remind cues (in progress)
+
+- **28.0** Care radar **Ops reminded** filter/cues + Care desk banner; next-steps elevates ops-reminded unacked
+
 ### Phase 27.x — Ops queue care remind
 
 - **27.2** Freeze pack `v0.1.20`; `pilot:freeze` covers 27.x queue remind + trail surface

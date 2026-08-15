@@ -15,6 +15,7 @@ import {
 const FILTER_CHIPS: { id: PortfolioCareFilter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "care", label: "Needs care" },
+  { id: "ops_reminded", label: "Ops reminded" },
   { id: "unacked", label: "Unacked" },
   { id: "awaiting", label: "Awaiting receipt" },
   { id: "complaints", label: "Complaints" },
@@ -106,6 +107,9 @@ export default async function AdviserHomePage({
           {full.unackedCareCount > 0 ? (
             <Badge tone="warn">{full.unackedCareCount} unacked</Badge>
           ) : null}
+          {full.opsRemindedCount > 0 ? (
+            <Badge tone="warn">{full.opsRemindedCount} ops reminded</Badge>
+          ) : null}
           {full.awaitingReceiptCount > 0 ? (
             <Badge tone="warn">{full.awaitingReceiptCount} awaiting receipt</Badge>
           ) : null}
@@ -142,20 +146,23 @@ export default async function AdviserHomePage({
                   <p className="font-display text-xl">{c.name}</p>
                   <p className="muted text-sm">{c.email}</p>
                 </div>
-                <Badge
-                  tone={
-                    c.careTone === "danger"
-                      ? "danger"
-                      : c.careTone === "warn"
-                        ? "warn"
-                        : "default"
-                  }
-                >
-                  {c.careLabel}
-                </Badge>
+                <div className="flex flex-wrap gap-2">
+                  {c.opsReminded ? <Badge tone="warn">Ops reminded</Badge> : null}
+                  <Badge
+                    tone={
+                      c.careTone === "danger"
+                        ? "danger"
+                        : c.careTone === "warn"
+                          ? "warn"
+                          : "default"
+                    }
+                  >
+                    {c.careLabel}
+                  </Badge>
+                </div>
               </div>
               <p className="mt-2 text-sm">Profile {c.profileCompleteness}% complete</p>
-              {c.careCount > 0 ? (
+              {c.careCount > 0 || c.awaitingReceipt ? (
                 <p className="muted mt-1 text-xs">
                   {c.openEscalations} case(s) · {c.openPrivacy} privacy · {c.ackCue}
                 </p>

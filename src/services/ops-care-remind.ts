@@ -136,3 +136,28 @@ export async function sendOpsCareReminds(input: {
 
   return { reminded, skipped, results };
 }
+
+export async function loadLastOpsCareRemind(customerId: string): Promise<{
+  createdAt: string;
+  adminName: string | null;
+} | null> {
+  const event = await prisma.auditEvent.findFirst({
+    where: { eventType: "OPS_CARE_REMIND", entityId: customerId },
+    include: { user: { select: { name: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!event) return null;
+
+  let adminName: string | null = event.user?.name ?? null;
+  try {
+    const payload = JSON.parse(event.payloadJson) as { adminName?: string };
+    if (payload.adminName?.trim()) adminName = payload.adminName.trim();
+  } catch {
+    // keep user name fallback
+  }
+
+  return {
+    createdAt: event.createdAt.toISOString(),
+    adminName,
+  };
+}

@@ -162,6 +162,7 @@ try {
         ["adviser", adviserEmail, [
           "/adviser",
           "/adviser?care=awaiting",
+          "/adviser?care=ops_reminded",
           "/adviser/ai",
           "/adviser/notifications",
           "/adviser/notifications?read=unread",

@@ -15,6 +15,7 @@ const customers = [
     openSupport: 0,
     needsFirstAck: true,
     awaitingReceipt: false,
+    opsReminded: false,
     sortScore: 11,
   },
   {
@@ -25,6 +26,7 @@ const customers = [
     openSupport: 1,
     needsFirstAck: false,
     awaitingReceipt: true,
+    opsReminded: false,
     sortScore: 5.5,
   },
 ];
@@ -61,11 +63,36 @@ describe("adviser next-steps pulse", () => {
           openSupport: 1,
           needsFirstAck: true,
           awaitingReceipt: false,
+          opsReminded: false,
           sortScore: 3,
         },
       ],
     });
     expect(pulse.items.some((i) => i.kind === "unacked")).toBe(true);
+    expect(pulse.primaryHref).toMatch(/\/adviser\/customers\/yomi/);
+  });
+
+  it("elevates ops-reminded unacked care", () => {
+    const pulse = buildAdviserNextStepsPulse({
+      totalComplaints: 0,
+      unackedCareCount: 1,
+      opsRemindedCount: 1,
+      customers: [
+        {
+          id: "yomi",
+          name: "Yomi",
+          openComplaints: 0,
+          openPrivacy: 0,
+          openSupport: 1,
+          needsFirstAck: true,
+          awaitingReceipt: false,
+          opsReminded: true,
+          sortScore: 6,
+        },
+      ],
+    });
+    expect(pulse.items[0]?.kind).toBe("ops_reminded");
+    expect(pulse.items[0]?.detail).toMatch(/Ops nudged|Queues stay open/i);
     expect(pulse.primaryHref).toMatch(/\/adviser\/customers\/yomi/);
   });
 
