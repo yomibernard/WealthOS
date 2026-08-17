@@ -1001,3 +1001,10 @@ Secrets hygiene gate:
 
 - `npm run secrets:check` — `.env` not tracked, `.env.example` present, no private keys / live API keys in git
 - Wired into `npm run release:check`; LAUNCH_REVIEW “No secrets in git” engineering-verified
+
+## Phase 31.2 delivered (17 Aug 2026)
+
+Secrets hygiene smoke/docs:
+
+- DEMO closing lines + `smoke:hosted-ready` matrix mention `secrets:check`
+- Unit test asserts DEMO/DEPLOY coverage

@@ -73,7 +73,7 @@ Presenter checklist UI: `/demo`
 - Cadence tools (report / digest / funding / profile) never move money
 - Adviser share + nudge are human collaboration, not auto-advice
 - Support/complaints close in-product; hosted smoke via `npm run smoke:hosted` (preflight `npm run smoke:hosted-ready`)
-- Launch rehearsal: `npm run launch:rehearse-prod` + engineering evidence `npm run launch:review`
+- Launch rehearsal: `npm run launch:rehearse-prod` + engineering evidence `npm run launch:review` + secrets hygiene `npm run secrets:check`
 - Postgres cutover, CI, and Vercel `build:vercel` exist for hosted pilots
 
 ## Recovery

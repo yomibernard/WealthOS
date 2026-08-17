@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased — Phase 31.0
+## Unreleased — Phase 31.x
 
-- Secrets hygiene: `npm run secrets:check` (no tracked `.env` / private keys); wired into `release:check`
+- **31.2** DEMO / hosted-ready beats for `secrets:check`
+- **31.0** Secrets hygiene: `npm run secrets:check` (no tracked `.env` / private keys); wired into `release:check`
 
 ## 0.1.23 — 17 Aug 2026 (Launch readiness pack)
 

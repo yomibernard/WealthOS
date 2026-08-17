@@ -17,5 +17,9 @@ describe("secrets hygiene gate", () => {
     });
     expect(res.status).toBe(0);
     expect(res.stdout).toMatch(/Secrets check OK/);
+    const demo = readFileSync(join(root, "DEMO_SCRIPT.md"), "utf8");
+    expect(demo).toContain("secrets:check");
+    const deploy = readFileSync(join(root, "DEPLOY.md"), "utf8");
+    expect(deploy).toContain("secrets:check");
   });
 });

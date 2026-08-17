@@ -46,6 +46,7 @@ for (const needle of [
   "smoke:hosted",
   "/api/health",
   "safe pilot",
+  "secrets:check",
 ]) {
   if (deploy && !deploy.includes(needle)) {
     failures.push(`DEPLOY.md missing readiness cue ${JSON.stringify(needle)}`);
@@ -90,6 +91,7 @@ console.log("  SMOKE_BASE_URL=https://your-app.vercel.app npm run smoke:hosted")
 console.log("  SMOKE_STRICT=1 SMOKE_BASE_URL=https://… npm run smoke:hosted");
 console.log("  SMOKE_SKIP_AUTH=1 SMOKE_BASE_URL=https://… npm run smoke:hosted");
 console.log("  npm run launch:rehearse-prod");
+console.log("  npm run secrets:check");
 console.log("  GET /api/health  (demoMode off, databaseKind postgres)");
 console.log("  /admin/flags → safe pilot for shared URLs");
 
