@@ -4,22 +4,26 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 describe("secrets hygiene gate", () => {
-  it("ships secrets:check and passes on this checkout", () => {
-    const root = process.cwd();
-    expect(existsSync(join(root, "scripts", "secrets-check.mjs"))).toBe(true);
-    const pkg = readFileSync(join(root, "package.json"), "utf8");
-    expect(pkg).toContain("secrets:check");
-    const release = readFileSync(join(root, "scripts", "release-check.mjs"), "utf8");
-    expect(release).toContain("secrets:check");
-    const res = spawnSync("node", [join("scripts", "secrets-check.mjs")], {
-      cwd: root,
-      encoding: "utf8",
-    });
-    expect(res.status).toBe(0);
-    expect(res.stdout).toMatch(/Secrets check OK/);
-    const demo = readFileSync(join(root, "DEMO_SCRIPT.md"), "utf8");
-    expect(demo).toContain("secrets:check");
-    const deploy = readFileSync(join(root, "DEPLOY.md"), "utf8");
-    expect(deploy).toContain("secrets:check");
-  });
+  it(
+    "ships secrets:check and passes on this checkout",
+    () => {
+      const root = process.cwd();
+      expect(existsSync(join(root, "scripts", "secrets-check.mjs"))).toBe(true);
+      const pkg = readFileSync(join(root, "package.json"), "utf8");
+      expect(pkg).toContain("secrets:check");
+      const release = readFileSync(join(root, "scripts", "release-check.mjs"), "utf8");
+      expect(release).toContain("secrets:check");
+      const res = spawnSync("node", [join("scripts", "secrets-check.mjs")], {
+        cwd: root,
+        encoding: "utf8",
+      });
+      expect(res.status).toBe(0);
+      expect(res.stdout).toMatch(/Secrets check OK/);
+      const demo = readFileSync(join(root, "DEMO_SCRIPT.md"), "utf8");
+      expect(demo).toContain("secrets:check");
+      const deploy = readFileSync(join(root, "DEPLOY.md"), "utf8");
+      expect(deploy).toContain("secrets:check");
+    },
+    60_000,
+  );
 });

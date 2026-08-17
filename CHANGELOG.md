@@ -1,9 +1,14 @@
 # Changelog
 
-## Unreleased — Phase 31.x
+## 0.1.24 — 17 Aug 2026 (Secrets/CI hygiene pack)
 
+Secrets and CI hygiene on top of the 0.1.23 launch readiness pack.
+
+### Phase 31.x — Secrets / CI hygiene
+
+- **31.5** Freeze pack `v0.1.24`; `pilot:freeze` covers 31.x secrets / local-a / ci gates
 - **31.4** `npm run ci:check` — GitHub Actions workflow evidence (test · build · release:check)
-- **31.3** `npm run launch:local-a` engineering umbrella (postgres-ready + rehearse + review + secrets + hosted-ready)
+- **31.3** `npm run launch:local-a` engineering umbrella (postgres-ready + rehearse + review + secrets + hosted-ready + ci)
 - **31.2** DEMO / hosted-ready beats for `secrets:check`
 - **31.0** Secrets hygiene: `npm run secrets:check` (no tracked `.env` / private keys); wired into `release:check`
 

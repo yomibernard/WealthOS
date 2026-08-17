@@ -1,8 +1,8 @@
 # WealthOS MVP status freeze
 
-**Version:** 0.1.23  
+**Version:** 0.1.24  
 **Date:** 17 August 2026  
-**Verdict:** Feature-complete for local/pilot demo through launch readiness tooling (ops + trust + adviser care + care UX + ops care handoff + customer care updates + WealthAI care_update + mark-as-seen + receipt close-loop + adviser notifications + adviser triage + customer triage + inbox triage + Home next-steps + adviser book next-steps + adviser WealthAI book + admin/ops next-steps + admin WealthAI ops + ops care remind + queue remind + adviser ops-remind cues + remind-answer close-loop + prod gate rehearsal + engineering LAUNCH_REVIEW evidence + hosted-smoke readiness). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
+**Verdict:** Feature-complete for local/pilot demo through secrets/CI hygiene (ops + trust + adviser care + … + launch readiness + secrets check + local-a umbrella + CI workflow evidence). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
 
 ## Promise
 
@@ -102,6 +102,7 @@
 - [x] Adviser ops-remind cues pack `v0.1.21` (`npm run pilot:freeze`)
 - [x] Ops remind-answer close-loop pack `v0.1.22` (`npm run pilot:freeze`)
 - [x] Launch readiness pack `v0.1.23` (`npm run pilot:freeze`)
+- [x] Secrets/CI hygiene pack `v0.1.24` (`npm run pilot:freeze`)
 - [x] Prod launch-gate rehearsal `npm run launch:rehearse-prod` (fixture fail-closed + pass; owner still runs prod `launch:check` on host env)
 - [x] Engineering LAUNCH_REVIEW evidence `npm run launch:review` (section B code paths; legal/staffing remain human)
 - [x] Hosted smoke readiness preflight `npm run smoke:hosted-ready` (live URL still owner-run)

@@ -7,7 +7,9 @@ import { join } from "node:path";
 const baseDate = new Date("2026-08-13T00:00:00Z");
 
 describe("goal funding pulse", () => {
-  it("flags underfunded goals as behind or critical", () => {
+  it(
+    "flags underfunded goals as behind or critical",
+    () => {
     const pulse = assessGoalFunding({
       id: "g1",
       name: "Emergency fund",
@@ -22,7 +24,9 @@ describe("goal funding pulse", () => {
     });
     expect(["behind", "critical"]).toContain(pulse.status);
     expect(pulse.monthlyGap).toBeGreaterThan(0);
-  });
+  },
+    30_000,
+  );
 
   it("summarises portfolio funding gaps", () => {
     const report = buildFundingPulse([

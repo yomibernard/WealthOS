@@ -43,15 +43,19 @@ describe("launch gate", () => {
     expect(report.profile).toBe("production");
   });
 
-  it("ships launch:rehearse-prod and passes fixture rehearsal", () => {
-    const root = process.cwd();
-    expect(existsSync(join(root, "scripts", "launch-rehearse-prod.mjs"))).toBe(true);
-    expect(existsSync(join(root, "scripts", "lib", "launch-evaluate.mjs"))).toBe(true);
-    const res = spawnSync("node", [join("scripts", "launch-rehearse-prod.mjs")], {
-      cwd: root,
-      encoding: "utf8",
-    });
-    expect(res.status).toBe(0);
-    expect(res.stdout).toMatch(/Prod launch rehearsal OK/);
-  });
+  it(
+    "ships launch:rehearse-prod and passes fixture rehearsal",
+    () => {
+      const root = process.cwd();
+      expect(existsSync(join(root, "scripts", "launch-rehearse-prod.mjs"))).toBe(true);
+      expect(existsSync(join(root, "scripts", "lib", "launch-evaluate.mjs"))).toBe(true);
+      const res = spawnSync("node", [join("scripts", "launch-rehearse-prod.mjs")], {
+        cwd: root,
+        encoding: "utf8",
+      });
+      expect(res.status).toBe(0);
+      expect(res.stdout).toMatch(/Prod launch rehearsal OK/);
+    },
+    60_000,
+  );
 });

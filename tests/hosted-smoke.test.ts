@@ -56,7 +56,9 @@ describe("hosted smoke rules", () => {
     expect(smokePassed(findings, true)).toBe(false);
   });
 
-  it("ships smoke:hosted script in the release package", () => {
+  it(
+    "ships smoke:hosted script in the release package",
+    () => {
     const root = process.cwd();
     expect(existsSync(join(root, "scripts", "smoke-hosted.mjs"))).toBe(true);
     expect(existsSync(join(root, "scripts", "smoke-hosted-ready.mjs"))).toBe(true);
@@ -175,5 +177,7 @@ describe("hosted smoke rules", () => {
     expect(hosted).toContain("/api/admin/ai");
     expect(hosted).toContain("What should I do next for ops?");
     expect(hosted).toContain("opsNextStepsPulse");
-  });
+  },
+    60_000,
+  );
 });

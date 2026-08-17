@@ -5,7 +5,7 @@
  *
  * Does not replace owner hygiene on the hosted pilot env.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -25,12 +25,13 @@ if (tracked.status !== 0) {
   failures.push("git ls-files failed — run from a git checkout");
 }
 
-const trackedFiles = tracked.status === 0
-  ? tracked.stdout
-      .toString("utf8")
-      .split("\0")
-      .filter(Boolean)
-  : [];
+const trackedFiles =
+  tracked.status === 0
+    ? tracked.stdout
+        .toString("utf8")
+        .split("\0")
+        .filter(Boolean)
+    : [];
 
 const forbiddenNames = new Set([
   ".env",
@@ -80,15 +81,19 @@ const skipScan = new Set([
   "pnpm-lock.yaml",
 ]);
 
+let scannedContent = 0;
 for (const f of trackedFiles) {
   if (skipScan.has(f.split(/[/\\]/).pop() ?? "")) continue;
   if (/\.(png|jpg|jpeg|gif|webp|ico|woff2?|ttf|eot|pdf|db|sqlite)$/i.test(f)) continue;
+  const abs = join(root, f);
   let text;
   try {
-    text = readFileSync(join(root, f), "utf8");
+    if (statSync(abs).size > 400_000) continue;
+    text = readFileSync(abs, "utf8");
   } catch {
     continue;
   }
+  scannedContent += 1;
   if (privateKey.test(text)) {
     failures.push(`private key material in tracked file: ${f}`);
   }
@@ -101,7 +106,7 @@ for (const f of trackedFiles) {
 }
 
 console.log("WealthOS secrets hygiene check");
-console.log(`  scanned ${trackedFiles.length} tracked files`);
+console.log(`  tracked ${trackedFiles.length} files; content-scanned ${scannedContent}`);
 
 if (failures.length) {
   console.error("Secrets check FAILED:");

@@ -1022,3 +1022,10 @@ CI workflow evidence gate:
 
 - `npm run ci:check` asserts `.github/workflows/ci.yml` ships test · build · release:check
 - Wired into `release:check` and `launch:local-a`; owner still confirms green on main
+
+## Phase 31.5 delivered (17 Aug 2026)
+
+Secrets/CI hygiene freeze pack **v0.1.24**:
+
+- `npm run pilot:freeze` checks secrets, local-a, ci:check, DEMO/DEPLOY/ops beats
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

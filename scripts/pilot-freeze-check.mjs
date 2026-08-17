@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.23 (… + ops remind-answer close-loop 29.x + launch readiness 30.x).
+ * Current pack: v0.1.24 (… + launch readiness 30.x + secrets/CI hygiene 31.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.23";
+const EXPECTED = "0.1.24";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -33,7 +33,11 @@ mustExist("scripts/smoke-hosted-ready.mjs");
 mustExist("scripts/launch-rehearse-prod.mjs");
 mustExist("scripts/launch-review-check.mjs");
 mustExist("scripts/lib/launch-evaluate.mjs");
+mustExist("scripts/secrets-check.mjs");
+mustExist("scripts/launch-local-a.mjs");
+mustExist("scripts/ci-check.mjs");
 mustExist("scripts/pilot-freeze-check.mjs");
+mustExist(".github/workflows/ci.yml");
 mustExist("src/engines/flag-profiles.ts");
 mustExist("src/engines/audit-export.ts");
 mustExist("src/engines/ops-daily.ts");
@@ -93,6 +97,9 @@ for (const s of [
   "smoke:hosted-ready",
   "launch:rehearse-prod",
   "launch:review",
+  "secrets:check",
+  "launch:local-a",
+  "ci:check",
   "pilot:freeze",
   "release:check",
   "build:vercel",
@@ -1046,6 +1053,65 @@ if (
 }
 if (!changelog.includes("0.1.23") || !changelog.includes("Launch readiness")) {
   failures.push("CHANGELOG.md missing 0.1.23 Launch readiness pack");
+}
+
+// 31.x Secrets / CI hygiene
+const secretsCheck = read("scripts/secrets-check.mjs");
+const launchLocalA = read("scripts/launch-local-a.mjs");
+const ciCheck = read("scripts/ci-check.mjs");
+const ciWorkflow = read(".github/workflows/ci.yml");
+if (
+  !secretsCheck.includes(".env.example") ||
+  !secretsCheck.includes("PRIVATE KEY") ||
+  !secretsCheck.includes("git ls-files")
+) {
+  failures.push("secrets-check missing hygiene coverage");
+}
+if (
+  !launchLocalA.includes("secrets:check") ||
+  !launchLocalA.includes("launch:rehearse-prod") ||
+  !launchLocalA.includes("ci:check") ||
+  !launchLocalA.includes("smoke:hosted-ready")
+) {
+  failures.push("launch-local-a missing engineering umbrella steps");
+}
+if (
+  !ciCheck.includes("npm run test") ||
+  !ciCheck.includes("npm run build") ||
+  !ciCheck.includes("npm run release:check") ||
+  !ciWorkflow.includes("npm run release:check")
+) {
+  failures.push("ci:check / workflow missing test·build·release evidence");
+}
+if (
+  !releaseCheck.includes("secrets:check") ||
+  !releaseCheck.includes("ci:check")
+) {
+  failures.push("release-check missing secrets:check / ci:check");
+}
+if (
+  !deployDoc.includes("secrets:check") ||
+  !deployDoc.includes("launch:local-a") ||
+  !deployDoc.includes("ci:check")
+) {
+  failures.push("DEPLOY.md missing Phase 31.x hygiene cues");
+}
+if (
+  !demo.includes("secrets:check") ||
+  !demo.includes("launch:local-a") ||
+  !demo.includes("ci:check")
+) {
+  failures.push("DEMO_SCRIPT.md missing Phase 31.x hygiene beats");
+}
+if (
+  !adminOps.includes("secrets:check") ||
+  !adminOps.includes("launch:local-a") ||
+  !adminOps.includes("ci:check")
+) {
+  failures.push("admin ops missing Phase 31.x command index");
+}
+if (!changelog.includes("0.1.24") || !changelog.includes("Secrets/CI hygiene")) {
+  failures.push("CHANGELOG.md missing 0.1.24 Secrets/CI hygiene pack");
 }
 
 if (failures.length) {
