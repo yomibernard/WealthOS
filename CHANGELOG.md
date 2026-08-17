@@ -1,7 +1,13 @@
 # Changelog
 
-## Unreleased — Phase 32–34
+## 0.1.25 — 17 Aug 2026 (Care ops polish pack)
 
+Care ops polish on top of the 0.1.24 secrets/CI hygiene pack.
+
+### Phase 32–35.x — Care audit, ops-reminded AI, stale reminds
+
+- **35.2** Freeze pack `v0.1.25`; `pilot:freeze` covers 32–35.x surface + smoke
+- **35.1** Smoke: audit `care` category, adviser AI ops-reminded cite, awaitingAnswer/stale cues
 - **34.0** Care handoff stale remind cues (Awaiting answer / 24h+)
 - **33.0** Adviser WealthAI cites ops-reminded book steps + “ops reminded” intent
 - **32.0** Audit **care** category for OPS_CARE_REMIND / OPS_REMIND_ANSWERED / ADVISER_CARE_ACK / CUSTOMER_CARE_RECEIPT

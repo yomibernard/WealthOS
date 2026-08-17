@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.24 (… + launch readiness 30.x + secrets/CI hygiene 31.x).
+ * Current pack: v0.1.25 (… + secrets/CI hygiene 31.x + care audit / ops-reminded AI / stale reminds 32–35.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.24";
+const EXPECTED = "0.1.25";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -1112,6 +1112,54 @@ if (
 }
 if (!changelog.includes("0.1.24") || !changelog.includes("Secrets/CI hygiene")) {
   failures.push("CHANGELOG.md missing 0.1.24 Secrets/CI hygiene pack");
+}
+
+// 32–35.x Care audit / ops-reminded AI / stale reminds
+const auditEngine = read("src/engines/audit-export.ts");
+const adminAudit = read("src/app/admin/audit/page.tsx");
+if (
+  !auditEngine.includes('"care"') ||
+  !auditEngine.includes("OPS_CARE_REMIND") ||
+  !auditEngine.includes("OPS_REMIND_ANSWERED") ||
+  !auditEngine.includes("CUSTOMER_CARE_RECEIPT") ||
+  !adminAudit.includes('"care"')
+) {
+  failures.push("audit export / admin audit missing care category");
+}
+if (
+  !adviserNextEngine.includes("Ops reminded") ||
+  !adviserNextEngine.includes("care=ops_reminded") ||
+  !adviserNextEngine.includes("ops remind")
+) {
+  failures.push("adviser-next-steps missing ops-reminded WealthAI cite");
+}
+if (
+  !opsDaily.includes("awaitingAnswer") ||
+  !opsDaily.includes("stale") ||
+  !opsDaily.includes("24h+") ||
+  !adminOps.includes("Awaiting answer")
+) {
+  failures.push("ops daily / Care handoff missing stale remind cues");
+}
+if (
+  !smokeLocal.includes("awaitingAnswer") ||
+  !smokeLocal.includes("category=care") ||
+  !smokeLocal.includes("ops_reminded cite") ||
+  !smokeHosted.includes("hosted ops remind awaitingAnswer") ||
+  !smokeHosted.includes("hosted adviser ai ops_reminded cite") ||
+  !smokeHosted.includes("hosted admin audit care category")
+) {
+  failures.push("smoke missing Phase 32–35 care audit / ops-reminded / stale coverage");
+}
+if (
+  !demo.includes("care") ||
+  !demo.includes("Awaiting answer") ||
+  !demo.includes("ops reminded")
+) {
+  failures.push("DEMO_SCRIPT.md missing Phase 32–35 care audit / stale / ops-reminded beats");
+}
+if (!changelog.includes("0.1.25")) {
+  failures.push("CHANGELOG.md missing 0.1.25 Care ops polish pack");
 }
 
 if (failures.length) {

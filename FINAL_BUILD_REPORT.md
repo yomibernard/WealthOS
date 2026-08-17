@@ -1049,3 +1049,16 @@ Ops handoff stale remind cues:
 
 - Recent ops reminds show Awaiting answer / 24h+ badges; summary calls out stale reminds
 - Queues stay open
+
+## Phase 35.1 delivered (17 Aug 2026)
+
+Care ops polish smoke:
+
+- Local/hosted: awaitingAnswer before care-ack; adviser AI ops-reminded cite; audit `care` category after close-loop
+
+## Phase 35.2 delivered (17 Aug 2026)
+
+Care ops polish freeze pack **v0.1.25**:
+
+- `npm run pilot:freeze` checks audit care, WealthAI ops-reminded cite, stale cues, smoke, DEMO
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
