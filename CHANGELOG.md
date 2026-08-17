@@ -2,6 +2,7 @@
 
 ## Unreleased — Phase 31.x
 
+- **31.3** `npm run launch:local-a` engineering umbrella (postgres-ready + rehearse + review + secrets + hosted-ready)
 - **31.2** DEMO / hosted-ready beats for `secrets:check`
 - **31.0** Secrets hygiene: `npm run secrets:check` (no tracked `.env` / private keys); wired into `release:check`
 

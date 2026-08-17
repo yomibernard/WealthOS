@@ -11,6 +11,7 @@ Engineering evidence for many section B product rules is also covered by `npm ru
 - [ ] `npm run perf:check` green
 - [ ] `npm run launch:check` green (prod profile)
 - [x] `npm run launch:rehearse-prod` green (fixture fail-closed + pass; still run prod `launch:check` on host env)
+- [x] `npm run launch:local-a` green (postgres-ready + rehearse + review + secrets + hosted-ready)
 - [ ] `npm run db:postgres-ready` green; `prisma/migrations-postgres` reviewed
 - [x] Local Postgres rehearsal done once (`db:rehearse-postgres` / migrate deploy) or waived with owner sign-off
 - [x] No secrets in git (`.env` local only; use `.env.example`) — `npm run secrets:check`

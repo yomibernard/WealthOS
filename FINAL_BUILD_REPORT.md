@@ -1008,3 +1008,10 @@ Secrets hygiene smoke/docs:
 
 - DEMO closing lines + `smoke:hosted-ready` matrix mention `secrets:check`
 - Unit test asserts DEMO/DEPLOY coverage
+
+## Phase 31.3 delivered (17 Aug 2026)
+
+Local engineering launch umbrella:
+
+- `npm run launch:local-a` runs postgres-ready → rehearse-prod → review → secrets → hosted-ready
+- Does not replace prod `launch:check` or live hosted smoke
