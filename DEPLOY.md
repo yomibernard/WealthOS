@@ -81,7 +81,8 @@ npm run build && npm run start
 - Prod rehearsal (fixture envs, no real secrets): `npm run launch:rehearse-prod` — proves fail-closed + pass fixture; still run the prod gate against the real host env
 - Engineering LAUNCH_REVIEW evidence: `npm run launch:review` (wired into `release:check`)
 - Secrets hygiene: `npm run secrets:check` (wired into `release:check`)
-- Local engineering umbrella: `npm run launch:local-a` (postgres-ready + rehearse + review + secrets + hosted-ready)
+- Local engineering umbrella: `npm run launch:local-a` (postgres-ready + rehearse + review + secrets + hosted-ready + ci:check)
+- CI workflow evidence: `npm run ci:check` (wired into `release:check` / `launch:local-a`)
 - Umbrella: `npm run release:check`
 
 ### Post-deploy hosted smoke

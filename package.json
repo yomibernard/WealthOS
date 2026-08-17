@@ -28,6 +28,7 @@
     "launch:review": "node scripts/launch-review-check.mjs",
     "secrets:check": "node scripts/secrets-check.mjs",
     "launch:local-a": "node scripts/launch-local-a.mjs",
+    "ci:check": "node scripts/ci-check.mjs",
     "release:check": "node scripts/release-check.mjs",
     "smoke": "node scripts/smoke-journeys.mjs",
     "smoke:hosted": "node scripts/smoke-hosted.mjs",

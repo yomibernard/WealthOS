@@ -15,6 +15,7 @@ describe("launch:local-a umbrella", () => {
       expect(script).toContain("secrets:check");
       expect(script).toContain("launch:rehearse-prod");
       expect(script).toContain("smoke:hosted-ready");
+      expect(script).toContain("ci:check");
       const res = spawnSync("node", [join("scripts", "launch-local-a.mjs")], {
         cwd: root,
         encoding: "utf8",
@@ -22,6 +23,6 @@ describe("launch:local-a umbrella", () => {
       expect(res.status).toBe(0);
       expect(res.stdout).toMatch(/launch:local-a OK/);
     },
-    60_000,
+    90_000,
   );
 });

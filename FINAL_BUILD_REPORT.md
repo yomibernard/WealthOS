@@ -1015,3 +1015,10 @@ Local engineering launch umbrella:
 
 - `npm run launch:local-a` runs postgres-ready → rehearse-prod → review → secrets → hosted-ready
 - Does not replace prod `launch:check` or live hosted smoke
+
+## Phase 31.4 delivered (17 Aug 2026)
+
+CI workflow evidence gate:
+
+- `npm run ci:check` asserts `.github/workflows/ci.yml` ships test · build · release:check
+- Wired into `release:check` and `launch:local-a`; owner still confirms green on main

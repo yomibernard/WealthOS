@@ -12,6 +12,7 @@ const steps = [
   { name: "db:postgres-ready", cmd: "npm", args: ["run", "db:postgres-ready"] },
   { name: "launch:review", cmd: "npm", args: ["run", "launch:review"] },
   { name: "secrets:check", cmd: "npm", args: ["run", "secrets:check"] },
+  { name: "ci:check", cmd: "npm", args: ["run", "ci:check"] },
 ];
 
 if (existsSync(join(root, ".next", "BUILD_ID"))) {

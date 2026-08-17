@@ -108,6 +108,7 @@
 - [x] Secrets hygiene `npm run secrets:check` (no tracked `.env` / private keys; wired into `release:check`)
 - [x] Secrets hygiene smoke/docs (DEMO + hosted-ready beats)
 - [x] Local engineering launch umbrella `npm run launch:local-a`
+- [x] CI workflow evidence `npm run ci:check` (test · build · release:check package; owner confirms green on main)
 - [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets + Postgres URL)
 - [ ] Hosted deploy smoke (`SMOKE_BASE_URL=… npm run smoke:hosted` — see [DEPLOY.md](./DEPLOY.md))
 - [ ] Human sign-off on `LAUNCH_REVIEW.md`

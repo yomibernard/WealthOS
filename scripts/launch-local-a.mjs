@@ -15,6 +15,7 @@ const steps = [
   { name: "launch:review", cmd: "npm", args: ["run", "launch:review"] },
   { name: "secrets:check", cmd: "npm", args: ["run", "secrets:check"] },
   { name: "smoke:hosted-ready", cmd: "npm", args: ["run", "smoke:hosted-ready"] },
+  { name: "ci:check", cmd: "npm", args: ["run", "ci:check"] },
 ];
 
 console.log("WealthOS launch:local-a (engineering gates only)");
