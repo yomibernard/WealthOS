@@ -103,6 +103,26 @@ describe("ops daily board", () => {
     expect(strip.recentReminds).toHaveLength(1);
     expect(strip.recentRemindCount).toBe(1);
 
+    const stale = buildOpsCareHandoff({
+      unackedCareCustomers: 1,
+      awaitingReceiptCount: 0,
+      recentAcks: [],
+      recentReminds: [
+        {
+          id: "rm-old",
+          customerName: "Chioma",
+          adminName: "Admin",
+          createdAt: "2026-08-10T10:00:00.000Z",
+          notificationCreated: true,
+        },
+      ],
+      recentRemindAnswers: [],
+      now: new Date("2026-08-15T12:00:00.000Z"),
+    });
+    expect(stale.recentReminds[0]?.stale).toBe(true);
+    expect(stale.recentReminds[0]?.awaitingAnswer).toBe(true);
+    expect(stale.summary).toMatch(/awaiting adviser answer \(24h\+\)/i);
+
     const answered = buildOpsCareHandoff({
       unackedCareCustomers: 0,
       awaitingReceiptCount: 0,

@@ -14,6 +14,10 @@ describe("audit export", () => {
     expect(categoriseAuditEvent("ESCALATION_UPDATED")).toBe("escalation");
     expect(categoriseAuditEvent("WEEKLY_WEALTH_DIGEST")).toBe("cadence");
     expect(categoriseAuditEvent("ADVISER_NUDGE_SENT")).toBe("adviser");
+    expect(categoriseAuditEvent("OPS_CARE_REMIND")).toBe("care");
+    expect(categoriseAuditEvent("OPS_REMIND_ANSWERED")).toBe("care");
+    expect(categoriseAuditEvent("ADVISER_CARE_ACK")).toBe("care");
+    expect(categoriseAuditEvent("CUSTOMER_CARE_RECEIPT")).toBe("care");
     expect(categoriseAuditEvent("AUDIT_EXPORT_DOWNLOADED")).toBe("admin");
     expect(categoriseAuditEvent("SOMETHING_NEW")).toBe("other");
   });

@@ -68,6 +68,9 @@
 | Admin/ops next-steps | Ready (demo) | Ranked ops next steps on `/admin` + `/admin/ops` |
 | Admin WealthAI ops | Ready (demo) | `/admin/ai` grounded on ops next-steps pulse |
 | Ops care remind | Ready (demo) | Remind loop + remind-answer trail on Care handoff |
+| Audit care filter | Ready (demo) | `/admin/audit` **care** category for remind/ack/receipt events |
+| Adviser WealthAI ops-reminded | Ready (demo) | Book AI cites ops-reminded next-steps |
+| Ops stale remind cues | Ready (demo) | Care handoff Awaiting answer / 24h+ badges |
 
 ## Quality gates (this machine)
 

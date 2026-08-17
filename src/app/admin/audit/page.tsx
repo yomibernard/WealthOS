@@ -23,6 +23,7 @@ const CATEGORIES = [
   "ai",
   "wealth",
   "adviser",
+  "care",
   "cadence",
   "execution",
   "admin",

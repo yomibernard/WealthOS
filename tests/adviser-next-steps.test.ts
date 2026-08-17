@@ -139,7 +139,29 @@ describe("adviser next-steps pulse", () => {
     expect(text).toMatch(/Path:\s*\/adviser/);
     expect(text).toMatch(/Care radar|book/i);
     expect(wantsAdviserBookNextSteps("What should I do next for my book?")).toBe(true);
+    expect(wantsAdviserBookNextSteps("ops reminded customers")).toBe(true);
     expect(wantsAdviserBookNextSteps("Hello")).toBe(false);
+
+    const remindedPulse = buildAdviserNextStepsPulse({
+      unackedCareCount: 1,
+      opsRemindedCount: 1,
+      customers: [
+        {
+          id: "yomi",
+          name: "Yomi",
+          openComplaints: 0,
+          openPrivacy: 0,
+          openSupport: 1,
+          needsFirstAck: true,
+          awaitingReceipt: false,
+          opsReminded: true,
+          sortScore: 6,
+        },
+      ],
+    });
+    const remindedText = formatAdviserNextStepsAiContent(remindedPulse);
+    expect(remindedText).toMatch(/Ops reminded/i);
+    expect(remindedText).toMatch(/care=ops_reminded/);
 
     const ai = runAdviserWealthAI("What should I do next for my book?", pulse);
     expect(ai.toolsUsed).toContain("adviserNextStepsPulse");

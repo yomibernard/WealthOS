@@ -10,6 +10,7 @@ export type AuditCategory =
   | "ai"
   | "wealth"
   | "adviser"
+  | "care"
   | "cadence"
   | "execution"
   | "admin"
@@ -23,6 +24,7 @@ export const AUDIT_CATEGORIES: AuditCategory[] = [
   "ai",
   "wealth",
   "adviser",
+  "care",
   "cadence",
   "execution",
   "admin",
@@ -50,6 +52,15 @@ const CATEGORY_MATCHERS: Array<{ category: AuditCategory; patterns: RegExp[] }> 
       /^MEMORY_/,
       /^connection\./i,
       /^FX_/,
+    ],
+  },
+  {
+    category: "care",
+    patterns: [
+      /^OPS_CARE_REMIND/,
+      /^OPS_REMIND_ANSWERED/,
+      /^ADVISER_CARE_ACK/,
+      /^CUSTOMER_CARE_RECEIPT/,
     ],
   },
   {

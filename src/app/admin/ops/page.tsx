@@ -164,15 +164,24 @@ export default async function AdminOpsPage() {
               </p>
               <ul className="space-y-1 text-sm">
                 {daily.careHandoff.recentReminds.map((r) => (
-                  <li key={r.id}>
-                    <span className="font-medium">{r.customerName}</span>
-                    {" — "}
-                    {r.adminName}
-                    {r.notificationCreated ? " reminded linked adviser" : " remind attempted"}
-                    <span className="muted">
-                      {" · "}
-                      {new Date(r.createdAt).toLocaleString("en-GB")}
+                  <li key={r.id} className="flex flex-wrap items-baseline gap-2">
+                    <span>
+                      <span className="font-medium">{r.customerName}</span>
+                      {" — "}
+                      {r.adminName}
+                      {r.notificationCreated ? " reminded linked adviser" : " remind attempted"}
+                      <span className="muted">
+                        {" · "}
+                        {new Date(r.createdAt).toLocaleString("en-GB")}
+                      </span>
                     </span>
+                    {r.stale ? (
+                      <Badge tone="warn">Awaiting answer 24h+</Badge>
+                    ) : r.awaitingAnswer ? (
+                      <Badge tone="warn">Awaiting answer</Badge>
+                    ) : (
+                      <Badge>Answered</Badge>
+                    )}
                   </li>
                 ))}
               </ul>

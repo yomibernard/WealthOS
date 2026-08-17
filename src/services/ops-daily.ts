@@ -183,6 +183,7 @@ export async function loadOpsDailyBoard() {
           payload.customerName ??
           remindCustomerName.get(customerId) ??
           (customerId ? `Customer ${customerId.slice(0, 8)}…` : "Customer"),
+        customerId: customerId || undefined,
         adminName: payload.adminName ?? e.user?.name ?? "Ops",
         createdAt: e.createdAt.toISOString(),
         notificationCreated: Boolean(payload.notificationCreated),

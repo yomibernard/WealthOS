@@ -43,9 +43,16 @@ export type OpsCareHandoffReceipt = {
 export type OpsCareHandoffRemind = {
   id: string;
   customerName: string;
+  customerId?: string;
   adminName: string;
   createdAt: string;
   notificationCreated: boolean;
+  /** True when no matching recent remind-answer for this customer */
+  awaitingAnswer?: boolean;
+  /** Whole hours since remind was sent */
+  ageHours?: number;
+  /** Awaiting answer for 24h+ */
+  stale?: boolean;
 };
 
 export type OpsCareHandoffRemindAnswer = {
@@ -193,12 +200,31 @@ export function buildOpsCareHandoff(input: {
   recentReceipts?: OpsCareHandoffReceipt[];
   recentReminds?: OpsCareHandoffRemind[];
   recentRemindAnswers?: OpsCareHandoffRemindAnswer[];
+  now?: Date;
 }): OpsCareHandoff {
   const recentAcks = input.recentAcks.slice(0, 5);
   const recentReceipts = (input.recentReceipts ?? []).slice(0, 5);
-  const recentReminds = (input.recentReminds ?? []).slice(0, 5);
   const recentRemindAnswers = (input.recentRemindAnswers ?? []).slice(0, 5);
+  const nowMs = (input.now ?? new Date()).getTime();
+  const answeredNames = new Set(
+    recentRemindAnswers.map((a) => a.customerName.trim().toLowerCase()).filter(Boolean),
+  );
+  const recentReminds = (input.recentReminds ?? []).slice(0, 5).map((r) => {
+    const ageHours = Math.max(
+      0,
+      Math.floor((nowMs - Date.parse(r.createdAt)) / (60 * 60 * 1000)),
+    );
+    const awaitingAnswer = !answeredNames.has(r.customerName.trim().toLowerCase());
+    return {
+      ...r,
+      ageHours,
+      awaitingAnswer,
+      stale: awaitingAnswer && ageHours >= 24,
+    };
+  });
   const awaitingReceiptCount = input.awaitingReceiptCount ?? 0;
+  const staleReminds = recentReminds.filter((r) => r.stale).length;
+  const awaitingAnswerCount = recentReminds.filter((r) => r.awaitingAnswer).length;
   let summary: string;
   if (
     input.unackedCareCustomers === 0 &&
@@ -214,10 +240,19 @@ export function buildOpsCareHandoff(input: {
     if (recentReminds.length > 0) {
       summary += ` ${recentReminds.length} recent ops remind(s) sent.`;
     }
+    if (staleReminds > 0) {
+      summary += ` ${staleReminds} remind(s) still awaiting adviser answer (24h+).`;
+    } else if (awaitingAnswerCount > 0) {
+      summary += ` ${awaitingAnswerCount} remind(s) awaiting adviser answer.`;
+    }
   } else if (awaitingReceiptCount > 0) {
     summary = `${awaitingReceiptCount} care acknowledgment(s) awaiting a customer receipt (seen).`;
+  } else if (staleReminds > 0) {
+    summary = `${staleReminds} ops remind(s) still awaiting adviser answer (24h+) — queues stay open.`;
   } else if (recentRemindAnswers.length > 0) {
     summary = `Care handoff clear — ${recentRemindAnswers.length} recent remind answer(s).`;
+  } else if (recentReminds.length > 0) {
+    summary = `${recentReminds.length} recent ops remind(s) sent — awaiting adviser care acknowledgment.`;
   } else if (recentReceipts.length > 0) {
     summary = `Care handoff clear — ${recentReceipts.length} recent customer receipt(s).`;
   } else {

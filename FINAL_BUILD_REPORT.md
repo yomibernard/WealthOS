@@ -1029,3 +1029,23 @@ Secrets/CI hygiene freeze pack **v0.1.24**:
 
 - `npm run pilot:freeze` checks secrets, local-a, ci:check, DEMO/DEPLOY/ops beats
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 32.0 delivered (17 Aug 2026)
+
+Audit care category:
+
+- `/admin/audit` filters **care** events: ops reminds, remind answers, care acks, customer receipts
+
+## Phase 33.0 delivered (17 Aug 2026)
+
+Adviser WealthAI ops-reminded cite:
+
+- Book next-steps AI highlights ops-reminded items and `/adviser?care=ops_reminded`
+- Intent matches “ops reminded” / “ops nudged”
+
+## Phase 34.0 delivered (17 Aug 2026)
+
+Ops handoff stale remind cues:
+
+- Recent ops reminds show Awaiting answer / 24h+ badges; summary calls out stale reminds
+- Queues stay open

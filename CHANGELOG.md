@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Phase 32–34
+
+- **34.0** Care handoff stale remind cues (Awaiting answer / 24h+)
+- **33.0** Adviser WealthAI cites ops-reminded book steps + “ops reminded” intent
+- **32.0** Audit **care** category for OPS_CARE_REMIND / OPS_REMIND_ANSWERED / ADVISER_CARE_ACK / CUSTOMER_CARE_RECEIPT
+
 ## 0.1.24 — 17 Aug 2026 (Secrets/CI hygiene pack)
 
 Secrets and CI hygiene on top of the 0.1.23 launch readiness pack.

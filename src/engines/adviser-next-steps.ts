@@ -212,16 +212,22 @@ export function formatAdviserNextStepsAiContent(
   const lines = pulse.items.map(
     (s, i) => `${i + 1}. ${s.title} — ${s.detail} Path: ${s.href}`,
   );
+  const reminded = pulse.items.filter((s) => s.kind === "ops_reminded");
+  const remindedNote =
+    reminded.length > 0
+      ? `Ops reminded ${reminded.length} unacked customer(s) — open /adviser?care=ops_reminded, acknowledge care, and leave admin queues open.`
+      : null;
   return [
     "Here is what to do next for your book from the live Care radar pulse (complaints and privacy first):",
     ...lines,
+    ...(remindedNote ? [remindedNote] : []),
     "Ops queues stay authoritative for complaints and privacy; care acks and receipts never close admin queues.",
   ].join("\n");
 }
 
 export function wantsAdviserBookNextSteps(message: string): boolean {
   const m = message.toLowerCase();
-  return /what should i do|next (step|best)|priority|care radar|my book|book next|needs (my|your) attention/.test(
+  return /what should i do|next (step|best)|priority|care radar|my book|book next|needs (my|your) attention|ops remind|ops nudged|ops_reminded/.test(
     m,
   );
 }
