@@ -952,3 +952,10 @@ Ops remind-answer close-loop:
 
 - Care ack after `OPS_CARE_REMIND` records `OPS_REMIND_ANSWERED` + admin notify
 - Care handoff shows **Recent remind answers**; queues stay open
+
+## Phase 29.1 delivered (17 Aug 2026)
+
+Ops remind-answer smoke:
+
+- Local/hosted: seed unacked Chioma case → care-remind → care-ack `answeredOpsRemind`
+- Asserts `recentRemindAnswers` trail + admin **Remind answered** notification

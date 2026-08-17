@@ -393,6 +393,32 @@ try {
       if (!ok) failures.push(`${path} status ${res.status}`);
     }
 
+    // Chioma has no seeded care_ack — open a support case so ops remind + answer close-loop is deterministic after db:setup
+    const chiomaLogin = await signIn("chioma@demo.wealthos.ng", "WealthOSdemo1!");
+    if (chiomaLogin.res.ok) {
+      const escRes = await fetch(`${base}/api/escalations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(chiomaLogin.cookie ? { cookie: chiomaLogin.cookie } : {}),
+        },
+        body: JSON.stringify({
+          reason: "Smoke: open support for ops remind-answer close-loop",
+          level: "L2_SUPPORT",
+          category: "support",
+        }),
+      });
+      const escOk = escRes.status === 200 || escRes.status === 201;
+      console.log(
+        `  [${escOk ? "OK" : "FAIL"}] POST /api/escalations (chioma unacked seed) → ${escRes.status}`,
+      );
+      if (!escOk) {
+        failures.push(`chioma escalation seed for care-remind failed: ${escRes.status}`);
+      }
+    } else {
+      console.log(`  [SKIP] chioma sign-in for care-remind seed → ${chiomaLogin.res.status}`);
+    }
+
     const opsNextRes = await authedGet("/api/admin/next-steps", adminLogin.cookie);
     const opsNextOk = opsNextRes.status === 200;
     console.log(`  [${opsNextOk ? "OK" : "FAIL"}] GET /api/admin/next-steps → ${opsNextRes.status}`);
@@ -538,7 +564,7 @@ try {
         const remindedCustomerId =
           Array.isArray(careRemindData.results) &&
           careRemindData.results.find(
-            (r) => r && r.created === true && typeof r.customerId === "string",
+            (r) => r && typeof r.customerId === "string" && r.customerId.length > 0,
           )?.customerId;
         if (remindedCustomerId) {
           const deskRes = await authedGet(
@@ -584,6 +610,34 @@ try {
             `adviser next-steps after care-remind status ${nextAfterRemind.status}`,
           );
         }
+
+        if (remindedCustomerId) {
+          const ackRes = await fetch(`${base}/api/adviser/care-ack`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(adviserRecheck.cookie ? { cookie: adviserRecheck.cookie } : {}),
+            },
+            body: JSON.stringify({
+              customerId: remindedCustomerId,
+              kind: "support",
+              message: "Smoke care ack answering ops remind — queues stay open.",
+            }),
+          });
+          const ackData = await ackRes.json().catch(() => ({}));
+          const ackOk =
+            ackRes.status === 200 &&
+            ackData.answeredOpsRemind === true &&
+            typeof ackData.noteId === "string";
+          console.log(
+            `  [${ackOk ? "OK" : "FAIL"}] POST /api/adviser/care-ack answeredOpsRemind=${ackData.answeredOpsRemind ?? "n/a"} → ${ackRes.status}`,
+          );
+          if (!ackOk) {
+            failures.push(
+              `adviser care-ack after ops remind failed: status=${ackRes.status} answeredOpsRemind=${ackData.answeredOpsRemind ?? "n/a"} ${String(ackData.error ?? "").slice(0, 120)}`,
+            );
+          }
+        }
       } else {
         failures.push(`adviser re-sign-in after care-remind failed: ${adviserRecheck.res.status}`);
       }
@@ -601,6 +655,43 @@ try {
       );
       if (!trailOk) {
         failures.push("ops care remind trail missing recentReminds after care-remind");
+      }
+
+      const answers = opsDaily?.careHandoff?.recentRemindAnswers;
+      const answersOk =
+        opsDailyRes.status === 200 &&
+        Array.isArray(answers) &&
+        answers.length > 0 &&
+        typeof answers[0]?.customerName === "string" &&
+        typeof answers[0]?.adviserName === "string";
+      console.log(
+        `  [${answersOk ? "OK" : "FAIL"}] ops remind-answer trail recentRemindAnswers=${Array.isArray(answers) ? answers.length : "n/a"} → ${opsDailyRes.status}`,
+      );
+      if (!answersOk) {
+        failures.push("ops remind-answer trail missing recentRemindAnswers after care-ack");
+      }
+
+      const adminNotesRes = await authedGet("/api/notifications", adminLogin.cookie);
+      const adminNotes =
+        adminNotesRes.status === 200 ? await adminNotesRes.json().catch(() => []) : [];
+      const answerNote = Array.isArray(adminNotes)
+        ? adminNotes.find(
+            (n) =>
+              n &&
+              typeof n.title === "string" &&
+              /Remind answered:/i.test(n.title),
+          )
+        : null;
+      const answerNotifyOk =
+        Boolean(answerNote) &&
+        typeof answerNote.body === "string" &&
+        /Queues stay open/i.test(answerNote.body) &&
+        /Path:\s*\/admin\/ops/i.test(answerNote.body);
+      console.log(
+        `  [${answerNotifyOk ? "OK" : "FAIL"}] admin Remind answered notification → ${adminNotesRes.status}`,
+      );
+      if (!answerNotifyOk) {
+        failures.push("admin Remind answered notification missing after care-ack");
       }
     }
 

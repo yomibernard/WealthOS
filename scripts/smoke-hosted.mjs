@@ -222,6 +222,32 @@ try {
           }
         }
         if (label === "admin") {
+          const chiomaEmail = process.env.SMOKE_CHIOMA_EMAIL || "chioma@demo.wealthos.ng";
+          const chiomaLogin = await fetch(`${base}/api/auth/sign-in`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: chiomaEmail, password }),
+          });
+          if (chiomaLogin.ok) {
+            const setCookie = chiomaLogin.headers.getSetCookie?.() ?? [];
+            const chiomaCookie = setCookie.map((c) => c.split(";")[0]).join("; ");
+            const escRes = await fetch(`${base}/api/escalations`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...(chiomaCookie ? { cookie: chiomaCookie } : {}),
+              },
+              body: JSON.stringify({
+                reason: "Hosted smoke: unacked support for remind-answer close-loop",
+                level: "L2_SUPPORT",
+                category: "support",
+              }),
+            });
+            console.log(
+              `  [${escRes.status === 200 || escRes.status === 201 ? "OK" : "WARN"}] hosted POST /api/escalations (chioma) → ${escRes.status}`,
+            );
+          }
+
           const careRemindRes = await fetch(`${base}/api/admin/care-remind`, {
             method: "POST",
             headers: {
@@ -330,6 +356,55 @@ try {
               );
               if (nextRes.status !== 200 || !opsStepOk) {
                 failures.push("hosted adviser next-steps missing ops_reminded kind after care-remind");
+              }
+
+              const remindedCustomerId =
+                Array.isArray(careRemindData.results) &&
+                careRemindData.results.find(
+                  (r) => r && typeof r.customerId === "string" && r.customerId.length > 0,
+                )?.customerId;
+              if (remindedCustomerId) {
+                const ackRes = await fetch(`${base}/api/adviser/care-ack`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    ...(adviserCookie ? { cookie: adviserCookie } : {}),
+                  },
+                  body: JSON.stringify({
+                    customerId: remindedCustomerId,
+                    kind: "support",
+                    message: "Hosted smoke care ack answering ops remind.",
+                  }),
+                });
+                const ackData = await ackRes.json().catch(() => ({}));
+                const ackOk = ackRes.status === 200 && ackData.answeredOpsRemind === true;
+                console.log(
+                  `  [${ackOk ? "OK" : "FAIL"}] hosted adviser care-ack answeredOpsRemind → ${ackRes.status}`,
+                );
+                if (!ackOk) {
+                  failures.push(
+                    `hosted adviser care-ack after ops remind failed: ${ackRes.status}`,
+                  );
+                } else {
+                  const opsDailyAfter = await fetch(`${base}/api/admin/ops-daily`, {
+                    headers: roleCookie ? { cookie: roleCookie } : {},
+                  });
+                  const boardAfter =
+                    opsDailyAfter.status === 200
+                      ? await opsDailyAfter.json().catch(() => ({}))
+                      : {};
+                  const answers = boardAfter?.careHandoff?.recentRemindAnswers;
+                  const answersOk =
+                    opsDailyAfter.status === 200 &&
+                    Array.isArray(answers) &&
+                    answers.length > 0;
+                  console.log(
+                    `  [${answersOk ? "OK" : "FAIL"}] hosted ops remind-answer trail → ${opsDailyAfter.status}`,
+                  );
+                  if (!answersOk) {
+                    failures.push("hosted ops remind-answer trail missing recentRemindAnswers");
+                  }
+                }
               }
             } else if (strict) {
               failures.push(`hosted adviser re-sign-in after care-remind failed: ${adviserAfter.status}`);

@@ -6,6 +6,7 @@ Adviser ops-remind cues on top of the 0.1.20 ops queue care remind pack.
 
 ### Phase 29.x — Ops remind-answer close-loop (in progress)
 
+- **29.1** Smoke: Chioma unacked seed → remind → care-ack → remind-answer trail + admin notify
 - **29.0** Care ack after ops remind → **Recent remind answers** on Care handoff + admin notify; queues stay open
 
 ### Phase 28.x — Adviser ops-remind cues

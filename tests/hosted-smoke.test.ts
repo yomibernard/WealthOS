@@ -96,6 +96,13 @@ describe("hosted smoke rules", () => {
     expect(local).toContain("ops care remind trail");
     expect(local).toContain("recentReminds");
     expect(hosted).toContain("hosted ops care remind trail");
+    expect(local).toContain("ops remind-answer trail");
+    expect(local).toContain("recentRemindAnswers");
+    expect(local).toContain("admin Remind answered notification missing after care-ack");
+    expect(local).toContain("/api/adviser/care-ack");
+    expect(local).toContain("answeredOpsRemind");
+    expect(hosted).toContain("hosted ops remind-answer trail");
+    expect(hosted).toContain("hosted adviser care-ack");
     expect(local).toContain("PATCH");
     expect(local).toContain("/api/notifications");
     expect(local).toContain("mark-all-read");
