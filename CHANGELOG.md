@@ -1,13 +1,18 @@
 # Changelog
 
+## 0.1.22 — 17 Aug 2026 (Ops remind-answer close-loop pack)
+
+Ops remind-answer close-loop on top of the 0.1.21 adviser ops-remind cues pack.
+
+### Phase 29.x — Ops remind-answer close-loop
+
+- **29.2** Freeze pack `v0.1.22`; `pilot:freeze` covers 29.x remind-answer trail + smoke
+- **29.1** Smoke: Chioma unacked seed → remind → care-ack → remind-answer trail + admin notify
+- **29.0** Care ack after ops remind → **Recent remind answers** on Care handoff + admin notify; queues stay open
+
 ## 0.1.21 — 15 Aug 2026 (Adviser ops-remind cues pack)
 
 Adviser ops-remind cues on top of the 0.1.20 ops queue care remind pack.
-
-### Phase 29.x — Ops remind-answer close-loop (in progress)
-
-- **29.1** Smoke: Chioma unacked seed → remind → care-ack → remind-answer trail + admin notify
-- **29.0** Care ack after ops remind → **Recent remind answers** on Care handoff + admin notify; queues stay open
 
 ### Phase 28.x — Adviser ops-remind cues
 

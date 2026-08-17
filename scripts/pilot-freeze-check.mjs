@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.21 (… + ops queue care remind 27.x + adviser ops-remind cues 28.x).
+ * Current pack: v0.1.22 (… + adviser ops-remind cues 28.x + ops remind-answer close-loop 29.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.21";
+const EXPECTED = "0.1.22";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -931,6 +931,51 @@ if (
   !demo.includes("care=ops_reminded")
 ) {
   failures.push("DEMO_SCRIPT.md missing adviser Ops reminded beat");
+}
+
+// 29.x Ops remind-answer close-loop
+if (
+  !opsCareRemindEngine.includes("wasAckAnsweringOpsRemind") ||
+  !opsCareRemindEngine.includes("buildOpsRemindAnsweredNotify")
+) {
+  failures.push("ops-care-remind missing remind-answer helpers");
+}
+if (
+  !careService.includes("answeredOpsRemind") ||
+  !careService.includes("OPS_REMIND_ANSWERED") ||
+  !careService.includes("buildOpsRemindAnsweredNotify")
+) {
+  failures.push("adviser care-ack missing ops remind-answer close-loop");
+}
+if (
+  !opsDaily.includes("recentRemindAnswers") ||
+  !opsDaily.includes("OpsCareHandoffRemindAnswer") ||
+  !adminOps.includes("recentRemindAnswers") ||
+  !adminOps.includes("Recent remind answers")
+) {
+  failures.push("ops daily / Care handoff missing recent remind answers trail");
+}
+if (
+  !smokeLocal.includes("ops remind-answer trail") ||
+  !smokeLocal.includes("recentRemindAnswers") ||
+  !smokeLocal.includes("admin Remind answered notification missing after care-ack") ||
+  !smokeLocal.includes("/api/adviser/care-ack") ||
+  !smokeLocal.includes("answeredOpsRemind")
+) {
+  failures.push("smoke-journeys missing ops remind-answer close-loop coverage");
+}
+if (
+  !smokeHosted.includes("hosted ops remind-answer trail") ||
+  !smokeHosted.includes("hosted adviser care-ack") ||
+  !smokeHosted.includes("recentRemindAnswers")
+) {
+  failures.push("smoke-hosted missing ops remind-answer close-loop coverage");
+}
+if (
+  !demo.includes("Recent remind answers") ||
+  !demo.includes("Remind answered")
+) {
+  failures.push("DEMO_SCRIPT.md missing ops remind-answer close-loop beat");
 }
 
 if (failures.length) {

@@ -3,12 +3,12 @@ import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 
 describe("pilot freeze check", () => {
-  it("passes for the 0.1.21 Adviser ops-remind cues pack", () => {
+  it("passes for the 0.1.22 Ops remind-answer close-loop pack", () => {
     const res = spawnSync("node", [join("scripts", "pilot-freeze-check.mjs")], {
       cwd: process.cwd(),
       encoding: "utf8",
     });
     expect(res.status).toBe(0);
-    expect(res.stdout).toMatch(/0\.1\.21/);
+    expect(res.stdout).toMatch(/0\.1\.22/);
   });
 });

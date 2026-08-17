@@ -959,3 +959,10 @@ Ops remind-answer smoke:
 
 - Local/hosted: seed unacked Chioma case → care-remind → care-ack `answeredOpsRemind`
 - Asserts `recentRemindAnswers` trail + admin **Remind answered** notification
+
+## Phase 29.2 delivered (17 Aug 2026)
+
+Ops remind-answer close-loop freeze pack **v0.1.22**:
+
+- `npm run pilot:freeze` checks remind-answer helpers, Care handoff trail, smoke, DEMO
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

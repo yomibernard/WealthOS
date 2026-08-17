@@ -18,7 +18,7 @@ Use this before any public or regulated pilot. Tick in order; freeze code when s
 - [ ] `DEMO_MODE` is not `true` in production
 - [ ] Partner execution remains non-moving funds unless contracted rail is live
 - [ ] Feature flags documented for launch; shared pilot matches **safe pilot** on `/admin/flags`
-- [ ] `npm run pilot:freeze` green (0.1.21 Adviser ops-remind cues pack)
+- [ ] `npm run pilot:freeze` green (0.1.22 Ops remind-answer close-loop pack)
 
 ## B. Product / compliance freeze
 
@@ -50,4 +50,4 @@ Use this before any public or regulated pilot. Tick in order; freeze code when s
 
 **Launch decision:** Go / No-go / Go with flags off: _______________
 
-**Freeze tag / commit:** `v0.1.21` (adviser ops-remind cues; ops queue care remind `v0.1.20`; ops care remind `v0.1.19`; admin WealthAI ops `v0.1.18`; admin/ops next-steps `v0.1.17`; adviser WealthAI book `v0.1.16`; book next-steps `v0.1.15`; Home next-steps `v0.1.14`; inbox triage `v0.1.13`; customer notify triage `v0.1.12`; adviser triage `v0.1.11`; notifications `v0.1.10`; close-loop `v0.1.9`; care receipts `v0.1.8`; WealthAI care `v0.1.7`; customer care `v0.1.6`; ops care `v0.1.5`; care UX `v0.1.4`; care `v0.1.3`; trust `v0.1.2`; ops `v0.1.1`; MVP `v0.1.0`)
+**Freeze tag / commit:** `v0.1.22` (ops remind-answer close-loop; adviser ops-remind cues `v0.1.21`; ops queue care remind `v0.1.20`; ops care remind `v0.1.19`; admin WealthAI ops `v0.1.18`; admin/ops next-steps `v0.1.17`; adviser WealthAI book `v0.1.16`; book next-steps `v0.1.15`; Home next-steps `v0.1.14`; inbox triage `v0.1.13`; customer notify triage `v0.1.12`; adviser triage `v0.1.11`; notifications `v0.1.10`; close-loop `v0.1.9`; care receipts `v0.1.8`; WealthAI care `v0.1.7`; customer care `v0.1.6`; ops care `v0.1.5`; care UX `v0.1.4`; care `v0.1.3`; trust `v0.1.2`; ops `v0.1.1`; MVP `v0.1.0`)

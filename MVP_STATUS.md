@@ -1,8 +1,8 @@
 # WealthOS MVP status freeze
 
-**Version:** 0.1.21  
-**Date:** 15 August 2026  
-**Verdict:** Feature-complete for local/pilot demo through adviser ops-remind cues (ops + trust + adviser care + care UX + ops care handoff + customer care updates + WealthAI care_update + mark-as-seen + receipt close-loop + adviser notifications + adviser triage + customer triage + inbox triage + Home next-steps + adviser book next-steps + adviser WealthAI book + admin/ops next-steps + admin WealthAI ops + ops care remind + queue remind + adviser ops-remind cues). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
+**Version:** 0.1.22  
+**Date:** 17 August 2026  
+**Verdict:** Feature-complete for local/pilot demo through ops remind-answer close-loop (ops + trust + adviser care + care UX + ops care handoff + customer care updates + WealthAI care_update + mark-as-seen + receipt close-loop + adviser notifications + adviser triage + customer triage + inbox triage + Home next-steps + adviser book next-steps + adviser WealthAI book + admin/ops next-steps + admin WealthAI ops + ops care remind + queue remind + adviser ops-remind cues + remind-answer close-loop). Not public-launch ready until prod secrets, legal sign-off, and hosted Postgres cutover.
 
 ## Promise
 
@@ -100,6 +100,7 @@
 - [x] Ops care remind pack `v0.1.19` (`npm run pilot:freeze`)
 - [x] Ops queue care remind pack `v0.1.20` (`npm run pilot:freeze`)
 - [x] Adviser ops-remind cues pack `v0.1.21` (`npm run pilot:freeze`)
+- [x] Ops remind-answer close-loop pack `v0.1.22` (`npm run pilot:freeze`)
 - [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets + Postgres URL)
 - [ ] Hosted deploy smoke (`SMOKE_BASE_URL=… npm run smoke:hosted` — see [DEPLOY.md](./DEPLOY.md))
 - [ ] Human sign-off on `LAUNCH_REVIEW.md`
