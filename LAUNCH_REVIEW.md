@@ -2,12 +2,15 @@
 
 Use this before any public or regulated pilot. Tick in order; freeze code when section A passes.
 
+Engineering evidence for many section B product rules is also covered by `npm run launch:review` (wired into `npm run release:check`). That gate does **not** replace legal counsel or ops staffing sign-off.
+
 ## A. Freeze gate (engineering)
 
 - [ ] `npm run test` green
 - [ ] `npm run build` green
 - [ ] `npm run perf:check` green
 - [ ] `npm run launch:check` green (prod profile)
+- [x] `npm run launch:rehearse-prod` green (fixture fail-closed + pass; still run prod `launch:check` on host env)
 - [ ] `npm run db:postgres-ready` green; `prisma/migrations-postgres` reviewed
 - [x] Local Postgres rehearsal done once (`db:rehearse-postgres` / migrate deploy) or waived with owner sign-off
 - [ ] No secrets in git (`.env` local only; use `.env.example`)
@@ -22,15 +25,17 @@ Use this before any public or regulated pilot. Tick in order; freeze code when s
 
 ## B. Product / compliance freeze
 
-- [ ] Suitability before return still enforced in code paths
-- [ ] WealthGuard never auto-labels scam/fraud/safe/guaranteed
-- [ ] NBFA can recommend do-nothing
-- [ ] Consent revoke blocks personalised AI
-- [ ] Material actions require step-up (demo code retired or replaced)
-- [ ] Crypto / lending pages show deferral (no trading / no loan offers)
-- [ ] Tax / estate pages show “not advice / not filing / not legal drafting”
+Code-evidence items below are checked by `npm run launch:review`. Legal counsel and staffing remain human.
+
+- [x] Suitability before return still enforced in code paths (`launch:review`)
+- [x] WealthGuard never auto-labels scam/fraud/safe/guaranteed (`launch:review`)
+- [x] NBFA can recommend do-nothing (`launch:review`)
+- [x] Consent revoke blocks personalised AI (`launch:review`)
+- [x] Material actions require step-up (demo code retired or replaced) (`launch:review`)
+- [x] Crypto / lending pages show deferral (no trading / no loan offers) (`launch:review`)
+- [x] Tax / estate pages show “not advice / not filing / not legal drafting” (`launch:review`)
 - [ ] Legal counsel sign-off on disclaimers and data processing notice
-- [ ] Complaints / escalation path staffed (L2–L5); ops can resolve in `/admin/escalations`
+- [ ] Complaints / escalation path staffed (L2–L5); ops can resolve in `/admin/escalations` (resolve path exists in code via `launch:review`; staffing is human)
 
 ## C. Demo readiness (if pilot includes live walkthrough)
 

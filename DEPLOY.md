@@ -79,6 +79,7 @@ npm run build && npm run start
 - Dev gate: `npm run launch:check`
 - Prod gate: `LAUNCH_PROFILE=production npm run launch:check` (must pass before public pilot)
 - Prod rehearsal (fixture envs, no real secrets): `npm run launch:rehearse-prod` — proves fail-closed + pass fixture; still run the prod gate against the real host env
+- Engineering LAUNCH_REVIEW evidence: `npm run launch:review` (wired into `release:check`)
 - Umbrella: `npm run release:check`
 
 ### Post-deploy hosted smoke

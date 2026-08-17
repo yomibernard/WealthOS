@@ -973,3 +973,10 @@ Prod launch-gate rehearsal:
 
 - Shared `scripts/lib/launch-evaluate.mjs` for CLI parity with `src/lib/launch-gate.ts`
 - `npm run launch:rehearse-prod` proves fail-closed + hardened Postgres fixture without reading real secrets
+
+## Phase 30.2 delivered (17 Aug 2026)
+
+Engineering LAUNCH_REVIEW evidence gate:
+
+- `npm run launch:review` asserts suitability, WealthGuard, NBFA do-nothing, consent, step-up, deferrals, escalations resolve path
+- Wired into `npm run release:check`; legal counsel / staffing remain human
