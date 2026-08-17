@@ -66,3 +66,32 @@ export function buildOpsRemindCareDeskBanner(input: {
   const who = input.adminName?.trim() ? ` (${input.adminName.trim()})` : "";
   return `${cue}${who} — still needs a care acknowledgment. Ops queues stay open until formally resolved.`;
 }
+
+/** True when a care ack lands at/after the latest ops remind for that customer. */
+export function wasAckAnsweringOpsRemind(input: {
+  ackAt: string | Date;
+  lastOpsRemindAt: string | Date | null | undefined;
+}): boolean {
+  if (!input.lastOpsRemindAt) return false;
+  const ack = new Date(input.ackAt).getTime();
+  const remind = new Date(input.lastOpsRemindAt).getTime();
+  if (Number.isNaN(ack) || Number.isNaN(remind)) return false;
+  return ack >= remind;
+}
+
+export function buildOpsRemindAnsweredNotify(input: {
+  customerId: string;
+  customerName: string;
+  adviserName: string;
+}): { title: string; body: string; href: string } {
+  const href = "/admin/ops";
+  return {
+    title: `Remind answered: ${input.customerName} care ack received`,
+    body: [
+      `${input.adviserName} acknowledged open care for ${input.customerName} after your ops remind.`,
+      "Ops queues stay open until formally resolved.",
+      `Path: ${href}`,
+    ].join(" "),
+    href,
+  };
+}

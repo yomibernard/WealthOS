@@ -945,3 +945,10 @@ Adviser ops-remind cues freeze pack **v0.1.21**:
 
 - `npm run pilot:freeze` checks Ops reminded radar/desk/next-steps, smoke, DEMO
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 29.0 delivered (15 Aug 2026)
+
+Ops remind-answer close-loop:
+
+- Care ack after `OPS_CARE_REMIND` records `OPS_REMIND_ANSWERED` + admin notify
+- Care handoff shows **Recent remind answers**; queues stay open

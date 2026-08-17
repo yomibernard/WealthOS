@@ -4,6 +4,10 @@
 
 Adviser ops-remind cues on top of the 0.1.20 ops queue care remind pack.
 
+### Phase 29.x — Ops remind-answer close-loop (in progress)
+
+- **29.0** Care ack after ops remind → **Recent remind answers** on Care handoff + admin notify; queues stay open
+
 ### Phase 28.x — Adviser ops-remind cues
 
 - **28.2** Freeze pack `v0.1.21`; `pilot:freeze` covers 28.x Ops reminded radar/desk/next-steps surface

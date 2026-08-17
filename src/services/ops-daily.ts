@@ -19,6 +19,7 @@ export async function loadOpsDailyBoard() {
     recentCareAcks,
     recentCareReceipts,
     recentCareReminds,
+    recentRemindAnswers,
     awaitingReceiptCount,
   ] = await Promise.all([
     prisma.escalation.count({
@@ -80,6 +81,11 @@ export async function loadOpsDailyBoard() {
     prisma.auditEvent.findMany({
       where: { eventType: "OPS_CARE_REMIND" },
       include: { user: { select: { name: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
+    prisma.auditEvent.findMany({
+      where: { eventType: "OPS_REMIND_ANSWERED" },
       orderBy: { createdAt: "desc" },
       take: 5,
     }),
@@ -180,6 +186,23 @@ export async function loadOpsDailyBoard() {
         adminName: payload.adminName ?? e.user?.name ?? "Ops",
         createdAt: e.createdAt.toISOString(),
         notificationCreated: Boolean(payload.notificationCreated),
+      };
+    }),
+    recentRemindAnswers: recentRemindAnswers.map((e) => {
+      let payload: {
+        customerName?: string;
+        adviserName?: string;
+      } = {};
+      try {
+        payload = JSON.parse(e.payloadJson) as typeof payload;
+      } catch {
+        payload = {};
+      }
+      return {
+        id: e.id,
+        customerName: payload.customerName ?? "Customer",
+        adviserName: payload.adviserName ?? "Adviser",
+        answeredAt: e.createdAt.toISOString(),
       };
     }),
   });

@@ -12,6 +12,10 @@ import {
   isCareAckSeen,
   type CareAckKind,
 } from "@/engines/adviser-care-ack";
+import {
+  buildOpsRemindAnsweredNotify,
+  wasAckAnsweringOpsRemind,
+} from "@/engines/ops-care-remind";
 
 export async function sendCareAcknowledgment(input: {
   adviserId: string;
@@ -67,6 +71,16 @@ export async function sendCareAcknowledgment(input: {
     },
   ]);
 
+  const lastRemind = await prisma.auditEvent.findFirst({
+    where: { eventType: "OPS_CARE_REMIND", entityId: input.customerId },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, userId: true, createdAt: true },
+  });
+  const answeredOpsRemind = wasAckAnsweringOpsRemind({
+    ackAt: note.createdAt,
+    lastOpsRemindAt: lastRemind?.createdAt ?? null,
+  });
+
   await prisma.auditEvent.create({
     data: {
       userId: input.adviserId,
@@ -77,11 +91,55 @@ export async function sendCareAcknowledgment(input: {
         customerId: input.customerId,
         kind: input.kind,
         itemId: input.itemId ?? null,
+        answeredOpsRemind,
+        remindEventId: answeredOpsRemind ? (lastRemind?.id ?? null) : null,
+        queuesUnchanged: true,
       }),
     },
   });
 
-  return { noteId: note.id, title: draft.title, href: draft.href };
+  if (answeredOpsRemind && lastRemind) {
+    await prisma.auditEvent.create({
+      data: {
+        userId: input.adviserId,
+        eventType: "OPS_REMIND_ANSWERED",
+        entityType: "User",
+        entityId: input.customerId,
+        payloadJson: JSON.stringify({
+          customerId: input.customerId,
+          customerName: customer.name,
+          adviserId: input.adviserId,
+          adviserName: input.adviserName,
+          noteId: note.id,
+          remindEventId: lastRemind.id,
+          remindAdminId: lastRemind.userId,
+          queuesUnchanged: true,
+        }),
+      },
+    });
+
+    if (lastRemind.userId) {
+      const notify = buildOpsRemindAnsweredNotify({
+        customerId: input.customerId,
+        customerName: customer.name,
+        adviserName: input.adviserName,
+      });
+      await createUserNotification({
+        userId: lastRemind.userId,
+        category: "important",
+        title: notify.title,
+        body: notify.body,
+        force: true,
+      });
+    }
+  }
+
+  return {
+    noteId: note.id,
+    title: draft.title,
+    href: draft.href,
+    answeredOpsRemind,
+  };
 }
 
 export async function loadCareAckHistory(customerId: string, limit = 5) {

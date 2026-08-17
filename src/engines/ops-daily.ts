@@ -48,16 +48,25 @@ export type OpsCareHandoffRemind = {
   notificationCreated: boolean;
 };
 
+export type OpsCareHandoffRemindAnswer = {
+  id: string;
+  customerName: string;
+  adviserName: string;
+  answeredAt: string;
+};
+
 export type OpsCareHandoff = {
   unackedCareCustomers: number;
   awaitingReceiptCount: number;
   recentAckCount: number;
   recentReceiptCount: number;
   recentRemindCount: number;
+  recentRemindAnswerCount: number;
   summary: string;
   recentAcks: OpsCareHandoffAck[];
   recentReceipts: OpsCareHandoffReceipt[];
   recentReminds: OpsCareHandoffRemind[];
+  recentRemindAnswers: OpsCareHandoffRemindAnswer[];
 };
 
 export type OpsQueueItem = {
@@ -183,10 +192,12 @@ export function buildOpsCareHandoff(input: {
   recentAcks: OpsCareHandoffAck[];
   recentReceipts?: OpsCareHandoffReceipt[];
   recentReminds?: OpsCareHandoffRemind[];
+  recentRemindAnswers?: OpsCareHandoffRemindAnswer[];
 }): OpsCareHandoff {
   const recentAcks = input.recentAcks.slice(0, 5);
   const recentReceipts = (input.recentReceipts ?? []).slice(0, 5);
   const recentReminds = (input.recentReminds ?? []).slice(0, 5);
+  const recentRemindAnswers = (input.recentRemindAnswers ?? []).slice(0, 5);
   const awaitingReceiptCount = input.awaitingReceiptCount ?? 0;
   let summary: string;
   if (
@@ -194,7 +205,8 @@ export function buildOpsCareHandoff(input: {
     awaitingReceiptCount === 0 &&
     recentAcks.length === 0 &&
     recentReceipts.length === 0 &&
-    recentReminds.length === 0
+    recentReminds.length === 0 &&
+    recentRemindAnswers.length === 0
   ) {
     summary = "No open care handoff gaps and no recent adviser acknowledgments.";
   } else if (input.unackedCareCustomers > 0) {
@@ -204,6 +216,8 @@ export function buildOpsCareHandoff(input: {
     }
   } else if (awaitingReceiptCount > 0) {
     summary = `${awaitingReceiptCount} care acknowledgment(s) awaiting a customer receipt (seen).`;
+  } else if (recentRemindAnswers.length > 0) {
+    summary = `Care handoff clear — ${recentRemindAnswers.length} recent remind answer(s).`;
   } else if (recentReceipts.length > 0) {
     summary = `Care handoff clear — ${recentReceipts.length} recent customer receipt(s).`;
   } else {
@@ -215,9 +229,11 @@ export function buildOpsCareHandoff(input: {
     recentAckCount: recentAcks.length,
     recentReceiptCount: recentReceipts.length,
     recentRemindCount: recentReminds.length,
+    recentRemindAnswerCount: recentRemindAnswers.length,
     summary,
     recentAcks,
     recentReceipts,
     recentReminds,
+    recentRemindAnswers,
   };
 }

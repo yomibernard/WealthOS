@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   buildOpsCareRemindDraft,
+  buildOpsRemindAnsweredNotify,
   isOpsCareRemindTitle,
   shouldOfferOpsCareRemind,
+  wasAckAnsweringOpsRemind,
 } from "@/engines/ops-care-remind";
 import { classifyAdviserNotificationKind } from "@/engines/adviser-notifications";
 
@@ -43,5 +45,35 @@ describe("ops care remind", () => {
       shouldOfferOpsCareRemind({ status: "resolved", hasCareAck: false }),
     ).toBe(false);
     expect(shouldOfferOpsCareRemind({ status: "open" })).toBe(false);
+  });
+
+  it("detects care ack answering an ops remind and drafts admin notify", () => {
+    expect(
+      wasAckAnsweringOpsRemind({
+        ackAt: "2026-08-15T12:00:00.000Z",
+        lastOpsRemindAt: "2026-08-15T10:00:00.000Z",
+      }),
+    ).toBe(true);
+    expect(
+      wasAckAnsweringOpsRemind({
+        ackAt: "2026-08-15T09:00:00.000Z",
+        lastOpsRemindAt: "2026-08-15T10:00:00.000Z",
+      }),
+    ).toBe(false);
+    expect(
+      wasAckAnsweringOpsRemind({
+        ackAt: "2026-08-15T12:00:00.000Z",
+        lastOpsRemindAt: null,
+      }),
+    ).toBe(false);
+
+    const notify = buildOpsRemindAnsweredNotify({
+      customerId: "yomi",
+      customerName: "Yomi",
+      adviserName: "Ada",
+    });
+    expect(notify.title).toMatch(/Remind answered/i);
+    expect(notify.body).toMatch(/Queues stay open/i);
+    expect(notify.href).toBe("/admin/ops");
   });
 });
