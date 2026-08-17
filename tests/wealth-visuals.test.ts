@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildDonutPaths,
   buildWealthMapSegments,
   convertNgnAmount,
   filterSnapshotsByPeriod,
   healthBand,
+  healthShortLabel,
   scoreToArcPath,
 } from "@/engines/wealth-visuals";
 
@@ -45,5 +47,22 @@ describe("wealth visuals", () => {
     expect(healthBand(82).title).toMatch(/Strong/i);
     expect(healthBand(67).title).toMatch(/attention/i);
     expect(scoreToArcPath(50, 100, 100, 80)).toContain("A");
+  });
+
+  it("builds donut paths from grounded slice values", () => {
+    const paths = buildDonutPaths(
+      [
+        { id: "cash", label: "Cash", value: 20, color: "#0f6e56" },
+        { id: "property", label: "Property", value: 80, color: "#245b7a" },
+      ],
+      80,
+      80,
+      60,
+      36,
+    );
+    expect(paths).toHaveLength(2);
+    expect(paths[0].percent).toBe(20);
+    expect(paths[1].d).toContain("A");
+    expect(healthShortLabel(81)).toBe("Strong");
   });
 });

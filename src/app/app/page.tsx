@@ -1,20 +1,19 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  ActionCard,
-  Badge,
-  EmptyState,
-  GoalCard,
-  InsightPanel,
-  SupportingPanel,
-} from "@/components/ui";
-import { NetWorthCurve } from "@/components/charts/NetWorthCurve";
-import { UserAvatar } from "@/components/profile/ProfileAvatar";
 import { BiometricPromptBanner } from "@/components/security/BiometricPromptBanner";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { DashboardNetWorthCard } from "@/components/dashboard/DashboardNetWorthCard";
+import { DashboardHealthCard } from "@/components/dashboard/DashboardHealthCard";
+import { DashboardAllocationCard } from "@/components/dashboard/DashboardAllocationCard";
+import { DashboardAttentionRow } from "@/components/dashboard/DashboardAttentionRow";
+import { DashboardAiInsightCard } from "@/components/dashboard/DashboardAiInsightCard";
+import { DashboardGoalsSection } from "@/components/dashboard/DashboardGoalsSection";
+import { DashboardAssetsSection } from "@/components/dashboard/DashboardAssetsSection";
 import { getSessionUser } from "@/lib/session";
 import {
   buildHomeDashboard,
   ensureRecommendations,
+  loadHomeAssetShowcase,
   loadWealthVisualContext,
 } from "@/services/wealth";
 import { prisma } from "@/lib/db";
@@ -25,8 +24,9 @@ import { loadPrivacyRequestsPulse } from "@/services/privacy";
 import { loadCareUpdatePulse } from "@/services/adviser-care-ack";
 import { loadCustomerNotificationPulse } from "@/services/notifications";
 import { loadNextStepsPulse } from "@/services/next-steps";
-import { formatNaira, greetingForHour } from "@/lib/format";
+import { formatNaira } from "@/lib/format";
 import { getFeatureFlags } from "@/lib/feature-flags";
+import { buildWealthMapSegments, healthShortLabel } from "@/engines/wealth-visuals";
 
 function buildGroundedInsight(input: {
   monthChange: number | null;
@@ -72,186 +72,127 @@ export default async function HomePage() {
 
   const flags = getFeatureFlags();
   const inbox = flags.wealthInbox ? await refreshInbox(user.id) : { unread: 0 };
-  const [profile, cases, privacyPulse, carePulse, notifyPulse, nextSteps, visuals, passkeyCount] =
-    await Promise.all([
-      syncProfileCompleteness(user.id),
-      loadCustomerCasesPulse(user.id),
-      loadPrivacyRequestsPulse(user.id),
-      loadCareUpdatePulse(user.id),
-      loadCustomerNotificationPulse(user.id),
-      loadNextStepsPulse(user.id),
-      loadWealthVisualContext(user.id),
-      prisma.webAuthnCredential.count({ where: { userId: user.id } }),
-    ]);
+  const [
+    profile,
+    cases,
+    privacyPulse,
+    carePulse,
+    notifyPulse,
+    nextSteps,
+    visuals,
+    passkeyCount,
+    showcaseAssets,
+  ] = await Promise.all([
+    syncProfileCompleteness(user.id),
+    loadCustomerCasesPulse(user.id),
+    loadPrivacyRequestsPulse(user.id),
+    loadCareUpdatePulse(user.id),
+    loadCustomerNotificationPulse(user.id),
+    loadNextStepsPulse(user.id),
+    loadWealthVisualContext(user.id),
+    prisma.webAuthnCredential.count({ where: { userId: user.id } }),
+    loadHomeAssetShowcase(user.id),
+  ]);
 
   const avatarSrc = user.avatarStorageKey
     ? `/api/media?key=${encodeURIComponent(user.avatarStorageKey)}`
     : null;
 
   const hour = new Date().getHours();
-  const change = dash.monthChange;
   const insight = buildGroundedInsight({
-    monthChange: change,
+    monthChange: dash.monthChange,
     propertyPercent: dash.propertyPercent,
     emergencyMonths: dash.emergencyMonths,
     healthOverall: dash.health.overall,
     confidence: dash.netWorth.confidence,
   });
 
+  const segments = buildWealthMapSegments(
+    dash.netWorth.assetBreakdown,
+    dash.netWorth.totalLiabilitiesNgn,
+  );
+
+  const attentionItems = nextSteps.items.slice(0, 3).map((item) => ({
+    id: item.id,
+    title: item.title,
+    detail: item.detail,
+    href: item.href,
+  }));
+
   const secondarySignals = [
-    profile && profile.score < 80
-      ? { href: "/app/profile", label: `Complete your profile · ${profile.score}%` }
-      : null,
-    cases.headline ? { href: cases.primaryHref, label: cases.headline } : null,
-    privacyPulse.headline ? { href: privacyPulse.primaryHref, label: privacyPulse.headline } : null,
     carePulse.headline ? { href: carePulse.primaryHref, label: carePulse.headline } : null,
     notifyPulse.headline ? { href: notifyPulse.primaryHref, label: notifyPulse.headline } : null,
-    flags.weeklyDigest ? { href: "/app/digest", label: "Weekly wealth digest" } : null,
-    flags.monthlyReports ? { href: "/app/reports", label: "Monthly wealth report" } : null,
+    cases.headline ? { href: cases.primaryHref, label: cases.headline } : null,
+    privacyPulse.headline ? { href: privacyPulse.primaryHref, label: privacyPulse.headline } : null,
   ].filter(Boolean) as { href: string; label: string }[];
 
+  const healthInsight = `Score ${dash.health.overall}/100 · ${healthShortLabel(dash.health.overall)}. ${
+    dash.emergencyMonths < 3
+      ? "Liquidity is the dimension to watch first."
+      : "Review dimensions before considering new products."
+  }`;
+
+  const impactLine =
+    dash.actions[0]?.amount != null
+      ? `Potential focus: ${dash.actions[0].title}`
+      : dash.monthChange != null
+        ? `Latest snapshot move: ${dash.monthChange >= 0 ? "+" : ""}${formatNaira(dash.monthChange, true)}`
+        : null;
+
+  const lastLogin = new Date().toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const inboxUnreadHref = "/app/inbox?status=unread";
+
   return (
-    <main>
-      <header className="animate-rise flex items-start justify-between gap-3 pt-2">
-        <div>
-          <p className="eyebrow">Home</p>
-          <h1 className="font-display mt-1 text-3xl tracking-tight">
-            {greetingForHour(hour, dash.name)}
-          </h1>
-          {flags.wealthInbox ? (
-            <Link
-              href={inbox.unread > 0 ? "/app/inbox?status=unread" : "/app/inbox"}
-              className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-accent"
-            >
-              Wealth Inbox
-              {inbox.unread > 0 ? <Badge tone="warn">{inbox.unread} unread</Badge> : null}
-            </Link>
-          ) : null}
-        </div>
-        <Link href="/app/profile" aria-label="Open profile">
-          <UserAvatar name={dash.name} src={avatarSrc} />
-        </Link>
-      </header>
+    <main className="dash-home">
+      <DashboardHeader
+        name={dash.name}
+        hour={hour}
+        avatarSrc={avatarSrc}
+        profileScore={profile?.score ?? null}
+        biometricsEnabled={passkeyCount > 0}
+        unreadCount={inbox.unread}
+      />
 
       <BiometricPromptBanner hasPasskey={passkeyCount > 0} />
 
-      <InsightPanel className="mt-5 animate-rise" eyebrow="For you today">
-        {insight}
-      </InsightPanel>
-
-      <div className="mt-4 animate-rise">
-        <NetWorthCurve
+      <section className="dash-hero-grid mt-5" aria-label="Wealth overview">
+        <DashboardNetWorthCard
           currentNetWorthNgn={dash.netWorth.netWorthNgn}
           snapshots={visuals.snapshots}
           rates={visuals.rates}
-          changeNgn={change}
-          confidencePct={Math.round(dash.netWorth.confidence * 100)}
+          changeNgn={dash.monthChange}
+          changePct={dash.changePct}
         />
-      </div>
+        <DashboardHealthCard overall={dash.health.overall} insight={healthInsight} />
+        <DashboardAllocationCard
+          segments={segments}
+          totalAssetsNgn={dash.netWorth.totalAssetsNgn}
+        />
+      </section>
 
-      {(dash.netWorth.confidence < 0.75 || dash.netWorth.staleAssetIds.length > 0) && (
-        <Link
-          href="/app/wealth/confidence"
-          className="mt-2 inline-flex text-sm font-semibold text-accent"
-        >
-          Review data quality
-          {dash.netWorth.staleAssetIds.length
-            ? ` · ${dash.netWorth.staleAssetIds.length} stale`
-            : ""}
-        </Link>
-      )}
-
-      <div className="mt-3 grid grid-cols-2 gap-3 animate-rise-delay">
-        <Link href="/app/health" className="block">
-          <GoalCard className="h-full transition hover:border-accent">
-            <p className="eyebrow">Wealth Health</p>
-            <p className="font-display mt-1 text-3xl">{dash.health.overall}</p>
-            <p className="muted text-sm">out of 100</p>
-          </GoalCard>
-        </Link>
-        <Link href="/app/cashflow" className="block">
-          <GoalCard className="h-full transition hover:border-accent">
-            <p className="eyebrow">Liquidity</p>
-            <p className="font-display mt-1 text-3xl">{dash.emergencyMonths.toFixed(1)}</p>
-            <p className="muted text-sm">months of expenses</p>
-          </GoalCard>
-        </Link>
-      </div>
-
-      <GoalCard className="mt-3">
-        <div className="flex items-center justify-between">
-          <p className="eyebrow">Goals</p>
-          <Link href="/app/plan" className="text-sm font-semibold text-accent">
-            Open Plan
-          </Link>
+      <div className="dash-mid-grid mt-5">
+        <div className="space-y-5 min-w-0">
+          {/* Needs your attention — next-steps pulse */}
+          <DashboardAttentionRow items={attentionItems} />
+          <DashboardGoalsSection goals={dash.goals} />
         </div>
-        {dash.goals.length ? (
-          <ul className="mt-3 space-y-2">
-            {dash.goals.map((g) => (
-              <li key={g.name} className="flex items-center justify-between gap-3 text-sm">
-                <span>{g.name}</span>
-                <span className="font-semibold">{Math.round(g.progress)}%</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="mt-3">
-            <EmptyState
-              title="No goals yet"
-              body="Add a goal so WealthOS can show progress and funding gaps — not product pitches."
-              action={
-                <Link href="/app/plan/new" className="btn btn-accent">
-                  Add a goal
-                </Link>
-              }
-              secondary={
-                <Link href="/app/plan" className="text-sm font-semibold text-accent">
-                  I&apos;ll do this later
-                </Link>
-              }
-            />
-          </div>
-        )}
-      </GoalCard>
+        <DashboardAiInsightCard insight={insight} impactLine={impactLine} />
+      </div>
 
-      <ActionCard className="mt-3">
-        <p className="eyebrow">Needs your attention</p>
-        <p className="muted mt-1 text-sm leading-relaxed">{nextSteps.summary}</p>
-        {nextSteps.items[0] ? (
-          <div className="mt-4">
-            <Link
-              href={nextSteps.items[0].href}
-              className="font-display text-xl font-semibold text-accent hover:underline"
-            >
-              {nextSteps.items[0].title}
-            </Link>
-            <p className="muted mt-2 text-sm leading-relaxed">{nextSteps.items[0].detail}</p>
-          </div>
-        ) : null}
-        {nextSteps.items.length > 1 ? (
-          <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm">
-            {nextSteps.items.slice(1).map((item) => (
-              <li key={item.id}>
-                <Link href={item.href} className="font-semibold text-accent hover:underline">
-                  {item.title}
-                </Link>
-              </li>
-            ))}
-          </ol>
-        ) : null}
-        <Link href={nextSteps.primaryHref} className="btn btn-primary mt-4 w-full">
-          {nextSteps.items[0]?.kind === "do_nothing"
-            ? "Review my actions"
-            : "Take the next step"}
-        </Link>
-        <Link href="/app/actions" className="btn btn-ghost mt-2 w-full">
-          All recommendations
-        </Link>
-      </ActionCard>
+      <div className="mt-5">
+        <DashboardAssetsSection assets={showcaseAssets} />
+      </div>
 
       {secondarySignals.length ? (
-        <SupportingPanel className="mt-4">
-          <p className="eyebrow">Also for you</p>
+        <section className="dash-card mt-5" aria-label="Also for you">
+          <p className="dash-card-label">Also for you</p>
           <ul className="mt-3 space-y-2">
             {secondarySignals.map((s) => (
               <li key={s.href + s.label}>
@@ -260,13 +201,35 @@ export default async function HomePage() {
                 </Link>
               </li>
             ))}
+            {inbox.unread > 0 ? (
+              <li>
+                <Link
+                  href={inboxUnreadHref}
+                  className="text-sm font-semibold text-accent hover:underline"
+                >
+                  Wealth Inbox · {inbox.unread} unread
+                </Link>
+              </li>
+            ) : null}
           </ul>
-        </SupportingPanel>
+        </section>
       ) : null}
 
-      <Link href="/app/ai" className="btn btn-soft mt-4 w-full" aria-label="Ask WealthAI">
-        Ask WealthAI
-      </Link>
+      {(dash.netWorth.confidence < 0.75 || dash.netWorth.staleAssetIds.length > 0) && (
+        <p className="mt-4 text-sm">
+          <Link href="/app/wealth/confidence" className="font-semibold text-accent">
+            Review data quality
+            {dash.netWorth.staleAssetIds.length
+              ? ` · ${dash.netWorth.staleAssetIds.length} stale valuation(s)`
+              : ""}
+          </Link>
+        </p>
+      )}
+
+      <footer className="dash-footer">
+        <span>Session active · {lastLogin}</span>
+        <Link href="/app/support">Help & support</Link>
+      </footer>
     </main>
   );
 }

@@ -202,11 +202,19 @@ export async function buildHomeDashboard(userId: string) {
     dataConfidence: nw.confidence,
   });
 
-  const goalCards = ctx.goals.slice(0, 3).map((g) => ({
-    name: g.name,
-    type: g.type,
-    progress: projectGoal(g).progressPercent,
-  }));
+  const goalCards = ctx.goals.slice(0, 3).map((g) => {
+    const forecast = projectGoal(g);
+    return {
+      id: g.id,
+      name: g.name,
+      type: g.type,
+      progress: forecast.progressPercent,
+      currentAmount: g.existingAllocation,
+      targetAmount: g.targetAmount,
+      targetDateIso: g.targetDate.toISOString(),
+      href: `/app/plan/${g.id}`,
+    };
+  });
 
   const attention = actions.slice(0, 3).map((a) => a.title);
 
@@ -219,10 +227,16 @@ export async function buildHomeDashboard(userId: string) {
   const monthChange =
     snapshots.length === 2 ? snapshots[0].netWorthNgn - snapshots[1].netWorthNgn : null;
 
+  const changePct =
+    monthChange != null && snapshots[1]?.netWorthNgn
+      ? (monthChange / Math.max(1, Math.abs(snapshots[1].netWorthNgn))) * 100
+      : null;
+
   return {
     name: ctx.name,
     netWorth: nw,
     monthChange,
+    changePct,
     health,
     goals: goalCards,
     actions,
@@ -230,6 +244,33 @@ export async function buildHomeDashboard(userId: string) {
     emergencyMonths,
     propertyPercent,
   };
+}
+
+/** Featured assets for Home dashboard tiles (covers when available). */
+export async function loadHomeAssetShowcase(userId: string) {
+  const rows = await prisma.asset.findMany({
+    where: { userId },
+    orderBy: { value: "desc" },
+    take: 8,
+  });
+  const preferred = [
+    ...rows.filter((a) => a.category === "PROPERTY"),
+    ...rows.filter((a) => a.category !== "PROPERTY"),
+  ].slice(0, 4);
+
+  return preferred.map((a) => ({
+    id: a.id,
+    name: a.name,
+    category: a.category,
+    assetType: a.assetType,
+    value: a.value,
+    currency: a.currency,
+    country: a.country,
+    coverUrl: a.coverStorageKey
+      ? `/api/media?key=${encodeURIComponent(a.coverStorageKey)}`
+      : null,
+    href: a.category === "PROPERTY" ? "/app/property" : "/app/wealth",
+  }));
 }
 
 export async function loadWealthVisualContext(userId: string) {

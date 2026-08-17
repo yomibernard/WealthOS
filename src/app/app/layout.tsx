@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { BottomNav } from "@/components/BottomNav";
 import { CommandPalette } from "@/components/CommandPalette";
+import { AppSidebar } from "@/components/shell/AppSidebar";
 import { getSessionUser } from "@/lib/session";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -10,19 +11,22 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (user.role === "ADMIN") redirect("/admin");
 
   return (
-    <div className="app-shell">
+    <div className="app-shell app-shell-dashboard">
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      <div className="page">
-        <div className="command-bar print:hidden">
-          <CommandPalette />
+      <AppSidebar />
+      <div className="app-main">
+        <div className="page page-dashboard">
+          <div className="command-bar print:hidden">
+            <CommandPalette />
+          </div>
+          <div id="main-content" tabIndex={-1} className="outline-none">
+            {children}
+          </div>
         </div>
-        <div id="main-content" tabIndex={-1} className="outline-none">
-          {children}
-        </div>
+        <BottomNav />
       </div>
-      <BottomNav />
     </div>
   );
 }

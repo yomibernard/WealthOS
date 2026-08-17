@@ -121,6 +121,65 @@ export function healthBand(score: number): { title: string; tone: "good" | "watc
   return { title: "Needs focused work", tone: "focus" };
 }
 
+/** Short label for compact dashboard cards (reference-style). */
+export function healthShortLabel(score: number): string {
+  if (score >= 80) return "Strong";
+  if (score >= 65) return "Good";
+  if (score >= 50) return "Watch";
+  return "Focus";
+}
+
+export type DonutSlice = {
+  id: string;
+  label: string;
+  value: number;
+  color: string;
+};
+
+/** SVG donut paths from positive values (pure geometry — values must be engine-grounded). */
+export function buildDonutPaths(
+  slices: DonutSlice[],
+  cx: number,
+  cy: number,
+  outerR: number,
+  innerR: number,
+): { id: string; label: string; color: string; d: string; percent: number }[] {
+  const total = slices.reduce((s, x) => s + Math.max(0, x.value), 0);
+  if (total <= 0) return [];
+  let angle = -Math.PI / 2;
+  return slices
+    .filter((s) => s.value > 0)
+    .map((s) => {
+      const sweep = (s.value / total) * Math.PI * 2;
+      const a0 = angle;
+      const a1 = angle + sweep;
+      angle = a1;
+      const large = sweep > Math.PI ? 1 : 0;
+      const x0o = cx + outerR * Math.cos(a0);
+      const y0o = cy + outerR * Math.sin(a0);
+      const x1o = cx + outerR * Math.cos(a1);
+      const y1o = cy + outerR * Math.sin(a1);
+      const x0i = cx + innerR * Math.cos(a1);
+      const y0i = cy + innerR * Math.sin(a1);
+      const x1i = cx + innerR * Math.cos(a0);
+      const y1i = cy + innerR * Math.sin(a0);
+      const d = [
+        `M ${x0o.toFixed(2)} ${y0o.toFixed(2)}`,
+        `A ${outerR} ${outerR} 0 ${large} 1 ${x1o.toFixed(2)} ${y1o.toFixed(2)}`,
+        `L ${x0i.toFixed(2)} ${y0i.toFixed(2)}`,
+        `A ${innerR} ${innerR} 0 ${large} 0 ${x1i.toFixed(2)} ${y1i.toFixed(2)}`,
+        "Z",
+      ].join(" ");
+      return {
+        id: s.id,
+        label: s.label,
+        color: s.color,
+        d,
+        percent: (s.value / total) * 100,
+      };
+    });
+}
+
 /** SVG arc path for a score 0–100 ring segment. */
 export function scoreToArcPath(
   score: number,
