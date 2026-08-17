@@ -105,6 +105,7 @@
 - [x] Prod launch-gate rehearsal `npm run launch:rehearse-prod` (fixture fail-closed + pass; owner still runs prod `launch:check` on host env)
 - [x] Engineering LAUNCH_REVIEW evidence `npm run launch:review` (section B code paths; legal/staffing remain human)
 - [x] Hosted smoke readiness preflight `npm run smoke:hosted-ready` (live URL still owner-run)
+- [x] Secrets hygiene `npm run secrets:check` (no tracked `.env` / private keys; wired into `release:check`)
 - [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets + Postgres URL)
 - [ ] Hosted deploy smoke (`SMOKE_BASE_URL=… npm run smoke:hosted` — see [DEPLOY.md](./DEPLOY.md))
 - [ ] Human sign-off on `LAUNCH_REVIEW.md`

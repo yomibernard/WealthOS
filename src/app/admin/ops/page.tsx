@@ -284,6 +284,7 @@ export default async function AdminOpsPage() {
             <li>npm run launch:check</li>
             <li>npm run launch:rehearse-prod</li>
             <li>npm run launch:review</li>
+            <li>npm run secrets:check</li>
             <li>LAUNCH_PROFILE=production npm run launch:check</li>
             <li>npm run db:postgres-ready</li>
             <li>npm run db:rehearse-postgres</li>

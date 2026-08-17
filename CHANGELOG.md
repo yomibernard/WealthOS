@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — Phase 31.0
+
+- Secrets hygiene: `npm run secrets:check` (no tracked `.env` / private keys); wired into `release:check`
+
 ## 0.1.23 — 17 Aug 2026 (Launch readiness pack)
 
 Launch readiness on top of the 0.1.22 ops remind-answer close-loop pack.

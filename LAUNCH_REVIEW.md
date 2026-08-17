@@ -13,7 +13,7 @@ Engineering evidence for many section B product rules is also covered by `npm ru
 - [x] `npm run launch:rehearse-prod` green (fixture fail-closed + pass; still run prod `launch:check` on host env)
 - [ ] `npm run db:postgres-ready` green; `prisma/migrations-postgres` reviewed
 - [x] Local Postgres rehearsal done once (`db:rehearse-postgres` / migrate deploy) or waived with owner sign-off
-- [ ] No secrets in git (`.env` local only; use `.env.example`)
+- [x] No secrets in git (`.env` local only; use `.env.example`) — `npm run secrets:check`
 - [ ] GitHub Actions CI green on `main`
 - [ ] Hosted pilot env documented per [DEPLOY.md](./DEPLOY.md)
 - [ ] `SMOKE_BASE_URL=https://… npm run smoke:hosted` green (or `SMOKE_SKIP_AUTH=1` if unseeded)

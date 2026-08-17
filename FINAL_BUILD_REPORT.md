@@ -994,3 +994,10 @@ Launch readiness freeze pack **v0.1.23**:
 
 - `npm run pilot:freeze` checks rehearsal, review evidence, hosted-ready, DEPLOY/DEMO/ops beats
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 31.0 delivered (17 Aug 2026)
+
+Secrets hygiene gate:
+
+- `npm run secrets:check` — `.env` not tracked, `.env.example` present, no private keys / live API keys in git
+- Wired into `npm run release:check`; LAUNCH_REVIEW “No secrets in git” engineering-verified
