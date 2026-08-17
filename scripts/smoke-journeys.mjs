@@ -519,6 +519,22 @@ try {
     }
 
     if (careRemindOk && (careRemindData.reminded ?? 0) > 0) {
+      const earlyOpsDaily = await authedGet("/api/admin/ops-daily", adminLogin.cookie);
+      const earlyBoard =
+        earlyOpsDaily.status === 200 ? await earlyOpsDaily.json().catch(() => ({})) : {};
+      const earlyReminds = earlyBoard?.careHandoff?.recentReminds;
+      const earlyAwaiting =
+        earlyOpsDaily.status === 200 &&
+        Array.isArray(earlyReminds) &&
+        earlyReminds.length > 0 &&
+        earlyReminds.some((r) => r && r.awaitingAnswer === true);
+      console.log(
+        `  [${earlyAwaiting ? "OK" : "FAIL"}] ops remind awaitingAnswer before care-ack → ${earlyOpsDaily.status}`,
+      );
+      if (!earlyAwaiting) {
+        failures.push("ops care remind trail missing awaitingAnswer true before care-ack");
+      }
+
       const adviserRecheck = await signIn("adviser@demo.wealthos.ng", "WealthOSdemo1!");
       if (adviserRecheck.res.ok) {
         const notesRes = await authedGet("/api/notifications", adviserRecheck.cookie);
@@ -604,6 +620,32 @@ try {
             failures.push(
               "adviser next-steps missing ops_reminded kind after ops care-remind",
             );
+          } else {
+            const opsAiRes = await fetch(`${base}/api/adviser/ai`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...(adviserRecheck.cookie ? { cookie: adviserRecheck.cookie } : {}),
+              },
+              body: JSON.stringify({ message: "ops reminded customers for my book" }),
+            });
+            const opsAiData = await opsAiRes.json().catch(() => ({}));
+            const opsAiContent =
+              typeof opsAiData.content === "string" ? opsAiData.content : "";
+            const opsAiOk =
+              opsAiRes.status === 200 &&
+              /Ops reminded/i.test(opsAiContent) &&
+              /care=ops_reminded/i.test(opsAiContent) &&
+              Array.isArray(opsAiData.toolsUsed) &&
+              opsAiData.toolsUsed.includes("adviserNextStepsPulse");
+            console.log(
+              `  [${opsAiOk ? "OK" : "FAIL"}] POST /api/adviser/ai ops_reminded cite → ${opsAiRes.status}`,
+            );
+            if (!opsAiOk) {
+              failures.push(
+                `adviser ai ops_reminded cite failed: status=${opsAiRes.status} ${opsAiContent.slice(0, 140)}`,
+              );
+            }
           }
         } else {
           failures.push(
@@ -655,6 +697,16 @@ try {
       );
       if (!trailOk) {
         failures.push("ops care remind trail missing recentReminds after care-remind");
+      } else {
+        const cueOk = reminds.every(
+          (r) => r && typeof r.awaitingAnswer === "boolean" && typeof r.stale === "boolean",
+        );
+        console.log(
+          `  [${cueOk ? "OK" : "FAIL"}] ops remind awaitingAnswer/stale cues on recentReminds`,
+        );
+        if (!cueOk) {
+          failures.push("ops care remind trail missing awaitingAnswer/stale cues after close-loop");
+        }
       }
 
       const answers = opsDaily?.careHandoff?.recentRemindAnswers;
@@ -669,6 +721,21 @@ try {
       );
       if (!answersOk) {
         failures.push("ops remind-answer trail missing recentRemindAnswers after care-ack");
+      }
+
+      const auditCareRes = await authedGet("/api/admin/audit?category=care&take=20", adminLogin.cookie);
+      const auditCare = auditCareRes.status === 200 ? await auditCareRes.json().catch(() => ({})) : {};
+      const careEvents = Array.isArray(auditCare.events) ? auditCare.events : [];
+      const careTypes = careEvents.map((e) => e?.eventType).filter(Boolean);
+      const hasRemind = careTypes.includes("OPS_CARE_REMIND");
+      const hasAnswer = careTypes.includes("OPS_REMIND_ANSWERED");
+      const hasAck = careTypes.includes("ADVISER_CARE_ACK");
+      const auditCareOk = auditCareRes.status === 200 && hasRemind && (hasAnswer || hasAck);
+      console.log(
+        `  [${auditCareOk ? "OK" : "FAIL"}] GET /api/admin/audit?category=care events=${careEvents.length} remind=${hasRemind} answer=${hasAnswer} ack=${hasAck} → ${auditCareRes.status}`,
+      );
+      if (!auditCareOk) {
+        failures.push("admin audit care category missing ops remind/answer events after close-loop");
       }
 
       const adminNotesRes = await authedGet("/api/notifications", adminLogin.cookie);

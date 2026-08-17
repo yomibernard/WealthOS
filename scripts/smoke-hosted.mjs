@@ -309,11 +309,19 @@ try {
               opsDailyRes.status === 200 &&
               Array.isArray(reminds) &&
               reminds.length > 0;
+            const awaitingOk =
+              trailOk && reminds.some((r) => r && r.awaitingAnswer === true);
             console.log(
               `  [${trailOk ? "OK" : "FAIL"}] hosted ops care remind trail → ${opsDailyRes.status}`,
             );
+            console.log(
+              `  [${awaitingOk ? "OK" : "FAIL"}] hosted ops remind awaitingAnswer before care-ack`,
+            );
             if (!trailOk) {
               failures.push("hosted ops care remind trail missing recentReminds");
+            }
+            if (!awaitingOk) {
+              failures.push("hosted ops care remind trail missing awaitingAnswer before care-ack");
             }
 
             const adviserEmail = process.env.SMOKE_ADVISER_EMAIL || "adviser@demo.wealthos.ng";
@@ -356,6 +364,28 @@ try {
               );
               if (nextRes.status !== 200 || !opsStepOk) {
                 failures.push("hosted adviser next-steps missing ops_reminded kind after care-remind");
+              } else {
+                const opsAiRes = await fetch(`${base}/api/adviser/ai`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    ...(adviserCookie ? { cookie: adviserCookie } : {}),
+                  },
+                  body: JSON.stringify({ message: "ops reminded customers for my book" }),
+                });
+                const opsAiData = await opsAiRes.json().catch(() => ({}));
+                const opsAiContent =
+                  typeof opsAiData.content === "string" ? opsAiData.content : "";
+                const opsAiOk =
+                  opsAiRes.status === 200 &&
+                  /Ops reminded/i.test(opsAiContent) &&
+                  /care=ops_reminded/i.test(opsAiContent);
+                console.log(
+                  `  [${opsAiOk ? "OK" : "FAIL"}] hosted adviser ai ops_reminded cite → ${opsAiRes.status}`,
+                );
+                if (!opsAiOk) {
+                  failures.push("hosted adviser ai ops_reminded cite failed after care-remind");
+                }
               }
 
               const remindedCustomerId =
@@ -403,6 +433,23 @@ try {
                   );
                   if (!answersOk) {
                     failures.push("hosted ops remind-answer trail missing recentRemindAnswers");
+                  } else {
+                    const auditRes = await fetch(`${base}/api/admin/audit?category=care&take=20`, {
+                      headers: roleCookie ? { cookie: roleCookie } : {},
+                    });
+                    const audit = auditRes.status === 200 ? await auditRes.json().catch(() => ({})) : {};
+                    const events = Array.isArray(audit.events) ? audit.events : [];
+                    const types = events.map((e) => e?.eventType);
+                    const auditOk =
+                      auditRes.status === 200 &&
+                      types.includes("OPS_CARE_REMIND") &&
+                      (types.includes("OPS_REMIND_ANSWERED") || types.includes("ADVISER_CARE_ACK"));
+                    console.log(
+                      `  [${auditOk ? "OK" : "FAIL"}] hosted admin audit care category → ${auditRes.status}`,
+                    );
+                    if (!auditOk) {
+                      failures.push("hosted admin audit care category missing remind/answer events");
+                    }
                   }
                 }
               }
