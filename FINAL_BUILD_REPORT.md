@@ -987,3 +987,10 @@ Hosted smoke / deploy readiness:
 
 - `npm run smoke:hosted-ready` preflight + DEPLOY readiness checklist
 - Admin ops + DEMO mention launch rehearsal / hosted-ready commands
+
+## Phase 30.4 delivered (17 Aug 2026)
+
+Launch readiness freeze pack **v0.1.23**:
+
+- `npm run pilot:freeze` checks rehearsal, review evidence, hosted-ready, DEPLOY/DEMO/ops beats
+- Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned

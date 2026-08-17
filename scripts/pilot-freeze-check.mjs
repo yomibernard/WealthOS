@@ -1,6 +1,6 @@
 /**
  * Pilot freeze gate — docs + scripts present, versions aligned.
- * Current pack: v0.1.22 (… + adviser ops-remind cues 28.x + ops remind-answer close-loop 29.x).
+ * Current pack: v0.1.23 (… + ops remind-answer close-loop 29.x + launch readiness 30.x).
  * Does not replace `npm run test` / `npm run release:check`.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const failures = [];
-const EXPECTED = "0.1.22";
+const EXPECTED = "0.1.23";
 
 function read(rel) {
   return readFileSync(join(root, rel), "utf8");
@@ -29,6 +29,10 @@ if (version !== EXPECTED) {
 
 // 8.x ops surface
 mustExist("scripts/smoke-hosted.mjs");
+mustExist("scripts/smoke-hosted-ready.mjs");
+mustExist("scripts/launch-rehearse-prod.mjs");
+mustExist("scripts/launch-review-check.mjs");
+mustExist("scripts/lib/launch-evaluate.mjs");
 mustExist("scripts/pilot-freeze-check.mjs");
 mustExist("src/engines/flag-profiles.ts");
 mustExist("src/engines/audit-export.ts");
@@ -84,7 +88,15 @@ mustExist("OPS_RUNBOOK.md");
 mustExist("LAUNCH_REVIEW.md");
 
 const pkgScripts = pkg.scripts || {};
-for (const s of ["smoke:hosted", "pilot:freeze", "release:check", "build:vercel"]) {
+for (const s of [
+  "smoke:hosted",
+  "smoke:hosted-ready",
+  "launch:rehearse-prod",
+  "launch:review",
+  "pilot:freeze",
+  "release:check",
+  "build:vercel",
+]) {
   if (!pkgScripts[s]) failures.push(`package.json missing script: ${s}`);
 }
 
@@ -976,6 +988,64 @@ if (
   !demo.includes("Remind answered")
 ) {
   failures.push("DEMO_SCRIPT.md missing ops remind-answer close-loop beat");
+}
+
+// 30.x Launch readiness
+const deployDoc = read("DEPLOY.md");
+const releaseCheck = read("scripts/release-check.mjs");
+const launchReviewCheck = read("scripts/launch-review-check.mjs");
+const launchRehearse = read("scripts/launch-rehearse-prod.mjs");
+const smokeHostedReady = read("scripts/smoke-hosted-ready.mjs");
+if (
+  !launchRehearse.includes("evaluateLaunchEnv") ||
+  !launchRehearse.includes("Fail-closed") ||
+  !launchRehearse.includes("Pass fixture")
+) {
+  failures.push("launch-rehearse-prod missing fixture fail-closed / pass coverage");
+}
+if (
+  !launchReviewCheck.includes("assessSuitability") ||
+  !launchReviewCheck.includes("Never auto-labels") ||
+  !launchReviewCheck.includes("do_nothing") ||
+  !launchReviewCheck.includes("consent is not active") ||
+  !launchReviewCheck.includes("not legal drafting")
+) {
+  failures.push("launch-review-check missing section B evidence needles");
+}
+if (!releaseCheck.includes("launch:review")) {
+  failures.push("release-check missing launch:review step");
+}
+if (
+  !smokeHostedReady.includes("SMOKE_REQUIRE_BASE") ||
+  !smokeHostedReady.includes("Hosted command matrix") ||
+  !smokeHostedReady.includes("smoke:hosted")
+) {
+  failures.push("smoke-hosted-ready missing preflight matrix");
+}
+if (
+  !deployDoc.includes("launch:rehearse-prod") ||
+  !deployDoc.includes("launch:review") ||
+  !deployDoc.includes("smoke:hosted-ready") ||
+  !deployDoc.includes("Readiness checklist")
+) {
+  failures.push("DEPLOY.md missing Phase 30.x launch readiness cues");
+}
+if (
+  !demo.includes("smoke:hosted-ready") ||
+  !demo.includes("launch:rehearse-prod") ||
+  !demo.includes("launch:review")
+) {
+  failures.push("DEMO_SCRIPT.md missing launch readiness beats");
+}
+if (
+  !adminOps.includes("launch:rehearse-prod") ||
+  !adminOps.includes("launch:review") ||
+  !adminOps.includes("smoke:hosted-ready")
+) {
+  failures.push("admin ops missing Phase 30.x command index");
+}
+if (!changelog.includes("0.1.23") || !changelog.includes("Launch readiness")) {
+  failures.push("CHANGELOG.md missing 0.1.23 Launch readiness pack");
 }
 
 if (failures.length) {

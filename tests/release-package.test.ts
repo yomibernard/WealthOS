@@ -6,8 +6,8 @@ describe("release package", () => {
   const root = process.cwd();
 
   it("ships version, changelog, and rehearsal script", () => {
-    expect(readFileSync(join(root, "VERSION"), "utf8").trim()).toBe("0.1.22");
-    expect(readFileSync(join(root, "CHANGELOG.md"), "utf8")).toContain("0.1.22");
+    expect(readFileSync(join(root, "VERSION"), "utf8").trim()).toBe("0.1.23");
+    expect(readFileSync(join(root, "CHANGELOG.md"), "utf8")).toContain("0.1.23");
     expect(existsSync(join(root, "scripts", "release-check.mjs"))).toBe(true);
     expect(existsSync(join(root, "scripts", "rehearse-postgres.mjs"))).toBe(true);
     expect(existsSync(join(root, "scripts", "pilot-freeze-check.mjs"))).toBe(true);

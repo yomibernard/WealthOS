@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.23 — 17 Aug 2026 (Launch readiness pack)
+
+Launch readiness on top of the 0.1.22 ops remind-answer close-loop pack.
+
+### Phase 30.x — Launch readiness
+
+- **30.4** Freeze pack `v0.1.23`; `pilot:freeze` covers 30.x rehearsal / review / hosted-ready
+- **30.3** `smoke:hosted-ready` preflight + DEPLOY readiness checklist; admin ops / DEMO beats
+- **30.2** `launch:review` engineering evidence for LAUNCH_REVIEW section B; wired into `release:check`
+- **30.1** `launch:rehearse-prod` fixture fail-closed + pass; shared `scripts/lib/launch-evaluate.mjs`
+
 ## 0.1.22 — 17 Aug 2026 (Ops remind-answer close-loop pack)
 
 Ops remind-answer close-loop on top of the 0.1.21 adviser ops-remind cues pack.
