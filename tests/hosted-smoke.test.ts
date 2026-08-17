@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
@@ -58,8 +59,18 @@ describe("hosted smoke rules", () => {
   it("ships smoke:hosted script in the release package", () => {
     const root = process.cwd();
     expect(existsSync(join(root, "scripts", "smoke-hosted.mjs"))).toBe(true);
-    expect(readFileSync(join(root, "package.json"), "utf8")).toContain("smoke:hosted");
+    expect(existsSync(join(root, "scripts", "smoke-hosted-ready.mjs"))).toBe(true);
+    const pkg = readFileSync(join(root, "package.json"), "utf8");
+    expect(pkg).toContain("smoke:hosted");
+    expect(pkg).toContain("smoke:hosted-ready");
+    const ready = spawnSync("node", [join("scripts", "smoke-hosted-ready.mjs")], {
+      cwd: root,
+      encoding: "utf8",
+    });
+    expect(ready.status).toBe(0);
+    expect(ready.stdout).toMatch(/Hosted smoke readiness OK/);
     expect(readFileSync(join(root, "DEPLOY.md"), "utf8")).toContain("smoke:hosted");
+    expect(readFileSync(join(root, "DEPLOY.md"), "utf8")).toContain("smoke:hosted-ready");
     const hosted = readFileSync(join(root, "scripts", "smoke-hosted.mjs"), "utf8");
     expect(hosted).toContain("/app/ai");
     expect(hosted).toContain("/api/care-updates");

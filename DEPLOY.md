@@ -86,6 +86,15 @@ npm run build && npm run start
 
 After Vercel (or other host) finishes deploying:
 
+**Readiness checklist**
+
+- [ ] `GET /api/health` → `status: ok`, `config.demoMode: false`, `config.databaseKind: postgres`
+- [ ] Shared pilot flags match **safe pilot** on `/admin/flags` (`FF_PARTNER_EXECUTION=false`, prefer `FF_LLM_POLISH=false`)
+- [ ] Preflight (no network): `npm run smoke:hosted-ready`
+- [ ] Live smoke: `SMOKE_BASE_URL=https://your-app.vercel.app npm run smoke:hosted`
+- [ ] Optional strict: `SMOKE_STRICT=1` (fail on DEMO_MODE / launch-gate warns)
+- [ ] Unseeded host: `SMOKE_SKIP_AUTH=1` (skip demo sign-in)
+
 ```bash
 SMOKE_BASE_URL=https://your-app.vercel.app npm run smoke:hosted
 ```
@@ -97,6 +106,7 @@ Optional:
 | `SMOKE_STRICT=1` | Fail on DEMO_MODE / launch-gate warns |
 | `SMOKE_SKIP_AUTH=1` | Skip demo sign-in (no seed on host) |
 | `SMOKE_EMAIL` / `SMOKE_PASSWORD` | Non-default pilot user |
+| `SMOKE_REQUIRE_BASE=1` | Make `smoke:hosted-ready` fail if `SMOKE_BASE_URL` is unset |
 
 Local laptop smoke remains `npm run smoke` (allows localhost).
 

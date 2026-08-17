@@ -29,6 +29,7 @@
     "release:check": "node scripts/release-check.mjs",
     "smoke": "node scripts/smoke-journeys.mjs",
     "smoke:hosted": "node scripts/smoke-hosted.mjs",
+    "smoke:hosted-ready": "node scripts/smoke-hosted-ready.mjs",
     "pilot:freeze": "node scripts/pilot-freeze-check.mjs",
     "postinstall": "prisma generate"
   },

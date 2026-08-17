@@ -980,3 +980,10 @@ Engineering LAUNCH_REVIEW evidence gate:
 
 - `npm run launch:review` asserts suitability, WealthGuard, NBFA do-nothing, consent, step-up, deferrals, escalations resolve path
 - Wired into `npm run release:check`; legal counsel / staffing remain human
+
+## Phase 30.3 delivered (17 Aug 2026)
+
+Hosted smoke / deploy readiness:
+
+- `npm run smoke:hosted-ready` preflight + DEPLOY readiness checklist
+- Admin ops + DEMO mention launch rehearsal / hosted-ready commands

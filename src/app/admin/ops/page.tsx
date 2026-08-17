@@ -282,10 +282,13 @@ export default async function AdminOpsPage() {
           <ul className="mt-2 space-y-1 text-sm font-mono">
             <li>npm run release:check</li>
             <li>npm run launch:check</li>
+            <li>npm run launch:rehearse-prod</li>
+            <li>npm run launch:review</li>
             <li>LAUNCH_PROFILE=production npm run launch:check</li>
             <li>npm run db:postgres-ready</li>
             <li>npm run db:rehearse-postgres</li>
             <li>npm run smoke</li>
+            <li>npm run smoke:hosted-ready</li>
             <li>SMOKE_BASE_URL=https://… npm run smoke:hosted</li>
             <li>npm run pilot:freeze</li>
             <li>npm run perf:check</li>
@@ -298,7 +301,7 @@ export default async function AdminOpsPage() {
             <li>Confirm Vercel env: Postgres <code>DATABASE_URL</code>, strong <code>SESSION_SECRET</code>, <code>DEMO_MODE=false</code></li>
             <li>Open <code>/api/health</code> — expect <code>status: ok</code>, <code>databaseKind: postgres</code></li>
             <li>
-              Run{" "}
+              Preflight <code className="font-mono text-ink">npm run smoke:hosted-ready</code>, then run{" "}
               <code className="font-mono text-ink">
                 SMOKE_BASE_URL=https://your-app.vercel.app npm run smoke:hosted
               </code>
