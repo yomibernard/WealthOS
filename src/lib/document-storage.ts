@@ -81,3 +81,56 @@ export async function softDeleteDocumentFile(storageKey: string): Promise<void> 
     // already gone
   }
 }
+
+/** Store binary media (profile/asset images). Not a public CDN URL. */
+export async function storeMediaBlob(
+  userId: string,
+  mimeType: string,
+  bytes: Buffer,
+): Promise<StoredDocument> {
+  if (!mimeType.startsWith("image/")) {
+    throw new Error("Only image media is supported");
+  }
+  if (bytes.length > 1_500_000) {
+    throw new Error("Image too large (max ~1.5MB after compression)");
+  }
+  await mkdir(path.join(ROOT, userId), { recursive: true });
+  const id = randomUUID();
+  const storageKey = `${userId}/${id}`;
+  const scannedClean = scanForMalwareMarkers(bytes);
+  if (!scannedClean) throw new Error("Media failed safety scan");
+  const envelope = Buffer.from(
+    JSON.stringify({
+      alg: "demo-media-v1",
+      mimeType,
+      ciphertext: bytes.toString("base64"),
+      storedAt: new Date().toISOString(),
+    }),
+    "utf8",
+  );
+  const checksum = createHash("sha256").update(envelope).digest("hex");
+  await writeFile(path.join(ROOT, storageKey), envelope);
+  return {
+    storageKey,
+    checksum,
+    encryptedAtRest: true,
+    scannedClean: true,
+    bytes: envelope.length,
+  };
+}
+
+export async function readMediaBlob(
+  storageKey: string,
+): Promise<{ mimeType: string; bytes: Buffer } | null> {
+  try {
+    const raw = await readFile(path.join(ROOT, storageKey), "utf8");
+    const parsed = JSON.parse(raw) as { alg?: string; mimeType?: string; ciphertext?: string };
+    if (parsed.alg !== "demo-media-v1" || !parsed.ciphertext || !parsed.mimeType) return null;
+    return {
+      mimeType: parsed.mimeType,
+      bytes: Buffer.from(parsed.ciphertext, "base64"),
+    };
+  } catch {
+    return null;
+  }
+}

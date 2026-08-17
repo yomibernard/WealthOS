@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { startAuthentication } from "@simplewebauthn/browser";
 import { Button, Field, Panel, TextInput } from "@/components/ui";
 
 export default function SignInPage() {
@@ -30,6 +31,33 @@ export default function SignInPage() {
     if (data.role === "ADVISER") router.push("/adviser");
     else if (data.role === "ADMIN") router.push("/admin");
     else router.push("/app");
+  }
+
+  async function signInWithPasskey() {
+    setLoading(true);
+    setError(null);
+    try {
+      const optRes = await fetch("/api/auth/webauthn/authenticate/options", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const options = await optRes.json();
+      if (!optRes.ok) throw new Error(options.error || "No passkey for this account");
+      const assertion = await startAuthentication({ optionsJSON: options });
+      const verify = await fetch("/api/auth/webauthn/authenticate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, response: assertion }),
+      });
+      const data = await verify.json();
+      if (!verify.ok) throw new Error(data.error || "Passkey sign-in failed");
+      router.push("/app");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Passkey sign-in failed");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -66,6 +94,15 @@ export default function SignInPage() {
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Signing in…" : "Sign in"}
           </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full"
+            disabled={loading}
+            onClick={() => void signInWithPasskey()}
+          >
+            Use Face ID / passkey
+          </Button>
         </form>
       </Panel>
       <p className="muted mt-4 text-sm">
@@ -77,7 +114,7 @@ export default function SignInPage() {
         <Link href="/wealth-check" className="font-semibold text-accent">
           Wealth Check
         </Link>
-        .
+        . Biometric data stays on your device.
       </p>
     </main>
   );

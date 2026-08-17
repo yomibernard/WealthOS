@@ -1,7 +1,9 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button, PageHeader } from "@/components/ui";
+import { WealthAiAnswer, type AiRichCard } from "@/components/ai/WealthAiAnswer";
 
 type Msg = {
   role: "user" | "assistant";
@@ -9,32 +11,53 @@ type Msg = {
   agent?: string;
   confidence?: number;
   escalate?: boolean;
+  assumptions?: string[];
+  missingInformation?: string[];
+  toolsUsed?: string[];
+  cards?: AiRichCard[];
 };
 
 const SUGGESTIONS = [
-  "What am I worth?",
-  "Am I financially healthy?",
-  "Should I repay debt or invest?",
-  "What are my top three priorities?",
+  "What should I do next?",
+  "Can I afford another property around ₦70m?",
+  "How does retiring at 55 look?",
   "Is this investment appropriate? 40% guaranteed monthly WhatsApp offer from Horizon Yield",
 ];
 
-export default function AiPage() {
+function AiInner() {
+  const searchParams = useSearchParams();
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
       content:
-        "I’m WealthAI. I use your Wealth Graph and deterministic engines — I won’t invent balances, returns or regulatory status. What would you like to understand?",
+        "I’m WealthAI — more private-bank briefing than chatbot. I use your Wealth Graph and deterministic engines. I won’t invent balances, returns or regulatory status.",
       agent: "ConciergeAI",
+      cards: [
+        {
+          type: "cta",
+          title: "Try a wealth question",
+          body: "Ask about net worth, goals, affordability, or paste an investment offer.",
+          href: "/app/plan/scenarios",
+          ctaLabel: "Open affordability simulator",
+        },
+      ],
     },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const seededFromQuery = useRef(false);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
+
+  useEffect(() => {
+    const q = searchParams.get("q")?.trim();
+    if (!q || seededFromQuery.current) return;
+    seededFromQuery.current = true;
+    setInput(q);
+  }, [searchParams]);
 
   async function send(text: string) {
     if (!text.trim() || loading) return;
@@ -58,6 +81,10 @@ export default function AiPage() {
         agent: data.agent,
         confidence: data.confidence,
         escalate: data.escalate,
+        assumptions: data.assumptions,
+        missingInformation: data.missingInformation,
+        toolsUsed: data.toolsUsed,
+        cards: data.cards,
       },
     ]);
   }
@@ -69,7 +96,10 @@ export default function AiPage() {
 
   return (
     <main className="flex min-h-[75dvh] flex-col">
-      <PageHeader title="WealthAI" subtitle="One interface. Specialist agents behind the scenes." />
+      <PageHeader
+        title="WealthAI"
+        subtitle="Intelligent private wealth conversation — engines calculate, I explain."
+      />
       <div className="flex flex-1 flex-col gap-3 pb-28">
         {messages.map((m, i) => (
           <div
@@ -80,22 +110,29 @@ export default function AiPage() {
                 : "chat-bubble-ai mr-6 p-3 text-sm leading-relaxed"
             }
           >
-            {m.role === "assistant" && m.agent ? (
-              <p className="eyebrow mb-2">{m.agent}</p>
-            ) : null}
-            <p className="whitespace-pre-wrap">{m.content}</p>
-            {m.confidence != null ? (
-              <p className="mt-2 text-xs opacity-80">
-                Confidence {Math.round(m.confidence * 100)}%
-                {m.escalate ? " · Escalation available" : ""}
-              </p>
-            ) : null}
+            {m.role === "assistant" ? (
+              <WealthAiAnswer
+                content={m.content}
+                agent={m.agent}
+                confidence={m.confidence}
+                escalate={m.escalate}
+                assumptions={m.assumptions}
+                missingInformation={m.missingInformation}
+                toolsUsed={m.toolsUsed}
+                cards={m.cards}
+              />
+            ) : (
+              <p className="whitespace-pre-wrap">{m.content}</p>
+            )}
           </div>
         ))}
         {loading ? (
-          <div className="chat-bubble-ai mr-6 p-3">
+          <div className="chat-bubble-ai mr-6 space-y-2 p-3" aria-live="polite">
+            <p className="eyebrow">WealthAI</p>
+            <p className="muted text-sm">Reviewing your wealth position…</p>
             <div className="skeleton h-4 w-40" />
-            <div className="skeleton mt-2 h-4 w-64" />
+            <div className="skeleton h-4 w-64" />
+            <p className="muted text-xs">Checking goals and allocation signals…</p>
           </div>
         ) : null}
         <div ref={endRef} />
@@ -114,14 +151,17 @@ export default function AiPage() {
             </button>
           ))}
         </div>
-        <form onSubmit={onSubmit} className="flex gap-2 rounded-2xl border border-line bg-white p-2 shadow-sm">
+        <form
+          onSubmit={onSubmit}
+          className="flex gap-2 rounded-2xl border border-line bg-white p-2 shadow-sm"
+        >
           <label htmlFor="ai-input" className="sr-only">
             Ask WealthAI
           </label>
           <input
             id="ai-input"
             className="min-h-12 flex-1 rounded-xl px-3"
-            placeholder="Ask about net worth, goals, risk, offers…"
+            placeholder="Ask about net worth, goals, affordability, offers…"
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />
@@ -131,5 +171,19 @@ export default function AiPage() {
         </form>
       </div>
     </main>
+  );
+}
+
+export default function AiPage() {
+  return (
+    <Suspense
+      fallback={
+        <main>
+          <PageHeader title="WealthAI" subtitle="Loading conversation…" />
+        </main>
+      }
+    >
+      <AiInner />
+    </Suspense>
   );
 }

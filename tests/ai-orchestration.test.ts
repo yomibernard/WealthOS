@@ -45,6 +45,16 @@ describe("WealthAI orchestration", () => {
     expect(classifyIntent("I want to open a support case")).toBe("support_case");
     expect(classifyIntent("How do I export my data for NDPR?")).toBe("privacy");
     expect(classifyIntent("Did my adviser acknowledge my complaint?")).toBe("care_update");
+    expect(classifyIntent("Can I afford another property around ₦70m?")).toBe("affordability");
+  });
+
+  it("returns affordability scenario cards without inventing balances", () => {
+    const res = runWealthAI("Can I afford another property around ₦70m?", ctx);
+    expect(res.intent).toBe("affordability");
+    expect(res.toolsUsed).toContain("decisionSimulator");
+    expect(res.cards?.length).toBeGreaterThan(1);
+    expect(res.cards?.some((c) => c.type === "scenario")).toBe(true);
+    expect(res.content).toMatch(/70/);
   });
 
   it("routes support and privacy without inventing balances", () => {

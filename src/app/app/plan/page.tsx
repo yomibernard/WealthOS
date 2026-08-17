@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { PageHeader, Panel, ProgressBar } from "@/components/ui";
+import { EmptyState, PageHeader, ProgressBar } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { projectGoal } from "@/engines/goals";
@@ -18,7 +18,7 @@ export default async function PlanPage() {
     <main>
       <PageHeader
         title="Plan"
-        subtitle="Goals, forecasts and scenarios — ranges, not false certainty."
+        subtitle="Goals, visual journeys and scenarios — ranges, not false certainty."
         action={
           <Link href="/app/plan/new" className="btn btn-soft">
             New goal
@@ -26,38 +26,56 @@ export default async function PlanPage() {
         }
       />
       <div className="space-y-3">
-        {goals.map((g) => {
-          const forecast = projectGoal(g);
-          return (
-            <Link key={g.id} href={`/app/plan/${g.id}`}>
-              <Panel>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-semibold">{g.name}</p>
-                    <p className="muted text-sm">
-                      Target {formatCurrency(g.targetAmount, g.currency, true)} ·{" "}
-                      {g.targetDate.toLocaleDateString("en-GB", {
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </p>
+        {goals.length ? (
+          goals.map((g) => {
+            const forecast = projectGoal(g);
+            return (
+              <Link key={g.id} href={`/app/plan/${g.id}`} className="block">
+                <article className="goal-card transition hover:border-accent">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold">{g.name}</p>
+                      <p className="muted text-sm">
+                        Target {formatCurrency(g.targetAmount, g.currency, true)} ·{" "}
+                        {g.targetDate.toLocaleDateString("en-GB", {
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+                    <p className="font-display text-2xl">{forecast.progressPercent}%</p>
                   </div>
-                  <p className="font-display text-2xl">{forecast.progressPercent}%</p>
-                </div>
-                <div className="mt-3">
-                  <ProgressBar value={forecast.progressPercent} />
-                </div>
-              </Panel>
-            </Link>
-          );
-        })}
+                  <div className="mt-3">
+                    <ProgressBar value={forecast.progressPercent} />
+                  </div>
+                  <p className="muted mt-2 text-xs">Open for visual journey & digital twin</p>
+                </article>
+              </Link>
+            );
+          })
+        ) : (
+          <EmptyState
+            title="No goals yet"
+            body="Add a goal so WealthOS can show progress, funding gaps and future scenarios — not product pitches."
+            action={
+              <Link href="/app/plan/new" className="btn btn-accent">
+                Add a goal
+              </Link>
+            }
+            secondary={
+              <Link href="/app/plan/scenarios" className="text-sm font-semibold text-accent">
+                Explore affordability first
+              </Link>
+            }
+          />
+        )}
       </div>
       <div className="mt-4 grid gap-3">
-        <Link href="/app/plan/funding" className="btn btn-soft w-full">
-          Goal funding pulse
+        <Link href="/app/plan/scenarios" className="btn btn-soft w-full">
+          Affordability simulator
         </Link>
-        <Link href="/app/plan/scenarios" className="btn btn-ghost w-full">
-          Scenario comparison
+        <Link href="/app/plan/funding" className="btn btn-ghost w-full">
+          Goal funding pulse
         </Link>
         <Link href="/app/health" className="btn btn-ghost w-full">
           Wealth Health

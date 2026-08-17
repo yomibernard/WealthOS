@@ -110,6 +110,7 @@ model User {
   liquidityNeeds    String?
   profileCompleteness Int    @default(0)
   vulnerableFlag    Boolean  @default(false)
+  avatarStorageKey  String?
   deletedAt         DateTime?
   status            String   @default("active")
   createdAt         DateTime @default(now())
@@ -138,6 +139,8 @@ model User {
   adviserNotesReceived AdviserNote[] @relation("AdviserNotesReceived")
   adviserLinks      AdviserCustomer[] @relation("CustomerLinks")
   advisedCustomers  AdviserCustomer[] @relation("AdviserLinks")
+  webauthnCredentials WebAuthnCredential[]
+  authSessionEvents AuthSessionEvent[]
 }
 
 model HouseholdMember {
@@ -198,6 +201,7 @@ model Asset {
   verificationStatus  VerificationStatus @default(ESTIMATED)
   confidence          Float              @default(0.7)
   notes               String?
+  coverStorageKey     String?
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
   user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -368,6 +372,37 @@ model Document {
   createdAt       DateTime @default(now())
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   asset           Asset?   @relation(fields: [assetId], references: [id], onDelete: SetNull)
+}
+
+/** Platform authenticator / passkey — public credential only; biometrics never leave the device. */
+model WebAuthnCredential {
+  id           String   @id @default(cuid())
+  userId       String
+  credentialId String   @unique
+  publicKey    String
+  counter      Int      @default(0)
+  transports   String?
+  deviceType   String?
+  backedUp     Boolean  @default(false)
+  label        String?
+  createdAt    DateTime @default(now())
+  lastUsedAt   DateTime?
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AuthSessionEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  kind      String
+  userAgent String?
+  ipHash    String?
+  detail    String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 model Conversation {

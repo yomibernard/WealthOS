@@ -37,20 +37,34 @@ export default async function MonthlyReportDetailPage({
     })),
   );
 
+  const periodLabel = new Date(report.generatedAt).toLocaleDateString("en-NG", {
+    month: "long",
+    year: "numeric",
+  });
+
   return (
-    <main className="report-print">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <PageHeader
-          title="Wealth report"
-          subtitle={new Date(report.generatedAt).toLocaleString("en-NG")}
-        />
+    <main className="report-print report-doc">
+      <div className="flex flex-wrap items-start justify-between gap-3 print:hidden">
+        <PageHeader title="Wealth report" subtitle={periodLabel} />
         <PrintReportButton />
       </div>
 
-      <Panel className="space-y-2">
+      <header className="report-cover">
+        <p className="eyebrow">Private wealth review</p>
+        <h1 className="report-cover-title">Monthly Wealth Report</h1>
+        <p className="report-cover-name">{user.name}</p>
+        <p className="muted mt-2 text-sm">{periodLabel}</p>
+        <p className="report-cover-promise mt-4">
+          A calm snapshot of position, movement, and what deserves attention — informational only.
+        </p>
+      </header>
+
+      <section className="report-hero-metric mt-4">
         <p className="eyebrow">Estimated net worth</p>
-        <p className="font-display text-4xl">{formatNaira(report.netWorthNgn, true)}</p>
-        <div className="flex flex-wrap gap-2">
+        <p className="font-display text-4xl font-semibold tracking-tight sm:text-5xl">
+          {formatNaira(report.netWorthNgn, true)}
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
           <Badge>Health {report.healthScore}/100</Badge>
           <Badge>Confidence {Math.round(report.confidence * 100)}%</Badge>
           {insights.netWorthDeltaNgn != null ? (
@@ -60,51 +74,64 @@ export default async function MonthlyReportDetailPage({
             </Badge>
           ) : null}
         </div>
-        <NetWorthSparkline values={insights.points.map((p) => p.netWorthNgn)} />
-      </Panel>
+        <div className="mt-4">
+          <NetWorthSparkline values={insights.points.map((p) => p.netWorthNgn)} />
+        </div>
+      </section>
 
       {insights.insights.length ? (
-        <Panel className="mt-4 space-y-3">
-          <h2 className="font-display text-xl">Month-over-month</h2>
-          <ul className="space-y-3">
+        <section className="report-section mt-4">
+          <h2 className="font-display text-xl font-semibold tracking-tight">What changed</h2>
+          <ul className="mt-3 space-y-3">
             {insights.insights.map((i) => (
-              <li key={i.id}>
-                <p className="font-medium">{i.title}</p>
-                <p className="muted text-sm">{i.body}</p>
+              <li key={i.id} className="report-insight">
+                <p className="font-semibold">{i.title}</p>
+                <p className="muted mt-1 text-sm leading-relaxed">{i.body}</p>
               </li>
             ))}
           </ul>
-        </Panel>
+        </section>
       ) : null}
 
-      <div className="mt-4 space-y-3">
+      {report.attention.length ? (
+        <section className="report-section mt-4">
+          <h2 className="font-display text-xl font-semibold tracking-tight">Major risks & gaps</h2>
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed">
+            {report.attention.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <div className="mt-4 space-y-4">
         {report.sections.map((s) => (
-          <Panel key={s.id} className="space-y-2">
-            <h2 className="font-display text-xl">{s.title}</h2>
-            <p className="text-sm leading-relaxed">{s.body}</p>
-          </Panel>
+          <section key={s.id} className="report-section">
+            <h2 className="font-display text-xl font-semibold tracking-tight">{s.title}</h2>
+            <p className="mt-2 text-sm leading-relaxed">{s.body}</p>
+          </section>
         ))}
       </div>
 
       {report.topActions.length > 0 ? (
-        <Panel className="mt-4 space-y-3">
-          <h2 className="font-display text-xl">Actions in this cycle</h2>
-          <ul className="space-y-3">
+        <section className="report-section mt-4">
+          <h2 className="font-display text-xl font-semibold tracking-tight">Top priorities</h2>
+          <ol className="mt-3 list-decimal space-y-3 pl-5">
             {report.topActions.map((a) => (
               <li key={a.id}>
-                <p className="font-medium">{a.title}</p>
-                <p className="muted text-sm">{a.why}</p>
+                <p className="font-semibold">{a.title}</p>
+                <p className="muted mt-1 text-sm leading-relaxed">{a.why}</p>
               </li>
             ))}
-          </ul>
-          <Link href="/app/actions" className="btn btn-soft inline-flex print:hidden">
+          </ol>
+          <Link href="/app/actions" className="btn btn-soft mt-4 inline-flex print:hidden">
             Review recommendations
           </Link>
-        </Panel>
+        </section>
       ) : null}
 
       <Panel className="mt-4">
-        <p className="muted text-sm">{report.disclaimer}</p>
+        <p className="muted text-sm leading-relaxed">{report.disclaimer}</p>
       </Panel>
 
       <p className="mt-4 print:hidden">

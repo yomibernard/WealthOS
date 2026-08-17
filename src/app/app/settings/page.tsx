@@ -1,34 +1,83 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { PageHeader, Panel } from "@/components/ui";
+import { PageHeader } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
+import { prisma } from "@/lib/db";
 
 export default async function SettingsPage() {
   const user = await getSessionUser();
   if (!user) redirect("/auth/sign-in");
+  const passkeys = await prisma.webAuthnCredential.count({ where: { userId: user.id } });
+
+  const groups = [
+    {
+      title: "Profile",
+      links: [
+        { href: "/app/profile", label: "Personal information & photo" },
+        { href: "/onboarding/fact-find", label: "Preferences & fact-find" },
+      ],
+    },
+    {
+      title: "Security",
+      links: [
+        {
+          href: "/app/security",
+          label: "Biometrics & passkeys",
+          note: passkeys ? `${passkeys} registered` : "Optional",
+        },
+        { href: "/app/trust", label: "Trust Centre" },
+      ],
+    },
+    {
+      title: "Privacy",
+      links: [
+        { href: "/app/consent", label: "Consent" },
+        { href: "/app/privacy", label: "Data export & deletion" },
+        { href: "/app/connections", label: "Connections", note: "Demo" },
+      ],
+    },
+    {
+      title: "AI & memory",
+      links: [{ href: "/app/memory", label: "What WealthAI remembers" }],
+    },
+    {
+      title: "Communication",
+      links: [
+        { href: "/app/notifications", label: "Notifications" },
+        { href: "/app/adviser-collab", label: "Adviser communications" },
+      ],
+    },
+  ];
 
   return (
     <main>
-      <PageHeader title="Security & settings" subtitle="MVP controls for a calm, trustworthy session." />
-      <Panel className="space-y-3 text-sm">
+      <PageHeader
+        title="Settings"
+        subtitle={`${user.email} · organise profile, security, privacy and AI.`}
+      />
+
+      <section className="insight-panel text-sm leading-relaxed">
         <p>
-          <strong>Signed in as:</strong> {user.email}
+          Session: HTTP-only cookie · 14-day max age · SameSite=Lax. Biometric templates never leave
+          your device.
         </p>
-        <p>
-          <strong>Session:</strong> HTTP-only cookie · 14-day max age · SameSite=Lax
-        </p>
-        <p>
-          <strong>MFA / step-up:</strong> Required before Phase 2 material execution (not enabled in
-          MVP self-service demo).
-        </p>
-        <p>
-          <strong>Encryption:</strong> TLS in transit in production; database encryption at rest via
-          hosting controls.
-        </p>
-        <p className="muted">
-          AI models never hold transaction credentials. Conversation, recommendation, consent and
-          execution paths remain separated.
-        </p>
-      </Panel>
+      </section>
+
+      {groups.map((g) => (
+        <section key={g.title} className="more-section mt-5">
+          <h2 className="font-display text-xl font-semibold tracking-tight">{g.title}</h2>
+          <div className="action-card mt-3 overflow-hidden p-0">
+            {g.links.map((l) => (
+              <Link key={l.href} href={l.href} className="more-link justify-between gap-3">
+                <span>{l.label}</span>
+                {"note" in l && l.note ? (
+                  <span className="muted text-xs font-medium">{l.note}</span>
+                ) : null}
+              </Link>
+            ))}
+          </div>
+        </section>
+      ))}
     </main>
   );
 }

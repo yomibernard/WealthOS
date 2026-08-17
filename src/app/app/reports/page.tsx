@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Badge, PageHeader, Panel } from "@/components/ui";
+import { Badge, PageHeader, Panel, EmptyState } from "@/components/ui";
 import { GenerateMonthlyReportButton } from "@/components/MonthlyReportClient";
 import { NetWorthSparkline } from "@/components/NetWorthSparkline";
 import { getSessionUser } from "@/lib/session";
@@ -27,16 +27,17 @@ export default async function MonthlyReportsPage() {
     <main>
       <PageHeader
         title="Monthly wealth report"
-        subtitle="A calm snapshot of position, attention items, and next steps — informational only."
+        subtitle="Private-bank style reviews of position, movement, and next steps — informational only."
       />
 
-      <Panel className="space-y-4 print:hidden">
-        <p className="muted text-sm">
-          Reports store a Wealth Snapshot you can revisit. They never move money and are not a product
-          solicitation.
+      <section className="hero-metric space-y-3 print:hidden">
+        <p className="eyebrow">For {user.name}</p>
+        <p className="text-sm leading-relaxed">
+          Generate a Wealth Snapshot you can revisit and print. Reports never move money and are not a
+          product solicitation.
         </p>
         <GenerateMonthlyReportButton />
-      </Panel>
+      </section>
 
       <Panel className="mt-4 space-y-3">
         <p className="eyebrow">Trend</p>
@@ -66,23 +67,29 @@ export default async function MonthlyReportsPage() {
       </Panel>
 
       {latest ? (
-        <Panel className="mt-4 space-y-3">
+        <section className="action-card mt-4 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <p className="eyebrow">Latest report</p>
             <Badge>{new Date(latest.generatedAt).toLocaleDateString("en-NG")}</Badge>
           </div>
-          <p className="font-display text-3xl">{formatNaira(latest.netWorthNgn, true)}</p>
+          <p className="font-display text-3xl font-semibold tracking-tight">
+            {formatNaira(latest.netWorthNgn, true)}
+          </p>
           <p className="muted text-sm">
             Health {latest.healthScore}/100 · confidence {Math.round(latest.confidence * 100)}%
           </p>
           <Link href={`/app/reports/${latest.snapshotId}`} className="btn btn-soft inline-flex">
             Open full report
           </Link>
-        </Panel>
+        </section>
       ) : (
-        <Panel className="mt-4">
-          <p className="muted text-sm">No reports yet. Generate one to create your first snapshot.</p>
-        </Panel>
+        <div className="mt-4">
+          <EmptyState
+            title="No reports yet"
+            body="Generate your first monthly review to create a Wealth Snapshot you can return to."
+            action={<p className="muted text-sm">Use Generate above when you are ready.</p>}
+          />
+        </div>
       )}
 
       <Panel className="mt-4 space-y-3">

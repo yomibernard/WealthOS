@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Badge, PageHeader, Panel } from "@/components/ui";
-import { SignOutButton } from "@/components/SignOutButton";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { loadOpsDailyBoard } from "@/services/ops-daily";
@@ -153,14 +152,10 @@ export default async function AdminPage() {
         </Link>
         <Link href="/admin/ops">
           <Panel>
-            <p className="font-semibold">Ops & launch</p>
-            <p className="muted text-sm">Runbooks, launch gate, demo checklist.</p>
+            <p className="font-semibold">Ops board</p>
+            <p className="muted text-sm">Live queues, care handoff, launch gate.</p>
           </Panel>
         </Link>
-      </div>
-
-      <div className="mt-6 max-w-xs">
-        <SignOutButton />
       </div>
     </main>
   );

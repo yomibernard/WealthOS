@@ -232,6 +232,31 @@ export async function buildHomeDashboard(userId: string) {
   };
 }
 
+export async function loadWealthVisualContext(userId: string) {
+  const [snapshots, fxRows] = await Promise.all([
+    prisma.wealthSnapshot.findMany({
+      where: { userId },
+      orderBy: { createdAt: "asc" },
+      take: 48,
+    }),
+    prisma.fxRate.findMany({ orderBy: { asOf: "desc" } }),
+  ]);
+
+  const rates = fxRows.map((r) => ({
+    from: r.from,
+    to: r.to,
+    rate: r.rate,
+  }));
+
+  return {
+    snapshots: snapshots.map((s) => ({
+      at: s.createdAt.toISOString(),
+      netWorthNgn: s.netWorthNgn,
+    })),
+    rates,
+  };
+}
+
 export async function ensureRecommendations(userId: string) {
   const dash = await buildHomeDashboard(userId);
   if (!dash) return [];

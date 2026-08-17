@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Badge, PageHeader, Panel } from "@/components/ui";
+import { Badge, PageHeader } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
-import { SignOutButton } from "@/components/SignOutButton";
 import { loadAdviserPortfolioCareRadar } from "@/services/adviser-portfolio";
 import { loadAdviserNotificationPulse } from "@/services/notifications";
 import { loadAdviserNextStepsPulse } from "@/services/adviser-next-steps";
@@ -44,77 +43,146 @@ export default async function AdviserHomePage({
     loadAdviserNextStepsPulse({ adviserId: user.id, role: user.role }),
   ]);
 
+  const priorityRows = [
+    full.totalComplaints > 0
+      ? {
+          href: "/adviser?care=complaints",
+          label: `${full.totalComplaints} complaint case(s)`,
+          tone: "danger" as const,
+          why: "Highest severity — review before product talk",
+        }
+      : null,
+    full.opsRemindedCount > 0
+      ? {
+          href: "/adviser?care=ops_reminded",
+          label: `${full.opsRemindedCount} ops-reminded`,
+          tone: "warn" as const,
+          why: "Operations asked for an adviser response",
+        }
+      : null,
+    full.unackedCareCount > 0
+      ? {
+          href: "/adviser?care=unacked",
+          label: `${full.unackedCareCount} unacked care`,
+          tone: "warn" as const,
+          why: "Open support/privacy without a care acknowledgment",
+        }
+      : null,
+    full.totalPrivacy > 0
+      ? {
+          href: "/adviser?care=privacy",
+          label: `${full.totalPrivacy} privacy`,
+          tone: "warn" as const,
+          why: "Privacy requests need human attention",
+        }
+      : null,
+    full.awaitingReceiptCount > 0
+      ? {
+          href: "/adviser?care=awaiting",
+          label: `${full.awaitingReceiptCount} awaiting receipt`,
+          tone: "default" as const,
+          why: "Customer has not marked your care update as seen",
+        }
+      : null,
+    notifyPulse.unreadCount > 0
+      ? {
+          href: notifyPulse.primaryHref,
+          label:
+            notifyPulse.unreadCount === 1
+              ? notifyPulse.headline ?? "1 unread notification"
+              : `${notifyPulse.unreadCount} unread notifications`,
+          tone: "default" as const,
+          why: "Shares, receipts, or ops handoffs in your inbox",
+        }
+      : null,
+  ].filter(Boolean) as {
+    href: string;
+    label: string;
+    tone: "danger" | "warn" | "default";
+    why: string;
+  }[];
+
   return (
     <main className="page-wide">
       <PageHeader
-        title="Adviser portal"
-        subtitle={`Welcome, ${user.name}. Care first — then insights and nudges.`}
+        title="Morning brief"
+        subtitle="Urgent care first — then your book. Badges are prioritised, not piled on."
       />
 
-      {notifyPulse.headline ? (
-        <Link
-          href={notifyPulse.primaryHref}
-          className="btn btn-soft mb-4 w-full sm:w-auto"
-        >
-          {notifyPulse.unreadCount === 1
-            ? notifyPulse.headline
-            : `${notifyPulse.unreadCount} unread notifications`}
-        </Link>
-      ) : (
-        <Link href="/adviser/notifications" className="btn btn-ghost mb-4 w-full sm:w-auto">
-          Adviser notifications
-        </Link>
-      )}
-
-      <Panel className="mb-4">
-        <p className="eyebrow">Needs your attention</p>
-        <p className="muted mt-1 text-sm">{nextSteps.summary}</p>
-        <ol className="mt-3 list-decimal space-y-3 pl-5">
-          {nextSteps.items.map((item) => (
-            <li key={item.id}>
-              <Link href={item.href} className="font-semibold text-accent hover:underline">
-                {item.title}
-              </Link>
-              <p className="muted mt-1 text-sm">{item.detail}</p>
-            </li>
-          ))}
-        </ol>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Link href={nextSteps.primaryHref} className="btn btn-primary w-full sm:w-auto">
+      <section className="hero-metric space-y-4">
+        <div>
+          <p className="eyebrow">Needs your attention</p>
+          <p className="muted mt-1 text-sm leading-relaxed">{nextSteps.summary}</p>
+        </div>
+        {nextSteps.items[0] ? (
+          <div>
+            <Link
+              href={nextSteps.items[0].href}
+              className="font-display text-2xl font-semibold text-accent hover:underline"
+            >
+              {nextSteps.items[0].title}
+            </Link>
+            <p className="muted mt-2 text-sm leading-relaxed">{nextSteps.items[0].detail}</p>
+          </div>
+        ) : null}
+        {nextSteps.items.length > 1 ? (
+          <ol className="list-decimal space-y-2 pl-5 text-sm">
+            {nextSteps.items.slice(1, 4).map((item) => (
+              <li key={item.id}>
+                <Link href={item.href} className="font-semibold text-accent hover:underline">
+                  {item.title}
+                </Link>
+              </li>
+            ))}
+          </ol>
+        ) : null}
+        <div className="flex flex-wrap gap-2">
+          <Link href={nextSteps.primaryHref} className="btn btn-primary">
             {nextSteps.items[0]?.kind === "do_nothing" ? "Open Care radar" : "Take the next step"}
           </Link>
-          <Link href="/adviser/ai" className="btn btn-soft w-full sm:w-auto">
-            Ask WealthAI what to do next
+          <Link href="/adviser/ai" className="btn btn-soft">
+            Ask WealthAI for my book
           </Link>
         </div>
-      </Panel>
+      </section>
 
-      <Panel className="mb-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="font-semibold">Care radar</p>
-          <Badge tone={full.withCareCount > 0 ? "warn" : "default"}>
-            {full.withCareCount} with care
-          </Badge>
-          {full.totalComplaints > 0 ? (
-            <Badge tone="danger">{full.totalComplaints} complaint(s)</Badge>
-          ) : null}
-          {full.totalPrivacy > 0 ? (
-            <Badge tone="warn">{full.totalPrivacy} privacy</Badge>
-          ) : null}
-          {full.totalSupport > 0 ? (
-            <Badge>{full.totalSupport} support</Badge>
-          ) : null}
-          {full.unackedCareCount > 0 ? (
-            <Badge tone="warn">{full.unackedCareCount} unacked</Badge>
-          ) : null}
-          {full.opsRemindedCount > 0 ? (
-            <Badge tone="warn">{full.opsRemindedCount} ops reminded</Badge>
-          ) : null}
-          {full.awaitingReceiptCount > 0 ? (
-            <Badge tone="warn">{full.awaitingReceiptCount} awaiting receipt</Badge>
-          ) : null}
+      <section className="action-card mt-4">
+        <p className="eyebrow">Priority queue</p>
+        <p className="muted mt-1 text-sm">
+          Showing the highest-severity items only — not every badge at once.
+        </p>
+        {priorityRows.length ? (
+          <ul className="mt-3 space-y-2">
+            {priorityRows.slice(0, 4).map((row) => (
+              <li key={row.href + row.label}>
+                <Link
+                  href={row.href}
+                  className="flex flex-wrap items-start justify-between gap-2 rounded-[var(--radius-sm)] border border-line bg-white px-3 py-3 hover:border-accent"
+                >
+                  <div>
+                    <p className="font-semibold">{row.label}</p>
+                    <p className="muted text-sm">{row.why}</p>
+                  </div>
+                  <Badge tone={row.tone}>Open</Badge>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm text-accent">No urgent care signals this morning.</p>
+        )}
+        <p className="muted mt-3 text-xs">
+          Book load: {full.withCareCount} with care · {full.customerCount} customers
+        </p>
+      </section>
+
+      <section className="mt-4">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 className="font-display text-xl font-semibold tracking-tight">Care radar</h2>
+            <p className="muted text-sm">{radar.summary}</p>
+          </div>
         </div>
-        <p className="muted mt-1 text-sm">{radar.summary}</p>
         <div className="mt-3 flex flex-wrap gap-2" aria-label="Care filters">
           {FILTER_CHIPS.map((chip) => {
             const active = filter === chip.id;
@@ -125,8 +193,8 @@ export default async function AdviserHomePage({
                 href={href}
                 className={
                   active
-                    ? "rounded-md border border-accent bg-accent-soft px-3 py-1 text-sm font-medium"
-                    : "muted rounded-md border border-line px-3 py-1 text-sm hover:border-accent"
+                    ? "rounded-full border border-accent bg-accent-soft px-3 py-1.5 text-sm font-semibold"
+                    : "muted rounded-full border border-line px-3 py-1.5 text-sm hover:border-accent"
                 }
                 aria-current={active ? "true" : undefined}
               >
@@ -135,19 +203,16 @@ export default async function AdviserHomePage({
             );
           })}
         </div>
-      </Panel>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        {radar.customers.map((c) => (
-          <Link key={c.id} href={`/adviser/customers/${c.id}`}>
-            <Panel className="h-full transition hover:border-accent">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div>
-                  <p className="font-display text-xl">{c.name}</p>
-                  <p className="muted text-sm">{c.email}</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {c.opsReminded ? <Badge tone="warn">Ops reminded</Badge> : null}
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {radar.customers.map((c) => (
+            <Link key={c.id} href={`/adviser/customers/${c.id}`}>
+              <article className="action-card h-full transition hover:border-accent">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="font-display text-xl">{c.name}</p>
+                    <p className="muted text-sm">{c.email}</p>
+                  </div>
                   <Badge
                     tone={
                       c.careTone === "danger"
@@ -157,34 +222,28 @@ export default async function AdviserHomePage({
                           : "default"
                     }
                   >
-                    {c.careLabel}
+                    {c.opsReminded ? "Ops reminded" : c.careLabel}
                   </Badge>
                 </div>
-              </div>
-              <p className="mt-2 text-sm">Profile {c.profileCompleteness}% complete</p>
-              {c.careCount > 0 || c.awaitingReceipt ? (
-                <p className="muted mt-1 text-xs">
-                  {c.openEscalations} case(s) · {c.openPrivacy} privacy · {c.ackCue}
-                </p>
-              ) : null}
-            </Panel>
-          </Link>
-        ))}
-      </div>
+                <p className="mt-2 text-sm">Profile {c.profileCompleteness}% complete</p>
+                {c.careCount > 0 || c.awaitingReceipt ? (
+                  <p className="muted mt-1 text-xs">
+                    {c.openEscalations} case(s) · {c.openPrivacy} privacy · {c.ackCue}
+                  </p>
+                ) : null}
+              </article>
+            </Link>
+          ))}
+        </div>
 
-      {radar.customers.length === 0 ? (
-        <Panel className="mt-3">
-          <p className="muted text-sm">
+        {radar.customers.length === 0 ? (
+          <p className="muted mt-3 text-sm">
             {full.customerCount === 0
               ? "No customers in your book yet."
               : "No customers match this care filter."}
           </p>
-        </Panel>
-      ) : null}
-
-      <div className="mt-6 max-w-xs">
-        <SignOutButton />
-      </div>
+        ) : null}
+      </section>
     </main>
   );
 }

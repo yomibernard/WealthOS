@@ -44,6 +44,14 @@ export async function POST(req: Request) {
         payloadJson: JSON.stringify({ email: user.email, role: user.role }),
       },
     });
+    await prisma.authSessionEvent.create({
+      data: {
+        userId: user.id,
+        kind: "SIGN_IN",
+        detail: "Password sign-in",
+        userAgent: req.headers.get("user-agent")?.slice(0, 240) ?? null,
+      },
+    });
     return NextResponse.json({ ok: true, role: user.role, name: user.name });
   } catch (err) {
     if (err instanceof z.ZodError) {

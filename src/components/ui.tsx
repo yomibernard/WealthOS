@@ -133,16 +133,19 @@ export function EmptyState({
   title,
   body,
   action,
+  secondary,
 }: {
   title: string;
   body: string;
   action?: ReactNode;
+  secondary?: ReactNode;
 }) {
   return (
     <Panel className="text-center">
       <h2 className="font-display text-xl">{title}</h2>
-      <p className="muted mt-2">{body}</p>
-      {action ? <div className="mt-4 flex justify-center">{action}</div> : null}
+      <p className="muted mt-2 leading-relaxed">{body}</p>
+      {action ? <div className="mt-4 flex flex-wrap justify-center gap-2">{action}</div> : null}
+      {secondary ? <div className="mt-3 flex justify-center">{secondary}</div> : null}
     </Panel>
   );
 }
@@ -163,6 +166,107 @@ export function Metric({
       {hint ? <p className="muted mt-1 text-sm">{hint}</p> : null}
     </div>
   );
+}
+
+/** Primary financial figure — net worth, large balances */
+export function HeroMetric({
+  label,
+  value,
+  hint,
+  children,
+  className,
+}: {
+  label: string;
+  value: string;
+  hint?: ReactNode;
+  children?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={clsx("hero-metric", className)}>
+      <p className="eyebrow">{label}</p>
+      <p className="font-display mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">{value}</p>
+      {hint ? <div className="mt-3 flex flex-wrap items-center gap-2">{hint}</div> : null}
+      {children}
+    </section>
+  );
+}
+
+/** Deterministic / AI-grounded insight copy */
+export function InsightPanel({
+  eyebrow = "Insight",
+  children,
+  className,
+}: {
+  eyebrow?: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <aside className={clsx("insight-panel", className)}>
+      <p className="eyebrow">{eyebrow}</p>
+      <div className="mt-2 text-[0.98rem] leading-relaxed text-ink-soft">{children}</div>
+    </aside>
+  );
+}
+
+/** Next-best action / attention block */
+export function ActionCard({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <section className={clsx("action-card", className)}>{children}</section>;
+}
+
+/** Tangible wealth item */
+export function AssetTile({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <article className={clsx("asset-tile", className)}>{children}</article>;
+}
+
+/** Goal progress surface */
+export function GoalCard({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <section className={clsx("goal-card", className)}>{children}</section>;
+}
+
+/** Material concern — not shame */
+export function RiskAlert({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <aside className={clsx("risk-alert", className)} role="status">
+      {children}
+    </aside>
+  );
+}
+
+/** Secondary / deferred detail */
+export function SupportingPanel({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <section className={clsx("supporting-panel", className)}>{children}</section>;
 }
 
 export function ProgressBar({ value, label }: { value: number; label?: string }) {

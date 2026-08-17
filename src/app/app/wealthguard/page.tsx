@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { Button, Field, PageHeader, Panel, Badge } from "@/components/ui";
+import { Button, Field, PageHeader, Panel } from "@/components/ui";
+import { WealthGuardAssessment } from "@/components/wealthguard/WealthGuardAssessment";
 
 type Result = {
   providerVerification: string;
@@ -11,6 +12,7 @@ type Result = {
   explanation: string;
   warningIndicators: string[];
   extracted: Record<string, string | undefined>;
+  version?: string;
   error?: string;
 };
 
@@ -71,7 +73,7 @@ export default function WealthGuardPage() {
     <main>
       <PageHeader
         title="WealthGuard"
-        subtitle="Paste text, note a link, or attach a document reference. We extract claims and flag warning indicators — without calling something a scam unless evidence supports it."
+        subtitle="Drop an investment offer here — text, link note, or document reference. We extract claims and flag warning indicators without calling something a scam or safe."
       />
 
       <div className="mb-3 flex flex-wrap gap-2" role="tablist" aria-label="WealthGuard input type">
@@ -97,8 +99,15 @@ export default function WealthGuardPage() {
         ))}
       </div>
 
-      <Panel>
+      <Panel className="border-dashed">
         <form className="space-y-4" onSubmit={onSubmit}>
+          <p className="font-display text-lg font-semibold tracking-tight">
+            Drop an investment offer here
+          </p>
+          <p className="muted text-sm leading-relaxed">
+            Support: pasted text, link notes, screenshots/PDFs as references. Binary OCR remains
+            limited — paste key claims for the strongest analysis.
+          </p>
           {mode === "link" ? (
             <Field label="Link or channel note" id="link" hint="We do not auto-fetch arbitrary URLs in MVP.">
               <input
@@ -166,41 +175,16 @@ export default function WealthGuardPage() {
       ) : null}
 
       {result && !result.error ? (
-        <Panel className="mt-4 space-y-3 animate-rise">
-          <div className="flex flex-wrap gap-2">
-            <Badge
-              tone={
-                result.overallOutcome.includes("Significant")
-                  ? "danger"
-                  : result.overallOutcome.includes("Further")
-                    ? "warn"
-                    : "default"
-              }
-            >
-              {result.overallOutcome}
-            </Badge>
-          </div>
-          <p>
-            <strong>Provider verification:</strong> {result.providerVerification}
-          </p>
-          <p>
-            <strong>Product transparency:</strong> {result.transparency}
-          </p>
-          <p>
-            <strong>Return claim:</strong> {result.returnClaim}
-          </p>
-          <p className="leading-relaxed">{result.explanation}</p>
-          {result.warningIndicators?.length ? (
-            <ul className="list-disc space-y-1 pl-5 text-sm">
-              {result.warningIndicators.map((w) => (
-                <li key={w}>{w}</li>
-              ))}
-            </ul>
-          ) : null}
-          <pre className="overflow-auto rounded-xl bg-surface p-3 text-xs">
-            {JSON.stringify(result.extracted, null, 2)}
-          </pre>
-        </Panel>
+        <WealthGuardAssessment
+          overallOutcome={result.overallOutcome}
+          providerVerification={result.providerVerification}
+          transparency={result.transparency}
+          returnClaim={result.returnClaim}
+          explanation={result.explanation}
+          warningIndicators={result.warningIndicators ?? []}
+          extracted={result.extracted ?? {}}
+          version={result.version}
+        />
       ) : null}
     </main>
   );

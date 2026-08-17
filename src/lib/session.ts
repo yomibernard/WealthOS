@@ -20,6 +20,7 @@ export async function getSessionUser() {
       riskTolerance: true,
       investmentExperience: true,
       liquidityNeeds: true,
+      avatarStorageKey: true,
       status: true,
       deletedAt: true,
     },

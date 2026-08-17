@@ -172,6 +172,15 @@ export type CustomerContext = {
   } | null;
 };
 
+export type AiRichCard = {
+  type: "scenario" | "metric" | "cta" | "alert";
+  title: string;
+  body?: string;
+  rows?: { label: string; value: string }[];
+  href?: string;
+  ctaLabel?: string;
+};
+
 export type AiResponse = {
   intent: Intent;
   agent: AgentName;
@@ -183,6 +192,7 @@ export type AiResponse = {
   escalate: boolean;
   escalationReason?: string;
   recommendationIds?: string[];
+  cards?: AiRichCard[];
 };
 
 export function classifyIntent(message: string): Intent {
@@ -367,6 +377,7 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
   let confidence = nw.confidence;
   let escalate = false;
   let escalationReason: string | undefined;
+  let cards: AiRichCard[] | undefined;
 
   switch (intent) {
     case "net_worth": {
@@ -481,8 +492,31 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
             `Option ${s.id} — ${s.label}: liquidity change ₦${Math.round(s.liquidityDelta).toLocaleString("en-NG")}, debt change ₦${Math.round(s.debtDelta).toLocaleString("en-NG")}. ${s.goalImpact} ${s.riskNote}`,
         ),
         "None of these outcomes are certain; assumptions dominate.",
+        "Open the affordability simulator to adjust price, cash, rent and rates interactively.",
       ].join("\n\n");
+      cards = scenarios.map((s) => ({
+        type: "scenario" as const,
+        title: `${s.label}`,
+        body: s.goalImpact,
+        rows: [
+          { label: "Liquidity", value: `₦${Math.round(s.liquidityDelta).toLocaleString("en-NG")}` },
+          { label: "Debt", value: `₦${Math.round(s.debtDelta).toLocaleString("en-NG")}` },
+          {
+            label: "Monthly cash flow",
+            value: `₦${Math.round(s.cashFlowMonthlyDelta).toLocaleString("en-NG")}`,
+          },
+          { label: "Concentration", value: `${s.concentrationDelta} pts` },
+        ],
+        href: "/app/plan/scenarios",
+        ctaLabel: "Run detailed scenario",
+      }));
+      cards.push({
+        type: "alert",
+        title: "Illustrative only",
+        body: scenarios[0]?.riskNote ?? "Assumptions dominate these outcomes.",
+      });
       confidence = 0.55;
+      assumptions.push("Mortgage rate 22% p.a.", "20-year term", "Illustrative rent and invest return");
       break;
     }
     case "property_intel": {
@@ -938,7 +972,63 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
       confidence = 0.85;
       break;
     }
-    case "affordability":
+    case "affordability": {
+      const priceMatch =
+        message.match(/₦\s?([\d,.]+)\s*(m|bn)?/i) ||
+        message.match(/([\d,.]+)\s*(m|bn)\b/i);
+      let price = 40_000_000;
+      if (priceMatch) {
+        const n = parseFloat(priceMatch[1].replace(/,/g, ""));
+        const unit = (priceMatch[2] || "").toLowerCase();
+        price = unit === "bn" ? n * 1_000_000_000 : unit === "m" ? n * 1_000_000 : n;
+      }
+      const scenarios = comparePropertyDecision({
+        propertyPrice: price,
+        cashAvailable: liquid,
+        mortgageRateAnnual: 0.22,
+        mortgageTermYears: 20,
+        rentMonthly: Math.max(500_000, Math.round(price * 0.015)),
+        investReturnAnnual: 0.12,
+      });
+      toolsUsed.push("decisionSimulator");
+      const propShare =
+        nw.assetBreakdown.find((b) => b.category === "PROPERTY")?.percent ?? 0;
+      content = [
+        `Here’s a grounded affordability read for about ₦${Math.round(price).toLocaleString("en-NG")}.`,
+        `Your liquid cash buffer is about ₦${Math.round(liquid).toLocaleString("en-NG")} (~${emergencyMonths.toFixed(1)} months of expenses).`,
+        `Property already represents roughly ${propShare.toFixed(0)}% of assets — buying may raise concentration.`,
+        "Compare buy cash / mortgage / rent+invest below, then open the simulator to stress the inputs.",
+      ].join(" ");
+      cards = [
+        {
+          type: "metric",
+          title: "Current property exposure",
+          rows: [
+            { label: "Property share", value: `${propShare.toFixed(0)}%` },
+            { label: "Liquidity (months)", value: emergencyMonths.toFixed(1) },
+            { label: "Cash available (est.)", value: `₦${Math.round(liquid).toLocaleString("en-NG")}` },
+          ],
+        },
+        ...scenarios.map((s) => ({
+          type: "scenario" as const,
+          title: s.label,
+          body: s.goalImpact,
+          rows: [
+            { label: "Liquidity impact", value: `₦${Math.round(s.liquidityDelta).toLocaleString("en-NG")}` },
+            { label: "Debt impact", value: `₦${Math.round(s.debtDelta).toLocaleString("en-NG")}` },
+            {
+              label: "Monthly cash flow",
+              value: `₦${Math.round(s.cashFlowMonthlyDelta).toLocaleString("en-NG")}`,
+            },
+          ],
+          href: "/app/plan/scenarios",
+          ctaLabel: "Run detailed scenario",
+        })),
+      ];
+      confidence = Math.min(0.7, nw.confidence + 0.1);
+      assumptions.push("Illustrative mortgage and rent assumptions", "Uses liquid cash from Wealth Graph");
+      break;
+    }
     default: {
       if (confidence < 0.45) {
         content =
@@ -982,6 +1072,7 @@ export function runWealthAI(message: string, ctx: CustomerContext): AiResponse {
     missingInformation,
     escalate,
     escalationReason,
+    cards,
   };
 }
 

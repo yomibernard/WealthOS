@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Badge, PageHeader, Panel } from "@/components/ui";
+import { Badge, EmptyState, PageHeader, Panel } from "@/components/ui";
+import { WealthMap } from "@/components/charts/WealthMap";
+import { AssetCoverEditor } from "@/components/wealth/AssetCoverEditor";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { buildHomeDashboard } from "@/services/wealth";
+import { buildWealthMapSegments } from "@/engines/wealth-visuals";
 import { formatCurrency, formatNaira, provenanceLabel } from "@/lib/format";
 
 export default async function WealthPage() {
@@ -20,6 +23,11 @@ export default async function WealthPage() {
     where: { userId: user.id },
     orderBy: { balance: "desc" },
   });
+
+  const mapSegments = buildWealthMapSegments(
+    dash.netWorth.assetBreakdown,
+    dash.netWorth.totalLiabilitiesNgn,
+  );
 
   return (
     <main>
@@ -46,73 +54,69 @@ export default async function WealthPage() {
           <Link href="/app/wealth/confidence" className="text-sm font-semibold text-accent">
             Data confidence
           </Link>
-          <Link href="/app/cashflow" className="text-sm font-semibold text-accent">
-            Cash flow
-          </Link>
-          <Link href="/app/property" className="text-sm font-semibold text-accent">
-            Property
-          </Link>
-          <Link href="/app/business" className="text-sm font-semibold text-accent">
-            Business
-          </Link>
-          <Link href="/app/insurance" className="text-sm font-semibold text-accent">
-            Insurance
-          </Link>
-          <Link href="/app/pension" className="text-sm font-semibold text-accent">
-            Pension
-          </Link>
-          <Link href="/app/connections" className="text-sm font-semibold text-accent">
-            Connections
-          </Link>
-          <Link href="/app/crypto" className="text-sm font-semibold text-accent">
-            Crypto
-          </Link>
-          <Link href="/app/lending" className="text-sm font-semibold text-accent">
-            Lending
-          </Link>
         </div>
       </Panel>
 
-      <Panel className="mt-3">
-        <div className="flex items-center justify-between">
-          <p className="eyebrow">Allocation</p>
-          <Link href="/app/wealth/allocation" className="text-sm font-semibold text-accent">
-            View
-          </Link>
-        </div>
-        <ul className="mt-3 space-y-2">
-          {dash.netWorth.assetBreakdown.map((b) => (
-            <li key={b.category} className="flex justify-between text-sm">
-              <span>{b.category}</span>
-              <span>
-                {b.percent.toFixed(0)}% · {formatNaira(b.valueNgn, true)}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </Panel>
+      <div className="mt-3">
+        <WealthMap
+          segments={mapSegments}
+          totalAssetsNgn={dash.netWorth.totalAssetsNgn}
+        />
+      </div>
 
       <section className="mt-5">
         <h2 className="font-display text-xl">Assets</h2>
         <div className="mt-3 space-y-3">
-          {assets.map((a) => (
-            <Panel key={a.id}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="font-semibold">{a.name}</p>
-                  <p className="muted text-sm">
-                    {a.provider ?? a.assetType} · {a.ownershipPercent}% ownership
+          {assets.length ? (
+            assets.map((a) => (
+              <article key={a.id} className="asset-tile">
+                {a.coverStorageKey ? (
+                  <div className="mb-3 overflow-hidden rounded-[var(--radius-sm)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`/api/media?key=${encodeURIComponent(a.coverStorageKey)}`}
+                      alt=""
+                      className="h-32 w-full object-cover"
+                    />
+                  </div>
+                ) : null}
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold">{a.name}</p>
+                    <p className="muted text-sm">
+                      {a.provider ?? a.assetType} · {a.ownershipPercent}% ownership
+                    </p>
+                  </div>
+                  <p className="font-semibold">
+                    {formatCurrency(a.value, a.currency, true)}
                   </p>
                 </div>
-                <p className="font-semibold">
-                  {formatCurrency(a.value, a.currency, true)}
+                <p className="muted mt-2 text-sm">
+                  {provenanceLabel(a.source, a.verificationStatus, a.lastValuationDate)}
                 </p>
-              </div>
-              <p className="muted mt-2 text-sm">
-                {provenanceLabel(a.source, a.verificationStatus, a.lastValuationDate)}
-              </p>
-            </Panel>
-          ))}
+                {a.category === "PROPERTY" ? (
+                  <AssetCoverEditor
+                    assetId={a.id}
+                    initialSrc={
+                      a.coverStorageKey
+                        ? `/api/media?key=${encodeURIComponent(a.coverStorageKey)}`
+                        : null
+                    }
+                  />
+                ) : null}
+              </article>
+            ))
+          ) : (
+            <EmptyState
+              title="No assets added yet"
+              body="Add what you own so WealthOS can build your Wealth Map and estimated net worth."
+              action={
+                <Link href="/app/wealth/add" className="btn btn-accent">
+                  Add to my wealth
+                </Link>
+              }
+            />
+          )}
         </div>
       </section>
 
@@ -132,9 +136,15 @@ export default async function WealthPage() {
               </Panel>
             ))
           ) : (
-            <Panel>
-              <p className="muted">No liabilities recorded.</p>
-            </Panel>
+            <EmptyState
+              title="No liabilities recorded"
+              body="If you have loans or credit, add them so net worth and debt health stay honest."
+              action={
+                <Link href="/app/lending" className="btn btn-ghost">
+                  Review lending awareness
+                </Link>
+              }
+            />
           )}
         </div>
       </section>
