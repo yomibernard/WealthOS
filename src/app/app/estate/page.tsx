@@ -1,7 +1,17 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { Badge, Button, Field, PageHeader, Panel, TextInput } from "@/components/ui";
+import Link from "next/link";
+import {
+  Badge,
+  Button,
+  Field,
+  HeroMetric,
+  InsightPanel,
+  PageHeader,
+  Panel,
+  TextInput,
+} from "@/components/ui";
 import { formatPercent } from "@/lib/format";
 
 type EstateItem = {
@@ -82,11 +92,15 @@ export default function EstatePage() {
     await load();
   }
 
+  const wills = items.filter((i) => i.kind === "will");
+  const beneficiaries = items.filter((i) => i.kind === "beneficiaries");
+  const docs = items.filter((i) => i.kind !== "will" && i.kind !== "beneficiaries");
+
   return (
     <main>
       <PageHeader
-        title="Estate & will lite"
-        subtitle="Inventory of wills, beneficiaries and succession notes — not legal drafting."
+        title="Estate readiness"
+        subtitle="Calm inventory of wills, beneficiaries and succession notes — not legal drafting, and no mortality imagery."
       />
 
       {error ? (
@@ -97,21 +111,45 @@ export default function EstatePage() {
 
       {intel ? (
         <>
-          <Panel>
-            <div className="flex flex-wrap gap-2">
-              <Badge>{intel.engineVersion}</Badge>
-              <Badge tone={intel.grade === "thin" ? "danger" : intel.grade === "emerging" ? "warn" : "default"}>
-                {intel.grade}
-              </Badge>
-            </div>
-            <p className="font-display mt-3 text-4xl">{formatPercent(intel.score, 0)}</p>
-            <p className="muted text-sm">Readiness score (illustrative)</p>
-            <p className="mt-4 leading-relaxed">{intel.narrative}</p>
-            <p className="muted mt-3 text-xs">{intel.disclaimer}</p>
-          </Panel>
+          <HeroMetric
+            label="Estate readiness"
+            value={formatPercent(intel.score, 0)}
+            hint={
+              <>
+                <Badge>{intel.engineVersion}</Badge>
+                <Badge
+                  tone={
+                    intel.grade === "thin"
+                      ? "danger"
+                      : intel.grade === "emerging"
+                        ? "warn"
+                        : "default"
+                  }
+                >
+                  {intel.grade}
+                </Badge>
+              </>
+            }
+          />
+
+          <InsightPanel className="mt-4" eyebrow="Readiness">
+            {intel.narrative}
+          </InsightPanel>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link href="#estate-checklist" className="btn btn-accent">
+              Review readiness
+            </Link>
+            <Link href="/app/adviser-request" className="btn btn-soft">
+              Speak to specialist
+            </Link>
+            <Link href="/app/documents" className="btn btn-ghost">
+              Important documents
+            </Link>
+          </div>
 
           {intel.signals.length ? (
-            <Panel className="mt-3">
+            <Panel className="mt-4">
               <p className="eyebrow">Signals</p>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
                 {intel.signals.map((s) => (
@@ -121,7 +159,7 @@ export default function EstatePage() {
             </Panel>
           ) : null}
 
-          <Panel className="mt-3">
+          <Panel id="estate-checklist" className="mt-3">
             <p className="eyebrow">Suggested checklist</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
               {intel.checklist.map((c) => (
@@ -129,12 +167,28 @@ export default function EstatePage() {
               ))}
             </ul>
           </Panel>
+
+          <p className="muted mt-3 text-xs">{intel.disclaimer}</p>
         </>
       ) : null}
 
-      <Panel className="mt-4">
+      <EstateGroup title="Will status" items={wills} empty="No will record yet." onUpdate={updateStatus} />
+      <EstateGroup
+        title="Beneficiaries"
+        items={beneficiaries}
+        empty="No beneficiary records yet."
+        onUpdate={updateStatus}
+      />
+      <EstateGroup
+        title="Asset documentation & trust awareness"
+        items={docs}
+        empty="No additional estate documents recorded."
+        onUpdate={updateStatus}
+      />
+
+      <Panel className="mt-5">
         <p className="eyebrow">Add estate record</p>
-        <form className="mt-3 space-y-3" onSubmit={onSubmit}>
+        <form className="mt-3 space-y-3" onSubmit={(e) => void onSubmit(e)}>
           <Field label="Kind" id="kind">
             <select
               id="kind"
@@ -172,7 +226,11 @@ export default function EstatePage() {
               ))}
             </select>
           </Field>
-          <Field label="Notes" id="notes" hint="Location of originals, solicitor name — not legal text.">
+          <Field
+            label="Notes"
+            id="notes"
+            hint="Location of originals, solicitor name — not legal text."
+          >
             <TextInput id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
           </Field>
           <Button type="submit" className="w-full">
@@ -180,64 +238,74 @@ export default function EstatePage() {
           </Button>
         </form>
       </Panel>
-
-      <section className="mt-5" aria-labelledby="estate-items">
-        <h2 id="estate-items" className="font-display text-xl">
-          Records
-        </h2>
-        <div className="mt-3 space-y-3">
-          {items.length === 0 ? (
-            <Panel>
-              <p className="muted text-sm">No estate records yet.</p>
-            </Panel>
-          ) : (
-            items.map((item) => (
-              <Panel key={item.id}>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-semibold">{item.label}</p>
-                    <p className="muted text-sm">
-                      {item.kind.replaceAll("_", " ")} · {item.status}
-                    </p>
-                    {item.notes ? <p className="muted mt-2 text-sm">{item.notes}</p> : null}
-                  </div>
-                  <Badge
-                    tone={
-                      item.status === "missing"
-                        ? "danger"
-                        : item.status === "draft"
-                          ? "warn"
-                          : "default"
-                    }
-                  >
-                    {item.status}
-                  </Badge>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {item.status !== "documented" ? (
-                    <Button
-                      type="button"
-                      variant="soft"
-                      onClick={() => void updateStatus(item.id, "documented")}
-                    >
-                      Mark documented
-                    </Button>
-                  ) : null}
-                  {item.status !== "reviewed" ? (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => void updateStatus(item.id, "reviewed")}
-                    >
-                      Mark reviewed
-                    </Button>
-                  ) : null}
-                </div>
-              </Panel>
-            ))
-          )}
-        </div>
-      </section>
     </main>
+  );
+}
+
+function EstateGroup({
+  title,
+  items,
+  empty,
+  onUpdate,
+}: {
+  title: string;
+  items: EstateItem[];
+  empty: string;
+  onUpdate: (id: string, next: string) => void;
+}) {
+  return (
+    <section className="mt-5">
+      <h2 className="font-display text-xl">{title}</h2>
+      <div className="mt-3 space-y-3">
+        {items.length === 0 ? (
+          <p className="muted text-sm">{empty}</p>
+        ) : (
+          items.map((item) => (
+            <article key={item.id} className="asset-tile">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-semibold">{item.label}</p>
+                  <p className="muted text-sm">
+                    {item.kind.replaceAll("_", " ")} · {item.status}
+                  </p>
+                  {item.notes ? <p className="muted mt-2 text-sm">{item.notes}</p> : null}
+                </div>
+                <Badge
+                  tone={
+                    item.status === "missing"
+                      ? "danger"
+                      : item.status === "draft"
+                        ? "warn"
+                        : "default"
+                  }
+                >
+                  {item.status}
+                </Badge>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {item.status !== "documented" ? (
+                  <Button
+                    type="button"
+                    variant="soft"
+                    onClick={() => onUpdate(item.id, "documented")}
+                  >
+                    Mark documented
+                  </Button>
+                ) : null}
+                {item.status !== "reviewed" ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => onUpdate(item.id, "reviewed")}
+                  >
+                    Mark reviewed
+                  </Button>
+                ) : null}
+              </div>
+            </article>
+          ))
+        )}
+      </div>
+    </section>
   );
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Badge, PageHeader, Panel } from "@/components/ui";
+import { Badge, HeroMetric, InsightPanel, PageHeader, Panel } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { loadFxRates } from "@/services/wealth";
@@ -21,7 +21,7 @@ export default async function InsurancePage() {
   if (!getFeatureFlags().insuranceIntel) {
     return (
       <main>
-        <PageHeader title="Insurance inventory" subtitle="Temporarily unavailable." />
+        <PageHeader title="Insurance" subtitle="Temporarily unavailable." />
       </main>
     );
   }
@@ -45,44 +45,48 @@ export default async function InsurancePage() {
   const hasDependants = household.some((h) => h.dependant);
 
   const intel = analyseInsurance(assets, annualIncome, fx, hasDependants);
+  const life = intel.covers.filter((c) => /life/i.test(c.coverType) || /life/i.test(c.name));
+  const other = intel.covers.filter((c) => !life.some((l) => l.id === c.id));
 
   return (
     <main>
       <PageHeader
-        title="Insurance inventory"
-        subtitle="What you already hold and where records look thin — not underwriting."
+        title="Insurance"
+        subtitle="Protection-first inventory — what you hold and where records look thin. Not a sales floor."
       />
 
-      <Panel>
-        <div className="flex flex-wrap gap-2">
-          <Badge>{intel.engineVersion}</Badge>
-          <Badge>{intel.covers.length} policies</Badge>
-          {intel.lifeMultipleOfIncome != null && intel.lifeMultipleOfIncome > 0 ? (
-            <Badge>
-              Life ~{intel.lifeMultipleOfIncome.toFixed(1)}× income
-            </Badge>
-          ) : null}
-        </div>
-        <p className="mt-4 leading-relaxed">{intel.narrative}</p>
-        <p className="muted mt-3 text-xs">{intel.disclaimer}</p>
-      </Panel>
+      <HeroMetric
+        label="Sum assured recorded"
+        value={formatNaira(intel.totalSumAssuredNgn, true)}
+        hint={
+          <>
+            <Badge>{intel.engineVersion}</Badge>
+            <Badge>{intel.covers.length} policies</Badge>
+            {intel.lifeMultipleOfIncome != null && intel.lifeMultipleOfIncome > 0 ? (
+              <Badge>Life ~{intel.lifeMultipleOfIncome.toFixed(1)}× income</Badge>
+            ) : null}
+          </>
+        }
+      />
 
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        <Panel>
-          <p className="eyebrow">Sum assured (recorded)</p>
-          <p className="font-display mt-1 text-2xl">
-            {formatNaira(intel.totalSumAssuredNgn, true)}
-          </p>
-        </Panel>
+      <InsightPanel className="mt-4" eyebrow="Protection lens">
+        {intel.narrative}
+      </InsightPanel>
+
+      <div className="mt-4 grid grid-cols-2 gap-3">
         <Panel>
           <p className="eyebrow">Annual income (est.)</p>
           <p className="font-display mt-1 text-2xl">{formatNaira(intel.annualIncomeNgn, true)}</p>
+        </Panel>
+        <Panel>
+          <p className="eyebrow">Dependants on file</p>
+          <p className="font-display mt-1 text-2xl">{hasDependants ? "Yes" : "None marked"}</p>
         </Panel>
       </div>
 
       {intel.gaps.length > 0 ? (
         <Panel className="mt-3">
-          <p className="eyebrow">Possible gaps in your record</p>
+          <p className="eyebrow">Coverage gaps in your record</p>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
             {intel.gaps.map((g) => (
               <li key={g}>{g}</li>
@@ -91,9 +95,9 @@ export default async function InsurancePage() {
           <p className="muted mt-3 text-sm">
             Confirm existing cover before shopping.{" "}
             <Link href="/app/adviser-request" className="font-semibold text-accent">
-              Request an adviser
+              Speak with an adviser
             </Link>{" "}
-            for product choice.
+            for product choice — WealthOS will not hard-sell policies here.
           </p>
         </Panel>
       ) : null}
@@ -109,47 +113,73 @@ export default async function InsurancePage() {
         </Panel>
       ) : null}
 
-      <section className="mt-5" aria-labelledby="policies-heading">
-        <h2 id="policies-heading" className="font-display text-xl">
-          Policies
-        </h2>
-        <div className="mt-3 space-y-3">
-          {intel.covers.length === 0 ? (
-            <Panel>
-              <p className="muted text-sm">
-                No insurance assets yet.{" "}
-                <Link href="/app/wealth/add" className="font-semibold text-accent">
-                  Add a policy
-                </Link>{" "}
-                (category: Insurance). Put sum assured in notes if value is 0.
-              </p>
-            </Panel>
-          ) : (
-            intel.covers.map((c) => (
-              <Panel key={c.id}>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-semibold">{c.name}</p>
-                    <p className="muted text-sm">
-                      {c.coverType}
-                      {c.provider ? ` · ${c.provider}` : ""}
-                    </p>
-                  </div>
-                  <p className="font-display text-xl">
-                    {c.sumAssuredNgn == null
-                      ? "—"
-                      : formatNaira(c.sumAssuredNgn, true)}
+      <CoverSection title="Life cover" covers={life} empty="No life policies recorded." />
+      <CoverSection title="Other cover" covers={other} empty="No other policies recorded." />
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Link href="/app/household" className="btn btn-soft">
+          Review beneficiaries / household
+        </Link>
+        <Link href="/app/documents" className="btn btn-ghost">
+          Policy documents
+        </Link>
+        <Link href="/app/wealth/add" className="btn btn-ghost">
+          Add a policy
+        </Link>
+      </div>
+
+      <p className="muted mt-4 text-xs">{intel.disclaimer}</p>
+    </main>
+  );
+}
+
+function CoverSection({
+  title,
+  covers,
+  empty,
+}: {
+  title: string;
+  covers: {
+    id: string;
+    name: string;
+    coverType: string;
+    provider: string | null;
+    sumAssuredNgn: number | null;
+    notes: string | null;
+    confidence: number;
+  }[];
+  empty: string;
+}) {
+  return (
+    <section className="mt-5">
+      <h2 className="font-display text-xl">{title}</h2>
+      <div className="mt-3 space-y-3">
+        {covers.length === 0 ? (
+          <p className="muted text-sm">{empty}</p>
+        ) : (
+          covers.map((c) => (
+            <article key={c.id} className="asset-tile">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-semibold">{c.name}</p>
+                  <p className="muted text-sm">
+                    {c.coverType}
+                    {c.provider ? ` · ${c.provider}` : ""}
                   </p>
                 </div>
-                {c.notes ? <p className="muted mt-2 text-sm">{c.notes}</p> : null}
-                <p className="muted mt-1 text-xs">
-                  Confidence {formatPercent(c.confidence * 100, 0)}
+                <p className="font-display text-xl">
+                  {c.sumAssuredNgn == null ? "—" : formatNaira(c.sumAssuredNgn, true)}
                 </p>
-              </Panel>
-            ))
-          )}
-        </div>
-      </section>
-    </main>
+              </div>
+              {c.notes ? <p className="muted mt-2 text-sm">{c.notes}</p> : null}
+              <p className="muted mt-1 text-xs">
+                Premium / renewal detail may sit in notes or documents · confidence{" "}
+                {formatPercent(c.confidence * 100, 0)}
+              </p>
+            </article>
+          ))
+        )}
+      </div>
+    </section>
   );
 }

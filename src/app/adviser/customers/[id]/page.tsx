@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { Badge, PageHeader, Panel } from "@/components/ui";
+import { Badge, InsightPanel, PageHeader, Panel } from "@/components/ui";
+import { UserAvatar } from "@/components/profile/ProfileAvatar";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { buildHomeDashboard } from "@/services/wealth";
@@ -72,14 +73,29 @@ export default async function AdviserCustomerPage({
         })
       : null;
 
+  const allowedTabs = new Set([
+    "overview",
+    "care",
+    "wealth",
+    "goals",
+    "actions",
+    "ai",
+    "documents",
+    "timeline",
+  ]);
   const defaultTab =
     sp.tab === "care" || care.openCount > 0 || opsRemindBanner
       ? "care"
-      : sp.tab === "wealth" ||
-          sp.tab === "actions" ||
-          sp.tab === "ai" ||
-          sp.tab === "timeline"
-        ? sp.tab
+      : sp.tab && allowedTabs.has(sp.tab)
+        ? (sp.tab as
+            | "overview"
+            | "care"
+            | "wealth"
+            | "goals"
+            | "actions"
+            | "ai"
+            | "documents"
+            | "timeline")
         : "overview";
 
   const wealthTier =
@@ -89,11 +105,19 @@ export default async function AdviserCustomerPage({
         ? "Mass affluent"
         : "Emerging wealth";
 
+  const avatarSrc = customer.avatarStorageKey
+    ? `/api/media?key=${encodeURIComponent(customer.avatarStorageKey)}`
+    : null;
+  const lastContact =
+    careHistory.items[0]?.title != null
+      ? `Last care: ${careHistory.items[0].title}`
+      : "No care acknowledgment yet";
+
   return (
     <Customer360Workspace
       defaultTab={defaultTab}
       header={
-        <header className="space-y-3">
+        <header className="space-y-4">
           <PageHeader
             title={customer.name}
             subtitle={`${wealthTier} · Care before product`}
@@ -103,19 +127,30 @@ export default async function AdviserCustomerPage({
               </Link>
             }
           />
-          <div className="flex flex-wrap gap-2 text-sm">
-            <Badge>Health {dash?.health.overall ?? "—"}</Badge>
-            <Badge>
-              NW {formatNaira(dash?.netWorth.netWorthNgn ?? 0, true)}
-            </Badge>
-            <Badge tone={care.openCount > 0 ? "warn" : "default"}>
-              {care.openCount} open care
-            </Badge>
-            {customer.goals[0] ? <Badge>Goal: {customer.goals[0].name}</Badge> : null}
-            <Badge>
-              Risk {customer.riskTolerance ?? "unset"}
-            </Badge>
+          <div className="flex flex-wrap items-start gap-4">
+            <UserAvatar
+              name={customer.name}
+              src={avatarSrc}
+              className="h-16 w-16 text-lg"
+            />
+            <div className="min-w-0 flex-1 space-y-2">
+              <p className="muted text-sm">{customer.email}</p>
+              <div className="flex flex-wrap gap-2 text-sm">
+                <Badge>Health {dash?.health.overall ?? "—"}</Badge>
+                <Badge>NW {formatNaira(dash?.netWorth.netWorthNgn ?? 0, true)}</Badge>
+                <Badge tone={care.openCount > 0 ? "warn" : "default"}>
+                  {care.openCount} open care
+                </Badge>
+                {customer.goals[0] ? <Badge>Goal: {customer.goals[0].name}</Badge> : null}
+                <Badge>Risk {customer.riskTolerance ?? "unset"}</Badge>
+              </div>
+              <p className="muted text-xs">{lastContact}</p>
+            </div>
           </div>
+          <InsightPanel eyebrow="360 rule">
+            Care desk and acknowledgments first when queues are open. Ack never closes admin
+            escalations or privacy requests.
+          </InsightPanel>
         </header>
       }
       overview={
@@ -267,16 +302,6 @@ export default async function AdviserCustomerPage({
             </Panel>
           ) : null}
           <Panel>
-            <p className="eyebrow">Goals</p>
-            <ul className="mt-2 space-y-1 text-sm">
-              {customer.goals.map((g) => (
-                <li key={g.id}>
-                  {g.name} · target {formatNaira(g.targetAmount, true)}
-                </li>
-              ))}
-            </ul>
-          </Panel>
-          <Panel>
             <p className="eyebrow">Consent state</p>
             <ul className="mt-2 space-y-1 text-sm">
               {customer.consents.map((c) => (
@@ -288,6 +313,28 @@ export default async function AdviserCustomerPage({
           </Panel>
         </div>
       }
+      goals={
+        <Panel>
+          <p className="eyebrow">Goals</p>
+          {customer.goals.length ? (
+            <ul className="mt-3 space-y-3">
+              {customer.goals.map((g) => (
+                <li key={g.id} className="rounded-xl border border-line p-3">
+                  <p className="font-semibold">{g.name}</p>
+                  <p className="muted mt-1 text-sm">
+                    Target {formatNaira(g.targetAmount, true)}
+                    {g.targetDate
+                      ? ` · by ${new Date(g.targetDate).toLocaleDateString("en-GB")}`
+                      : ""}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="muted mt-2 text-sm">No goals on file yet.</p>
+          )}
+        </Panel>
+      }
       actions={
         <div className="space-y-3">
           <Panel>
@@ -296,6 +343,9 @@ export default async function AdviserCustomerPage({
               {customer.recommendations.map((r) => (
                 <li key={r.id}>{r.title}</li>
               ))}
+              {!customer.recommendations.length ? (
+                <li className="muted">No proposed recommendations.</li>
+              ) : null}
             </ul>
           </Panel>
           {flags.adviserCollab ? <AdviserNudgePanel customerId={customer.id} /> : null}
@@ -314,10 +364,26 @@ export default async function AdviserCustomerPage({
                 </div>
               </li>
             ))}
+            {!customer.conversations.length ? (
+              <li className="muted">No recent conversations.</li>
+            ) : null}
           </ul>
-          <p className="muted mt-3 text-xs">
-            Documents on file: {customer.documents.length}
-          </p>
+        </Panel>
+      }
+      documents={
+        <Panel>
+          <p className="eyebrow">Documents on file</p>
+          <ul className="mt-2 space-y-2 text-sm">
+            {customer.documents.map((d) => (
+              <li key={d.id} className="flex flex-wrap items-center justify-between gap-2">
+                <span>{d.name}</span>
+                <Badge>{d.mimeType}</Badge>
+              </li>
+            ))}
+            {!customer.documents.length ? (
+              <li className="muted">No documents uploaded yet.</li>
+            ) : null}
+          </ul>
         </Panel>
       }
       timeline={
@@ -336,6 +402,8 @@ export default async function AdviserCustomerPage({
           health={dash?.health.overall ?? 0}
           attention={dash?.attention ?? []}
           goals={customer.goals.map((g) => g.name)}
+          careOpen={care.openCount}
+          risk={customer.riskTolerance}
         />
       }
     />

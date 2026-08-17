@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Button, PageHeader } from "@/components/ui";
+import { Button, InsightPanel, PageHeader } from "@/components/ui";
 
 type Msg = {
   role: "user" | "assistant";
@@ -69,10 +69,16 @@ export default function AdviserAiPage() {
       <PageHeader
         title="WealthAI (book)"
         subtitle="Care-first next steps for your book — same ranking as Needs your attention."
+        action={
+          <Link href="/adviser" className="btn btn-soft">
+            Morning brief
+          </Link>
+        }
       />
-      <Link href="/adviser" className="btn btn-soft mb-3 w-full sm:w-auto">
-        Back to Care radar
-      </Link>
+      <InsightPanel eyebrow="Grounding">
+        Answers stay on your Care radar pulse. Ops queues remain authoritative — AI never closes
+        cases.
+      </InsightPanel>
       <div className="flex flex-1 flex-col gap-3 pb-28">
         {messages.map((m, i) => (
           <div

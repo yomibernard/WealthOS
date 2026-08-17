@@ -485,32 +485,126 @@ textarea {
 /* —— Landing story —— */
 .landing {
   min-height: 100dvh;
-  background:
-    radial-gradient(1200px 520px at 12% -10%, color-mix(in srgb, var(--accent-soft) 70%, white), transparent 60%),
-    radial-gradient(900px 480px at 100% 8%, color-mix(in srgb, var(--info-soft) 55%, white), transparent 55%),
-    linear-gradient(180deg, #eef3f1 0%, var(--surface) 42%, #f7f9fa 100%);
+  background: var(--surface);
   color: var(--ink);
   overflow-x: hidden;
 }
 
 .landing-hero {
   position: relative;
+  isolation: isolate;
   min-height: 100dvh;
   display: grid;
-  align-content: center;
-  padding: clamp(1.5rem, 4vw, 3rem) clamp(1.1rem, 4vw, 2.5rem) 4rem;
+  grid-template-rows: auto 1fr;
+  align-content: stretch;
+  padding: 0 clamp(1.1rem, 4vw, 2.5rem) clamp(3rem, 8vh, 5rem);
+  color: #f7faf9;
+}
+
+.landing-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.landing-topbar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 0 0.5rem;
+  pointer-events: auto;
+}
+
+.landing-topbar-brand {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.landing-topbar-auth {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.landing-auth-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.landing-auth-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.landing-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--sidebar);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.landing-auth-btn:hover {
+  background: var(--accent-soft);
+}
+
+.landing-hero-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+  display: block;
+  transform: scale(1.02);
+}
+
+.landing-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8, 28, 24, 0.45) 0%,
+      rgba(8, 28, 24, 0.28) 35%,
+      rgba(8, 28, 24, 0.72) 72%,
+      rgba(8, 28, 24, 0.88) 100%
+    ),
+    linear-gradient(90deg, rgba(8, 28, 24, 0.55) 0%, rgba(8, 28, 24, 0.15) 55%, transparent 100%);
 }
 
 .landing-hero-inner {
   position: relative;
   z-index: 1;
   width: min(720px, 100%);
-  margin: 0 auto;
+  margin: 0;
+  align-self: end;
+  padding-top: 2rem;
   animation: rise 0.7s ease both;
 }
 
+.landing-hero .hero-brand {
+  color: #ffffff;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
+}
+
 .landing-eyebrow {
-  color: color-mix(in srgb, var(--muted) 85%, var(--accent));
+  color: color-mix(in srgb, #d8efe7 75%, white);
 }
 
 .landing-promise {
@@ -521,7 +615,7 @@ textarea {
   font-weight: 550;
   line-height: 1.25;
   letter-spacing: -0.015em;
-  color: var(--ink-soft);
+  color: rgba(255, 255, 255, 0.96);
 }
 
 .landing-support {
@@ -529,7 +623,7 @@ textarea {
   max-width: 26rem;
   font-size: 1.05rem;
   line-height: 1.55;
-  color: var(--muted);
+  color: rgba(247, 250, 249, 0.82);
 }
 
 .landing-cta {
@@ -539,33 +633,80 @@ textarea {
   margin-top: 1.75rem;
 }
 
+.landing-cta-secondary-row {
+  margin-top: 0.75rem;
+}
+
+.landing-cta-secondary {
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.landing-cta-secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 .landing-note {
   margin-top: 1rem;
   font-size: 0.85rem;
+  color: rgba(247, 250, 249, 0.7);
 }
 
-.landing-hero-visual {
-  position: absolute;
-  inset: auto 0 0;
-  height: min(48vh, 420px);
-  pointer-events: none;
-  opacity: 0.95;
+/* —— Wealth Check stages —— */
+.wc-stages {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
 }
 
-.landing-curve {
-  width: 100%;
-  height: 100%;
+.wc-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.7rem 0.65rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.55);
+  min-width: 0;
 }
 
-.landing-curve-line {
-  stroke-dasharray: 1200;
-  stroke-dashoffset: 1200;
-  animation: draw-curve 1.6s ease forwards 0.25s;
+.wc-stage.is-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
-@keyframes draw-curve {
-  to {
-    stroke-dashoffset: 0;
+.wc-stage.is-complete {
+  border-color: rgba(15, 118, 110, 0.35);
+}
+
+.wc-stage-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(15, 118, 110, 0.12);
+  color: var(--accent);
+}
+
+.wc-stage-label {
+  font-size: 0.72rem;
+  font-weight: 650;
+  line-height: 1.25;
+  color: var(--ink-soft);
+}
+
+.wc-stage.is-active .wc-stage-label {
+  color: var(--ink);
+}
+
+@media (max-width: 640px) {
+  .wc-stages {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -838,13 +979,12 @@ textarea {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .landing-curve-line,
   .landing-hero-inner {
     animation: none !important;
   }
 
-  .landing-curve-line {
-    stroke-dashoffset: 0;
+  .landing-hero-photo {
+    transform: none;
   }
 }
 
@@ -1002,6 +1142,314 @@ textarea {
   display: grid;
   gap: 0.85rem;
   margin-top: 0.85rem;
+}
+
+.dash-attention-empty {
+  margin-top: 0.85rem;
+  padding: 1.15rem 1.2rem;
+}
+
+.dash-bio-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.dash-also {
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.dash-also-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.dash-also-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin-top: 0.55rem;
+}
+
+.dash-also-link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.dash-also-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* —— Sprint 2 wealth surfaces —— */
+.wealth-view-toggle {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.wealth-view-btn {
+  border: 0;
+  background: transparent;
+  border-radius: 999px;
+  padding: 0.4rem 0.95rem;
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.wealth-view-btn.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.wealth-stat-link {
+  display: block;
+  padding: 0.95rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface-elevated);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.wealth-stat-link:hover {
+  border-color: var(--accent);
+}
+
+.wealth-bar-row + .wealth-bar-row {
+  margin-top: 0.65rem;
+}
+
+.wealth-bar-track {
+  margin-top: 0.35rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.wealth-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.wealth-waterfall-track {
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.wealth-waterfall-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.wealth-waterfall-fill.is-pos {
+  background: var(--accent);
+}
+
+.wealth-waterfall-fill.is-neg {
+  background: color-mix(in srgb, var(--danger) 75%, #8b2e2e);
+}
+
+.wealth-waterfall-fill.is-end {
+  background: var(--ink);
+}
+
+.wealth-dim-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-elevated);
+  text-decoration: none;
+  color: inherit;
+}
+
+.wealth-dim-link:hover {
+  border-color: var(--accent);
+}
+
+/* —— Sprint 4 WealthAI workspace —— */
+.ai-workspace {
+  display: flex;
+  flex-direction: column;
+  min-height: 75dvh;
+  padding-bottom: 1rem;
+}
+
+.ai-workspace-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ai-workspace-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  padding-top: 0.35rem;
+}
+
+.ai-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: var(--ink-soft);
+}
+
+.ai-status-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.ai-workspace-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  flex: 1;
+}
+
+@media (min-width: 900px) {
+  .ai-workspace-grid {
+    grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
+    align-items: stretch;
+  }
+}
+
+.ai-prompt-rail {
+  padding: 0.85rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.ai-prompt-chip {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 0.85rem;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.ai-prompt-chip:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.ai-prompt-chip:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ai-thread {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.45);
+  overflow: hidden;
+}
+
+.ai-thread-scroll {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  overflow-y: auto;
+  max-height: min(62dvh, 720px);
+}
+
+.ai-composer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.65rem;
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+
+.profile-id-tile {
+  display: block;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease;
+}
+
+a.profile-id-tile:hover {
+  border-color: var(--accent);
+}
+
+@media (max-width: 899px) {
+  .ai-prompt-rail ul {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .ai-prompt-rail li {
+    flex: 0 0 auto;
+    max-width: 220px;
+  }
+}
+
+/* —— Sprint 3 plan / scenarios —— */
+.scenario-split {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 960px) {
+  .scenario-split {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    align-items: start;
+  }
+
+  .scenario-controls {
+    position: sticky;
+    top: 1rem;
+  }
 }
 
 .dash-attention-icon {

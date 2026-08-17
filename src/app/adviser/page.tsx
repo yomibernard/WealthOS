@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Badge, PageHeader } from "@/components/ui";
+import { Badge, EmptyState, InsightPanel, PageHeader } from "@/components/ui";
+import { UserAvatar } from "@/components/profile/ProfileAvatar";
 import { getSessionUser } from "@/lib/session";
+import { formatNaira } from "@/lib/format";
 import { loadAdviserPortfolioCareRadar } from "@/services/adviser-portfolio";
 import { loadAdviserNotificationPulse } from "@/services/notifications";
 import { loadAdviserNextStepsPulse } from "@/services/adviser-next-steps";
@@ -21,6 +23,17 @@ const FILTER_CHIPS: { id: PortfolioCareFilter; label: string }[] = [
   { id: "privacy", label: "Privacy" },
   { id: "support", label: "Support" },
 ];
+
+function formatContact(iso: string | null | undefined): string {
+  if (!iso) return "No recent contact";
+  const then = new Date(iso);
+  if (Number.isNaN(then.getTime())) return "No recent contact";
+  const days = Math.floor((Date.now() - then.getTime()) / 86_400_000);
+  if (days <= 0) return "Contacted today";
+  if (days === 1) return "Contacted yesterday";
+  if (days < 7) return `Contacted ${days}d ago`;
+  return `Contacted ${then.toLocaleDateString("en-GB")}`;
+}
 
 export default async function AdviserHomePage({
   searchParams,
@@ -42,6 +55,45 @@ export default async function AdviserHomePage({
     loadAdviserNotificationPulse(user.id),
     loadAdviserNextStepsPulse({ adviserId: user.id, role: user.role }),
   ]);
+
+  const briefTiles = [
+    {
+      href: "/adviser?care=care",
+      label: "Needing care",
+      value: full.withCareCount,
+      tone: full.withCareCount > 0 ? ("warn" as const) : ("default" as const),
+    },
+    {
+      href: "/adviser?care=ops_reminded",
+      label: "Ops reminders",
+      value: full.opsRemindedCount,
+      tone: full.opsRemindedCount > 0 ? ("warn" as const) : ("default" as const),
+    },
+    {
+      href: "/adviser?care=unacked",
+      label: "Outstanding responses",
+      value: full.unackedCareCount,
+      tone: full.unackedCareCount > 0 ? ("warn" as const) : ("default" as const),
+    },
+    {
+      href: "/adviser?care=privacy",
+      label: "Privacy",
+      value: full.totalPrivacy,
+      tone: full.totalPrivacy > 0 ? ("warn" as const) : ("default" as const),
+    },
+    {
+      href: "/adviser?care=complaints",
+      label: "Complaints",
+      value: full.totalComplaints,
+      tone: full.totalComplaints > 0 ? ("danger" as const) : ("default" as const),
+    },
+    {
+      href: "/adviser?care=awaiting",
+      label: "Awaiting receipt",
+      value: full.awaitingReceiptCount,
+      tone: "default" as const,
+    },
+  ];
 
   const priorityRows = [
     full.totalComplaints > 0
@@ -106,10 +158,26 @@ export default async function AdviserHomePage({
     <main className="page-wide">
       <PageHeader
         title="Morning brief"
-        subtitle="Urgent care first — then your book. Badges are prioritised, not piled on."
+        subtitle="Care first — then your book. Severity-ordered, not badge-stacked."
+        action={
+          <div className="flex flex-wrap gap-2">
+            <Link href="/adviser/notifications" className="btn btn-ghost">
+              Notifications
+              {notifyPulse.unreadCount > 0 ? ` · ${notifyPulse.unreadCount}` : ""}
+            </Link>
+            <Link href="/adviser/ai" className="btn btn-soft">
+              Ask WealthAI
+            </Link>
+          </div>
+        }
       />
 
-      <section className="hero-metric space-y-4">
+      <InsightPanel eyebrow="How to use this desk">
+        Work complaints and ops-reminded customers before product conversations. Care acknowledgments
+        never close admin queues — mark seen only tells you the customer read your update.
+      </InsightPanel>
+
+      <section className="hero-metric mt-4 space-y-4">
         <div>
           <p className="eyebrow">Needs your attention</p>
           <p className="muted mt-1 text-sm leading-relaxed">{nextSteps.summary}</p>
@@ -146,10 +214,32 @@ export default async function AdviserHomePage({
         </div>
       </section>
 
+      <section className="mt-4">
+        <p className="eyebrow">Book pulse</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {briefTiles.map((tile) => (
+            <Link
+              key={tile.label}
+              href={tile.href}
+              className="rounded-xl border border-line bg-white px-3 py-3 transition hover:border-accent"
+            >
+              <p className="muted text-xs">{tile.label}</p>
+              <div className="mt-1 flex items-center justify-between gap-2">
+                <p className="font-display text-2xl">{tile.value}</p>
+                <Badge tone={tile.tone}>{tile.value > 0 ? "Open" : "Clear"}</Badge>
+              </div>
+            </Link>
+          ))}
+        </div>
+        <p className="muted mt-2 text-xs">
+          Upcoming reviews — use clear-book customers in the radar below for routine check-ins.
+        </p>
+      </section>
+
       <section className="action-card mt-4">
         <p className="eyebrow">Priority queue</p>
         <p className="muted mt-1 text-sm">
-          Showing the highest-severity items only — not every badge at once.
+          Highest-severity items only — not every badge at once.
         </p>
         {priorityRows.length ? (
           <ul className="mt-3 space-y-2">
@@ -176,10 +266,10 @@ export default async function AdviserHomePage({
         </p>
       </section>
 
-      <section className="mt-4">
+      <section className="mt-6">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
-            <h2 className="font-display text-xl font-semibold tracking-tight">Care radar</h2>
+            <h2 className="font-display text-xl font-semibold tracking-tight">Customer book</h2>
             <p className="muted text-sm">{radar.summary}</p>
           </div>
         </div>
@@ -208,40 +298,76 @@ export default async function AdviserHomePage({
           {radar.customers.map((c) => (
             <Link key={c.id} href={`/adviser/customers/${c.id}`}>
               <article className="action-card h-full transition hover:border-accent">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <p className="font-display text-xl">{c.name}</p>
-                    <p className="muted text-sm">{c.email}</p>
+                <div className="flex gap-3">
+                  <UserAvatar name={c.name} src={c.avatarSrc} className="h-12 w-12 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-display text-xl leading-tight">{c.name}</p>
+                        <p className="muted truncate text-sm">{c.email}</p>
+                      </div>
+                      <Badge
+                        tone={
+                          c.careTone === "danger"
+                            ? "danger"
+                            : c.careTone === "warn"
+                              ? "warn"
+                              : "default"
+                        }
+                      >
+                        {c.opsReminded ? "Ops reminded" : c.careLabel}
+                      </Badge>
+                    </div>
                   </div>
-                  <Badge
-                    tone={
-                      c.careTone === "danger"
-                        ? "danger"
-                        : c.careTone === "warn"
-                          ? "warn"
-                          : "default"
-                    }
-                  >
-                    {c.opsReminded ? "Ops reminded" : c.careLabel}
-                  </Badge>
                 </div>
-                <p className="mt-2 text-sm">Profile {c.profileCompleteness}% complete</p>
-                {c.careCount > 0 || c.awaitingReceipt ? (
-                  <p className="muted mt-1 text-xs">
-                    {c.openEscalations} case(s) · {c.openPrivacy} privacy · {c.ackCue}
-                  </p>
-                ) : null}
+
+                <div className="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
+                  <div>
+                    <p className="muted text-xs">Health</p>
+                    <p className="font-semibold">
+                      {c.healthScore != null ? Math.round(c.healthScore) : "—"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="muted text-xs">Net worth</p>
+                    <p className="font-semibold">
+                      {c.netWorthNgn != null ? formatNaira(c.netWorthNgn, true) : "—"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="muted text-xs">Risk</p>
+                    <p className="font-semibold">{c.riskTolerance ?? "unset"}</p>
+                  </div>
+                  <div>
+                    <p className="muted text-xs">Profile</p>
+                    <p className="font-semibold">{c.profileCompleteness}%</p>
+                  </div>
+                </div>
+
+                <p className="mt-3 text-sm">
+                  <span className="font-semibold">Next:</span> {c.nextAction}
+                </p>
+                <p className="muted mt-1 text-xs">
+                  {formatContact(c.lastContactAt)}
+                  {c.careCount > 0 || c.awaitingReceipt ? ` · ${c.ackCue}` : ""}
+                  {c.primaryGoal ? ` · Goal: ${c.primaryGoal}` : ""}
+                </p>
               </article>
             </Link>
           ))}
         </div>
 
         {radar.customers.length === 0 ? (
-          <p className="muted mt-3 text-sm">
-            {full.customerCount === 0
-              ? "No customers in your book yet."
-              : "No customers match this care filter."}
-          </p>
+          <div className="mt-4">
+            <EmptyState
+              title={full.customerCount === 0 ? "No customers in your book yet" : "No matches"}
+              body={
+                full.customerCount === 0
+                  ? "Linked customers will appear here with care status and next actions."
+                  : "No customers match this care filter. Clear the filter to see the full book."
+              }
+            />
+          </div>
         ) : null}
       </section>
     </main>

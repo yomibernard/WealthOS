@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Button, PageHeader } from "@/components/ui";
+import { Button, InsightPanel, PageHeader } from "@/components/ui";
 
 type Msg = {
   role: "user" | "assistant";
@@ -69,10 +69,16 @@ export default function AdminAiPage() {
       <PageHeader
         title="WealthAI (ops)"
         subtitle="Queue-first next steps for ops — same ranking as Needs your attention."
+        action={
+          <Link href="/admin/ops" className="btn btn-soft">
+            Ops board
+          </Link>
+        }
       />
-      <Link href="/admin/ops" className="btn btn-soft mb-3 w-full sm:w-auto">
-        Back to ops board
-      </Link>
+      <InsightPanel eyebrow="Grounding">
+        Answers stay on the daily board pulse. Ops queues remain authoritative — AI never closes
+        cases.
+      </InsightPanel>
       <div className="flex flex-1 flex-col gap-3 pb-28">
         {messages.map((m, i) => (
           <div

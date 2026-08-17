@@ -3,17 +3,17 @@ import Link from "next/link";
 const story = [
   {
     id: "see",
-    title: "See everything",
+    title: "See your complete wealth",
     body: "One calm view of cash, property, investments, pension, business interests, and liabilities — estimated, labelled, and honest about confidence.",
   },
   {
-    id: "understand",
-    title: "Understand what it means",
+    id: "health",
+    title: "Understand your financial health",
     body: "Wealth Health diagnoses liquidity, debt, diversification, goals, protection, retirement, and estate readiness before any product pitch.",
   },
   {
-    id: "decide",
-    title: "Make better decisions",
+    id: "ai",
+    title: "Ask WealthAI",
     body: "WealthAI explains what the engines calculated — never invents balances, returns, or licence status. Consent comes first.",
   },
   {
@@ -23,12 +23,12 @@ const story = [
   },
   {
     id: "guard",
-    title: "Check before investing",
+    title: "Check investments with WealthGuard",
     body: "WealthGuard reviews offers carefully. It never auto-labels something a scam or safe — it surfaces gaps that deserve human attention.",
   },
   {
     id: "human",
-    title: "Human help when needed",
+    title: "Human adviser support",
     body: "Adviser care acknowledgments and ops reminds keep people in the loop without closing formal support or privacy queues.",
   },
   {
@@ -42,8 +42,31 @@ export default function LandingPage() {
   return (
     <main className="landing">
       <section className="landing-hero" aria-labelledby="landing-brand">
+        <div className="landing-hero-bg" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/homepage-background.png"
+            alt=""
+            className="landing-hero-photo"
+          />
+          <div className="landing-hero-scrim" />
+        </div>
+
+        <header className="landing-topbar">
+          <Link href="/" className="landing-topbar-brand">
+            WealthOS
+          </Link>
+          <nav className="landing-topbar-auth" aria-label="Account">
+            <Link href="/auth/sign-in" className="landing-auth-link">
+              Sign in
+            </Link>
+            <Link href="/auth/sign-up" className="landing-auth-btn">
+              Register
+            </Link>
+          </nav>
+        </header>
+
         <div className="landing-hero-inner">
-          <p className="eyebrow landing-eyebrow">Nigeria-first wealth intelligence</p>
           <h1 id="landing-brand" className="hero-brand">
             WealthOS
           </h1>
@@ -57,35 +80,15 @@ export default function LandingPage() {
             <Link href="/wealth-check" className="btn btn-accent">
               Check my wealth
             </Link>
-            <a href="#how-it-works" className="btn btn-ghost">
+          </div>
+          <div className="landing-cta-secondary-row">
+            <a href="#how-it-works" className="btn btn-ghost landing-cta-secondary">
               See how WealthOS works
             </a>
           </div>
-          <p className="muted landing-note">
+          <p className="landing-note">
             Diagnosis before products · Demo rails labelled simulated
           </p>
-        </div>
-        <div className="landing-hero-visual" aria-hidden="true">
-          <svg viewBox="0 0 640 420" className="landing-curve" role="presentation">
-            <defs>
-              <linearGradient id="landFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0f6e56" stopOpacity="0.28" />
-                <stop offset="100%" stopColor="#0f6e56" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M0 280 C80 250 120 300 180 240 C240 180 280 200 340 160 C400 120 460 150 520 110 C560 85 600 90 640 70 L640 420 L0 420 Z"
-              fill="url(#landFill)"
-            />
-            <path
-              d="M0 280 C80 250 120 300 180 240 C240 180 280 200 340 160 C400 120 460 150 520 110 C560 85 600 90 640 70"
-              fill="none"
-              stroke="#0f6e56"
-              strokeWidth="3"
-              strokeLinecap="round"
-              className="landing-curve-line"
-            />
-          </svg>
         </div>
       </section>
 
@@ -125,9 +128,6 @@ export default function LandingPage() {
           <div className="landing-cta mt-6">
             <Link href="/wealth-check" className="btn btn-accent">
               Check my wealth
-            </Link>
-            <Link href="/auth/sign-in" className="btn btn-ghost">
-              Sign in
             </Link>
           </div>
         </div>

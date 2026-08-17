@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Badge, Button, PageHeader, Panel } from "@/components/ui";
+import { Badge, Button, EmptyState, InsightPanel, PageHeader, Panel } from "@/components/ui";
 import { resolveNotificationLink } from "@/lib/notification-links";
 import {
   adviserNotificationKindLabel,
@@ -113,13 +113,18 @@ function AdviserNotificationsInner() {
     <main className="page-wide">
       <PageHeader
         title="Adviser notifications"
-        subtitle="Triage care receipts and customer shares — filter, open the Care desk, or clear the unread desk."
+        subtitle="Care receipts, shares, and handoffs — triage here, act on Morning Brief / Customer 360."
         action={
           <Link href="/adviser" className="btn btn-soft">
-            Care radar
+            Morning brief
           </Link>
         }
       />
+
+      <InsightPanel eyebrow="Desk vs book">
+        Notifications tell you something changed. Morning Brief ranks who needs you next. Care ack
+        still never closes admin queues.
+      </InsightPanel>
 
       {message ? (
         <p className="mb-3 text-sm" role="status">
@@ -233,12 +238,10 @@ function AdviserNotificationsInner() {
           );
         })}
         {!notes.length ? (
-          <Panel>
-            <p className="muted text-sm">
-              No adviser notifications yet. When a customer marks a care update as seen or shares a
-              briefing, it appears here.
-            </p>
-          </Panel>
+          <EmptyState
+            title="No adviser notifications yet"
+            body="When a customer marks a care update as seen or shares a briefing, it appears here."
+          />
         ) : null}
         {notes.length && !visible.length ? (
           <Panel>

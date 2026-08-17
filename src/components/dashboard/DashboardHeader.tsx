@@ -29,10 +29,7 @@ export function DashboardHeader({
           <UserAvatar name={name} src={avatarSrc} className="h-13 w-13 h-[52px] w-[52px] text-base" />
         </Link>
         <div>
-          <h1 className="dash-greeting">
-            {greeting}
-            <span aria-hidden> 👋</span>
-          </h1>
+          <h1 className="dash-greeting">{greeting}</h1>
           <p className="muted mt-1 text-sm sm:text-base">
             Here&apos;s what your wealth looks like today.
           </p>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Badge, PageHeader, Panel } from "@/components/ui";
+import { Badge, HeroMetric, InsightPanel, PageHeader, Panel, ProgressBar } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { loadFxRates } from "@/services/wealth";
@@ -16,7 +16,7 @@ export default async function PensionPage() {
   if (!getFeatureFlags().pensionIntel) {
     return (
       <main>
-        <PageHeader title="Pension aggregation" subtitle="Temporarily unavailable." />
+        <PageHeader title="Pension" subtitle="Temporarily unavailable." />
       </main>
     );
   }
@@ -45,12 +45,19 @@ export default async function PensionPage() {
     : null;
 
   const intel = analysePension(pensions, nw.totalAssetsNgn, retirement, fx);
+  const progressTowardGoal =
+    retirement && retirement.targetAmount > 0
+      ? Math.min(
+          100,
+          Math.round((intel.totalPensionNgn / retirement.targetAmount) * 100),
+        )
+      : null;
 
   return (
     <main>
       <PageHeader
-        title="Pension aggregation"
-        subtitle="RSA and foreign pots in one view — estimates, not PenCom statements."
+        title="Pension"
+        subtitle="RSA and other pots in plain language — estimates, not PenCom statements."
         action={
           <Link href="/app/plan" className="btn btn-soft">
             Retirement goal
@@ -58,21 +65,25 @@ export default async function PensionPage() {
         }
       />
 
-      <Panel>
-        <div className="flex flex-wrap gap-2">
-          <Badge>{intel.engineVersion}</Badge>
-          <Badge>{intel.pots.length} pots</Badge>
-          {intel.currencies.map((c) => (
-            <Badge key={c}>{c}</Badge>
-          ))}
-        </div>
-        <p className="font-display mt-3 text-4xl">{formatNaira(intel.totalPensionNgn, true)}</p>
-        <p className="muted text-sm">Aggregated pension capital (NGN)</p>
-        <p className="mt-4 leading-relaxed">{intel.narrative}</p>
-        <p className="muted mt-3 text-xs">{intel.disclaimer}</p>
-      </Panel>
+      <HeroMetric
+        label="Pension balance (aggregated)"
+        value={formatNaira(intel.totalPensionNgn, true)}
+        hint={
+          <>
+            <Badge>{intel.engineVersion}</Badge>
+            <Badge>{intel.pots.length} pots</Badge>
+            {intel.currencies.map((c) => (
+              <Badge key={c}>{c}</Badge>
+            ))}
+          </>
+        }
+      />
 
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <InsightPanel className="mt-4" eyebrow="In simple terms">
+        {intel.narrative}
+      </InsightPanel>
+
+      <div className="mt-4 grid grid-cols-2 gap-3">
         <Panel>
           <p className="eyebrow">RSA (NGN)</p>
           <p className="font-display mt-1 text-2xl">{formatNaira(intel.rsaNgn, true)}</p>
@@ -88,22 +99,55 @@ export default async function PensionPage() {
           </p>
         </Panel>
         <Panel>
-          <p className="eyebrow">Illustrative gap</p>
+          <p className="eyebrow">Goal gap</p>
           <p className="font-display mt-1 text-2xl">
             {intel.fundingGapNgn == null ? "—" : formatNaira(intel.fundingGapNgn, true)}
           </p>
         </Panel>
       </div>
 
-      {intel.yearsToTarget != null ? (
-        <Panel className="mt-3">
-          <p className="eyebrow">Years to retirement target</p>
-          <p className="font-display mt-1 text-2xl">{intel.yearsToTarget.toFixed(1)}</p>
+      {retirement ? (
+        <section className="action-card mt-4">
+          <p className="eyebrow">Retirement timeline</p>
+          <h2 className="font-display mt-1 text-xl font-semibold tracking-tight">
+            {goals[0]?.name ?? "Retirement goal"}
+          </h2>
           <p className="muted mt-1 text-sm">
-            Gap uses a cautious illustrative return path — not a guarantee.
+            Target {formatNaira(retirement.targetAmount, true)} ·{" "}
+            {retirement.targetDate.toLocaleDateString("en-GB", {
+              month: "short",
+              year: "numeric",
+            })}
+            {intel.yearsToTarget != null
+              ? ` · ~${intel.yearsToTarget.toFixed(1)} years on the clock`
+              : ""}
           </p>
-        </Panel>
-      ) : null}
+          {progressTowardGoal != null ? (
+            <div className="mt-4">
+              <ProgressBar
+                value={progressTowardGoal}
+                label={`Pension capital vs goal · ${progressTowardGoal}%`}
+              />
+            </div>
+          ) : null}
+          <p className="muted mt-3 text-sm">
+            Monthly contribution on the goal: {formatNaira(retirement.monthlyContribution, true)}.
+            Employer vs employee splits are not always available — we do not invent them.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link href={`/app/plan/${goals[0]!.id}`} className="btn btn-soft">
+              Open goal journey
+            </Link>
+            <Link href="/app/plan/scenarios" className="btn btn-ghost">
+              Scenario modeller
+            </Link>
+          </div>
+        </section>
+      ) : (
+        <InsightPanel className="mt-4" eyebrow="Next">
+          Add a retirement goal to see projected funding and gap against your pension pots.
+        </InsightPanel>
+      )}
 
       {intel.signals.length > 0 ? (
         <Panel className="mt-3">
@@ -116,10 +160,8 @@ export default async function PensionPage() {
         </Panel>
       ) : null}
 
-      <section className="mt-5" aria-labelledby="pots-heading">
-        <h2 id="pots-heading" className="font-display text-xl">
-          Pots
-        </h2>
+      <section className="mt-5">
+        <h2 className="font-display text-xl">Pots</h2>
         <div className="mt-3 space-y-3">
           {intel.pots.length === 0 ? (
             <Panel>
@@ -132,7 +174,7 @@ export default async function PensionPage() {
             </Panel>
           ) : (
             intel.pots.map((p) => (
-              <Panel key={p.id}>
+              <article key={p.id} className="asset-tile">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-semibold">{p.name}</p>
@@ -146,11 +188,13 @@ export default async function PensionPage() {
                   </div>
                   <p className="font-display text-xl">{formatNaira(p.ownedValueNgn, true)}</p>
                 </div>
-              </Panel>
+              </article>
             ))
           )}
         </div>
       </section>
+
+      <p className="muted mt-4 text-xs">{intel.disclaimer}</p>
     </main>
   );
 }

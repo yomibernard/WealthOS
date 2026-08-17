@@ -17,6 +17,12 @@ export type PortfolioCustomerInput = {
   unseenCareAckCount?: number;
   /** Latest OPS_CARE_REMIND audit time for this customer (if any) */
   lastOpsRemindAt?: string | null;
+  avatarStorageKey?: string | null;
+  riskTolerance?: string | null;
+  netWorthNgn?: number | null;
+  healthScore?: number | null;
+  primaryGoal?: string | null;
+  lastContactAt?: string | null;
 };
 
 export type PortfolioCustomerRow = PortfolioCustomerInput & {
@@ -29,7 +35,26 @@ export type PortfolioCustomerRow = PortfolioCustomerInput & {
   awaitingReceipt: boolean;
   opsReminded: boolean;
   sortScore: number;
+  nextAction: string;
+  avatarSrc: string | null;
 };
+
+export function derivePortfolioNextAction(input: {
+  openComplaints: number;
+  openPrivacy: number;
+  openEscalations: number;
+  needsFirstAck: boolean;
+  awaitingReceipt: boolean;
+  opsReminded: boolean;
+}): string {
+  if (input.openComplaints > 0) return "Review complaint";
+  if (input.opsReminded) return "Respond to ops remind";
+  if (input.needsFirstAck) return "Send care acknowledgment";
+  if (input.openPrivacy > 0) return "Review privacy request";
+  if (input.awaitingReceipt) return "Follow up on care receipt";
+  if (input.openEscalations > 0) return "Review support case";
+  return "Routine book review";
+}
 
 export type PortfolioCareFilter =
   | "all"
@@ -122,6 +147,18 @@ export function scorePortfolioCare(
     if (opsCue) ackCue = `${ackCue} · ${opsCue}`;
   }
 
+  const nextAction = derivePortfolioNextAction({
+    openComplaints: input.openComplaints,
+    openPrivacy: input.openPrivacy,
+    openEscalations: input.openEscalations,
+    needsFirstAck,
+    awaitingReceipt,
+    opsReminded,
+  });
+  const avatarSrc = input.avatarStorageKey
+    ? `/api/media?key=${encodeURIComponent(input.avatarStorageKey)}`
+    : null;
+
   return {
     ...input,
     lastCareAckAt,
@@ -136,6 +173,8 @@ export function scorePortfolioCare(
     awaitingReceipt,
     opsReminded,
     sortScore,
+    nextAction,
+    avatarSrc,
   };
 }
 

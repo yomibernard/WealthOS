@@ -93,8 +93,12 @@ export function ConnectionsClient({
             <Panel key={c.id}>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-semibold">{c.providerName}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold">{c.providerName}</p>
+                    <Badge>simulated</Badge>
+                  </div>
                   <p className="muted text-sm">{c.kind.replaceAll("_", " ")}</p>
+                  <p className="muted mt-1 text-xs">Data used · account balances (demo refresh)</p>
                 </div>
                 <Badge
                   tone={
@@ -123,7 +127,7 @@ export function ConnectionsClient({
                   onClick={() => void act(c.id, "sync")}
                   aria-label={`Sync ${c.providerName}`}
                 >
-                  {busy === `sync:${c.id}` ? "Syncing…" : "Sync now"}
+                  {busy === `sync:${c.id}` ? "Syncing…" : "Refresh"}
                 </Button>
                 <Button
                   type="button"
@@ -147,8 +151,8 @@ export function ConnectionsClient({
       <Panel>
         <p className="eyebrow">Connect demo bank</p>
         <p className="muted mt-1 text-sm">
-          Demo only — no credentials leave this device. Consent is created automatically and can be
-          paused anytime.
+          <strong>Simulated</strong> only — no credentials leave this device. Consent is created
+          automatically and can be paused anytime.
         </p>
         <ul className="mt-3 space-y-2">
           {banks.map((b) => {

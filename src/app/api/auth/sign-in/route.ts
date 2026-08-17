@@ -22,14 +22,16 @@ export async function POST(req: Request) {
 
     const json = await req.json();
     const body = schema.parse(json);
-    const user = await prisma.user.findUnique({ where: { email: body.email.toLowerCase() } });
+    const email = body.email.trim().toLowerCase();
+    const password = body.password;
+    const user = await prisma.user.findUnique({ where: { email } });
     if (!user || user.deletedAt || user.status === "erased") {
       return NextResponse.json(
         { error: "We could not find that email. Check the address or create an account." },
         { status: 401 },
       );
     }
-    const ok = await bcrypt.compare(body.password, user.passwordHash);
+    const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) {
       return NextResponse.json(
         { error: "That password does not match. Please try again." },

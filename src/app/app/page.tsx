@@ -190,23 +190,20 @@ export default async function HomePage() {
         <DashboardAssetsSection assets={showcaseAssets} />
       </div>
 
-      {secondarySignals.length ? (
-        <section className="dash-card mt-5" aria-label="Also for you">
-          <p className="dash-card-label">Also for you</p>
-          <ul className="mt-3 space-y-2">
+      {secondarySignals.length || inbox.unread > 0 ? (
+        <section className="dash-also mt-5" aria-label="Also for you">
+          <p className="dash-also-label">Also for you</p>
+          <ul className="dash-also-list">
             {secondarySignals.map((s) => (
               <li key={s.href + s.label}>
-                <Link href={s.href} className="text-sm font-semibold text-accent hover:underline">
+                <Link href={s.href} className="dash-also-link">
                   {s.label}
                 </Link>
               </li>
             ))}
             {inbox.unread > 0 ? (
               <li>
-                <Link
-                  href={inboxUnreadHref}
-                  className="text-sm font-semibold text-accent hover:underline"
-                >
+                <Link href={inboxUnreadHref} className="dash-also-link">
                   Wealth Inbox · {inbox.unread} unread
                 </Link>
               </li>

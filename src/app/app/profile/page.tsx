@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Badge, PageHeader, ProgressBar } from "@/components/ui";
+import { Badge, InsightPanel, PageHeader, ProgressBar } from "@/components/ui";
 import { ProfileAvatarEditor } from "@/components/profile/ProfileAvatar";
 import { getSessionUser } from "@/lib/session";
 import { getFeatureFlags } from "@/lib/feature-flags";
@@ -20,7 +20,7 @@ export default async function ProfilePage() {
   const user = await getSessionUser();
   if (!user) redirect("/auth/sign-in");
 
-  const [report, link, full, passkeys, primaryGoal, householdCount, connections] =
+  const [report, link, full, passkeys, primaryGoal, householdCount, connections, consents] =
     await Promise.all([
       syncProfileCompleteness(user.id),
       listLinkedAdviser(user.id),
@@ -32,6 +32,7 @@ export default async function ProfilePage() {
       prisma.goal.findFirst({ where: { userId: user.id }, orderBy: { priority: "asc" } }),
       prisma.householdMember.count({ where: { userId: user.id } }),
       prisma.connection.count({ where: { userId: user.id } }),
+      prisma.consent.findMany({ where: { userId: user.id } }),
     ]);
   if (!report) redirect("/auth/sign-in");
   const flags = getFeatureFlags();
@@ -39,11 +40,14 @@ export default async function ProfilePage() {
     ? `/api/media?key=${encodeURIComponent(full.avatarStorageKey)}`
     : null;
 
+  const activeConsents = consents.filter((c) => c.status === "ACTIVE").length;
+  const pausedConsents = consents.filter((c) => c.status !== "ACTIVE").length;
+
   return (
     <main>
       <PageHeader
         title="Profile"
-        subtitle="Your financial identity centre — photo optional, completeness clear."
+        subtitle="Your personal financial identity centre — photo optional, completeness clear."
       />
 
       <section className="hero-metric space-y-4">
@@ -53,44 +57,63 @@ export default async function ProfilePage() {
           <p className="mt-1 text-ink-soft">
             {wealthPersona(report.score, user.riskTolerance)}
           </p>
+          <p className="muted mt-1 text-sm">{user.email}</p>
         </div>
         <ProgressBar value={report.score} label={`Profile completeness ${report.score}%`} />
-        <div className="grid gap-2 sm:grid-cols-2">
-          <div className="rounded-[var(--radius-sm)] border border-line bg-white p-3 text-sm">
+        {report.summary ? (
+          <InsightPanel eyebrow="Completeness">
+            {report.summary}
+          </InsightPanel>
+        ) : null}
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <Link href="/app/plan" className="profile-id-tile">
             <p className="muted text-xs font-semibold">Primary goal</p>
             <p className="mt-1 font-semibold">{primaryGoal?.name ?? "Not set yet"}</p>
-          </div>
-          <div className="rounded-[var(--radius-sm)] border border-line bg-white p-3 text-sm">
+          </Link>
+          <div className="profile-id-tile">
             <p className="muted text-xs font-semibold">Risk profile</p>
             <p className="mt-1 font-semibold capitalize">
               {user.riskTolerance?.replaceAll("_", " ") ?? "Not set"}
             </p>
           </div>
-          <div className="rounded-[var(--radius-sm)] border border-line bg-white p-3 text-sm">
-            <p className="muted text-xs font-semibold">Primary currency</p>
+          <div className="profile-id-tile">
+            <p className="muted text-xs font-semibold">Preferred currency</p>
             <p className="mt-1 font-semibold">{full?.baseCurrency ?? user.baseCurrency}</p>
           </div>
-          <div className="rounded-[var(--radius-sm)] border border-line bg-white p-3 text-sm">
+          <Link href="/app/household" className="profile-id-tile">
+            <p className="muted text-xs font-semibold">Household</p>
+            <p className="mt-1 font-semibold">{householdCount} member(s)</p>
+          </Link>
+          <Link href="/app/security" className="profile-id-tile">
             <p className="muted text-xs font-semibold">Security</p>
             <p className="mt-1 font-semibold">
-              {passkeys > 0 ? "Biometric / passkey enabled" : "Password only"}
+              {passkeys > 0 ? "Biometrics / passkey on" : "Password only"}
             </p>
-          </div>
+          </Link>
+          <Link href="/app/connections" className="profile-id-tile">
+            <p className="muted text-xs font-semibold">Connected institutions</p>
+            <p className="mt-1 font-semibold">{connections} connection(s)</p>
+          </Link>
+          <Link href="/app/consent" className="profile-id-tile sm:col-span-2 lg:col-span-3">
+            <p className="muted text-xs font-semibold">Consent status</p>
+            <p className="mt-1 font-semibold">
+              {activeConsents} active
+              {pausedConsents ? ` · ${pausedConsents} paused/revoked` : ""}
+            </p>
+          </Link>
         </div>
         <div className="flex flex-wrap gap-2 text-sm">
-          <Badge>{householdCount} household</Badge>
-          <Badge>{connections} connection(s)</Badge>
           <Badge tone={report.missing.length ? "warn" : "default"}>
             {report.missing.length} profile gaps
           </Badge>
         </div>
         {report.nextHref ? (
-          <Link href={report.nextHref} className="btn btn-primary w-full sm:w-auto">
-            Review my financial profile
+          <Link href={report.nextHref} className="btn btn-accent w-full sm:w-auto">
+            Review my profile
           </Link>
         ) : (
           <Link href="/onboarding/fact-find" className="btn btn-soft w-full sm:w-auto">
-            Review my financial profile
+            Review my profile
           </Link>
         )}
       </section>
@@ -119,11 +142,17 @@ export default async function ProfilePage() {
         </ul>
       </section>
 
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-        <Link href="/app/security" className="btn btn-soft flex-1">
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        <Link href="/app/security" className="btn btn-soft w-full">
           Security & biometrics
         </Link>
-        <Link href="/app/trust" className="btn btn-ghost flex-1">
+        <Link href="/app/consent" className="btn btn-ghost w-full">
+          Consent Centre
+        </Link>
+        <Link href="/app/privacy" className="btn btn-ghost w-full">
+          Privacy
+        </Link>
+        <Link href="/app/trust" className="btn btn-ghost w-full">
           Trust Centre
         </Link>
       </div>

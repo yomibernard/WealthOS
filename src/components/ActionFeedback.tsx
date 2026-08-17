@@ -121,11 +121,17 @@ export function ActionFeedback({
 
       <div className="flex flex-wrap gap-2">
         <Button type="button" variant="accent" onClick={() => void submit("ACCEPTED")}>
-          {needsStepUp ? "Confirm & accept" : "Makes sense"}
+          {needsStepUp ? "Confirm & accept" : "Accept"}
         </Button>
         <Button type="button" variant="ghost" onClick={() => void submit("REJECTED")}>
-          I disagree / Not for me
+          Not now
         </Button>
+        <Button type="button" variant="ghost" onClick={() => void submit("REJECTED")}>
+          I disagree
+        </Button>
+        <Link href="/app/support" className="btn btn-ghost">
+          Speak to adviser
+        </Link>
       </div>
     </Panel>
   );

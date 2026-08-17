@@ -12,6 +12,7 @@ const LINKS = [
   { href: "/admin/privacy", label: "Privacy" },
   { href: "/admin/change-requests", label: "Checker" },
   { href: "/admin/audit", label: "Audit" },
+  { href: "/admin/flags", label: "Flags" },
   { href: "/admin/ai", label: "AI" },
 ];
 

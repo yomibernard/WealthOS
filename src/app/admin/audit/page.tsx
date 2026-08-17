@@ -1,7 +1,16 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { Badge, Button, Field, PageHeader, Panel, TextInput } from "@/components/ui";
+import {
+  Badge,
+  Button,
+  EmptyState,
+  Field,
+  InsightPanel,
+  PageHeader,
+  Panel,
+  TextInput,
+} from "@/components/ui";
 
 type AuditRow = {
   id: string;
@@ -30,6 +39,19 @@ const CATEGORIES = [
   "other",
 ] as const;
 
+function payloadPreview(payload: unknown): string {
+  if (payload == null) return "No payload";
+  if (typeof payload === "string") return payload.slice(0, 160);
+  if (typeof payload === "object") {
+    const o = payload as Record<string, unknown>;
+    const bits = Object.entries(o)
+      .slice(0, 4)
+      .map(([k, v]) => `${k}: ${typeof v === "string" ? v.slice(0, 40) : String(v)}`);
+    return bits.join(" · ") || "Structured payload";
+  }
+  return String(payload);
+}
+
 export default function AdminAuditPage() {
   const [events, setEvents] = useState<AuditRow[]>([]);
   const [eventTypes, setEventTypes] = useState<string[]>([]);
@@ -37,6 +59,7 @@ export default function AdminAuditPage() {
   const [eventType, setEventType] = useState("");
   const [q, setQ] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const load = useCallback(async () => {
     const params = new URLSearchParams();
@@ -77,11 +100,16 @@ export default function AdminAuditPage() {
   return (
     <main className="page-wide">
       <PageHeader
-        title="Audit logs"
-        subtitle="Filter structured events and download a redacted JSON pack for pilot compliance review."
+        title="Audit timeline"
+        subtitle="Readable events first. JSON download stays secondary for pilot compliance packs."
       />
 
-      <Panel className="mb-4">
+      <InsightPanel eyebrow="How to read this">
+        Filter by category (care, consent, AI, execution…). Expand a row only when you need raw
+        payload detail.
+      </InsightPanel>
+
+      <Panel className="mb-4 mt-4">
         <form className="grid gap-3 md:grid-cols-4" onSubmit={onFilter}>
           <Field label="Category" id="category">
             <select
@@ -124,7 +152,7 @@ export default function AdminAuditPage() {
             <Button type="submit" variant="soft">
               Apply
             </Button>
-            <a href={downloadHref()} className="btn btn-accent">
+            <a href={downloadHref()} className="btn btn-ghost">
               Download JSON
             </a>
           </div>
@@ -138,27 +166,43 @@ export default function AdminAuditPage() {
 
       <div className="space-y-2">
         {events.length === 0 ? (
-          <Panel>
-            <p className="muted text-sm">No events match this filter.</p>
-          </Panel>
+          <EmptyState title="No events" body="No events match this filter." />
         ) : (
-          events.map((e) => (
-            <Panel key={e.id} className="py-3">
-              <div className="flex flex-wrap gap-2">
-                <Badge>{e.category}</Badge>
-                <Badge tone="default">{e.eventType}</Badge>
-              </div>
-              <p className="mt-2 text-sm font-semibold">
-                {new Date(e.createdAt).toLocaleString("en-GB")}
-                {e.userId ? ` · user ${e.userId.slice(0, 8)}` : ""}
-                {e.entityType ? ` · ${e.entityType}` : ""}
-                {e.entityId ? ` ${e.entityId.slice(0, 8)}` : ""}
-              </p>
-              <pre className="muted mt-1 overflow-auto text-xs">
-                {JSON.stringify(e.payload, null, 2)}
-              </pre>
-            </Panel>
-          ))
+          events.map((e) => {
+            const open = Boolean(expanded[e.id]);
+            return (
+              <Panel key={e.id} className="py-3">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap gap-2">
+                      <Badge>{e.category}</Badge>
+                      <Badge tone="default">{e.eventType}</Badge>
+                    </div>
+                    <p className="mt-2 text-sm font-semibold">
+                      {new Date(e.createdAt).toLocaleString("en-GB")}
+                      {e.userId ? ` · user ${e.userId.slice(0, 8)}` : ""}
+                      {e.entityType ? ` · ${e.entityType}` : ""}
+                      {e.entityId ? ` ${e.entityId.slice(0, 8)}` : ""}
+                    </p>
+                    <p className="muted mt-1 text-sm">{payloadPreview(e.payload)}</p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="text-sm"
+                    onClick={() => setExpanded((s) => ({ ...s, [e.id]: !open }))}
+                  >
+                    {open ? "Hide JSON" : "Show JSON"}
+                  </Button>
+                </div>
+                {open ? (
+                  <pre className="muted mt-2 overflow-auto rounded-xl bg-white p-3 text-xs">
+                    {JSON.stringify(e.payload, null, 2)}
+                  </pre>
+                ) : null}
+              </Panel>
+            );
+          })
         )}
       </div>
     </main>

@@ -19,7 +19,25 @@ export type AttentionItem = {
 
 export function DashboardAttentionRow({ items }: { items: AttentionItem[] }) {
   const cards = items.slice(0, 3);
-  if (!cards.length) return null;
+
+  if (!cards.length) {
+    return (
+      <section className="dash-section">
+        <h2 className="dash-section-title">Needs your attention</h2>
+        <article className="dash-card dash-attention-empty">
+          <p className="font-semibold">Nothing urgent right now</p>
+          <p className="muted mt-2 text-sm leading-relaxed">
+            When WealthOS surfaces a gap — liquidity, concentration, stale data, or care updates —
+            it will appear here first. You can still review your next steps anytime.
+          </p>
+          <Link href="/app/actions" className="btn btn-soft mt-4 inline-flex items-center gap-2">
+            Review recommendations
+            <ArrowRight size={16} aria-hidden />
+          </Link>
+        </article>
+      </section>
+    );
+  }
 
   return (
     <section className="dash-section">

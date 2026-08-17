@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Badge, PageHeader, Panel } from "@/components/ui";
+import { Badge, InsightPanel, PageHeader, Panel } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
 import { evaluateLaunchGate } from "@/lib/launch-gate";
 import { getFeatureFlags } from "@/lib/feature-flags";
@@ -23,10 +23,34 @@ const moduleIndex = [
   { href: "/admin/audit", label: "Audit export", flag: null },
 ];
 
-export default async function AdminOpsPage() {
+const FOCUS_CHIPS = [
+  { id: "all", label: "All", href: "/admin/ops" },
+  { id: "complaint", label: "Complaint", href: "/admin/ops?focus=complaint" },
+  { id: "privacy", label: "Privacy", href: "/admin/ops?focus=privacy" },
+  { id: "ops_reminded", label: "Ops reminded", href: "/admin/ops?focus=ops_reminded" },
+  { id: "awaiting", label: "Awaiting adviser", href: "/admin/ops?focus=awaiting" },
+  { id: "seen", label: "Customer seen", href: "/admin/ops?focus=seen" },
+  { id: "stale", label: "Stale", href: "/admin/ops?focus=stale" },
+  { id: "new", label: "New", href: "/admin/ops?focus=new" },
+] as const;
+
+type FocusId = (typeof FOCUS_CHIPS)[number]["id"];
+
+function parseFocus(raw: string | undefined): FocusId {
+  if (raw && FOCUS_CHIPS.some((c) => c.id === raw)) return raw as FocusId;
+  return "all";
+}
+
+export default async function AdminOpsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ focus?: string }>;
+}) {
   const user = await getSessionUser();
   if (!user || user.role !== "ADMIN") redirect("/auth/sign-in");
 
+  const params = await searchParams;
+  const focus = parseFocus(params.focus);
   const launch = evaluateLaunchGate();
   const flags = getFeatureFlags();
   const [daily, nextSteps] = await Promise.all([
@@ -34,14 +58,47 @@ export default async function AdminOpsPage() {
     loadOpsNextStepsPulse(),
   ]);
 
+  const queues =
+    focus === "complaint"
+      ? daily.queues.filter((q) => q.id === "complaints" || q.id === "escalations")
+      : focus === "privacy"
+        ? daily.queues.filter((q) => q.id === "privacy")
+        : focus === "awaiting" || focus === "ops_reminded" || focus === "seen" || focus === "stale"
+          ? daily.queues.filter((q) => q.id === "care_handoff")
+          : focus === "new"
+            ? daily.queues.filter((q) => q.count > 0)
+            : daily.queues;
+
+  const showHandoff = focus === "all" || focus === "awaiting" || focus === "ops_reminded" || focus === "seen" || focus === "stale" || focus === "new";
+  const reminds =
+    focus === "stale"
+      ? daily.careHandoff.recentReminds.filter((r) => r.stale)
+      : focus === "ops_reminded"
+        ? daily.careHandoff.recentReminds.filter((r) => r.awaitingAnswer || r.stale)
+        : daily.careHandoff.recentReminds;
+  const receipts = focus === "seen" ? daily.careHandoff.recentReceipts : daily.careHandoff.recentReceipts;
+  const showReceipts = focus === "all" || focus === "seen" || focus === "new";
+  const showReminds = focus === "all" || focus === "ops_reminded" || focus === "stale" || focus === "awaiting" || focus === "new";
+  const showAcks = focus === "all" || focus === "awaiting" || focus === "new";
+
   return (
     <main className="page-wide">
       <PageHeader
         title="Ops board"
-        subtitle="Live queues and care handoff first. Runbooks and commands stay collapsed until you need them."
+        subtitle="What needs attention now — priority, status, required action. Runbooks stay collapsed."
+        action={
+          <Link href="/admin/ai" className="btn btn-soft">
+            Ask WealthAI
+          </Link>
+        }
       />
 
-      <section className="hero-metric mb-4 space-y-4">
+      <InsightPanel eyebrow="Primary job">
+        Work complaints and privacy before product talk. Care handoff reminds advisers — it never
+        closes admin queues.
+      </InsightPanel>
+
+      <section className="hero-metric mb-4 mt-4 space-y-4">
         <div>
           <p className="eyebrow">Needs your attention</p>
           <p className="muted mt-1 text-sm leading-relaxed">{nextSteps.summary}</p>
@@ -66,6 +123,26 @@ export default async function AdminOpsPage() {
         </div>
       </section>
 
+      <div className="mb-4 flex flex-wrap gap-2" aria-label="Ops focus filters">
+        {FOCUS_CHIPS.map((chip) => {
+          const active = focus === chip.id;
+          return (
+            <Link
+              key={chip.id}
+              href={chip.href}
+              className={
+                active
+                  ? "rounded-full border border-accent bg-accent-soft px-3 py-1.5 text-sm font-semibold"
+                  : "muted rounded-full border border-line px-3 py-1.5 text-sm hover:border-accent"
+              }
+              aria-current={active ? "true" : undefined}
+            >
+              {chip.label}
+            </Link>
+          );
+        })}
+      </div>
+
       <Panel className="mb-4">
         <div className="flex flex-wrap items-center gap-2">
           <p className="font-semibold">Daily ops board</p>
@@ -77,12 +154,15 @@ export default async function AdminOpsPage() {
           </Badge>
         </div>
         <p className="muted mt-1 text-sm">{daily.summary}</p>
+        <p className="muted mt-2 text-xs">
+          Columns: priority · status · required action · SLA cue (tone). Owner sits on queue pages.
+        </p>
         <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {daily.queues.map((q) => (
+          {queues.map((q) => (
             <li key={q.id}>
               <Link
                 href={q.href}
-                className="block rounded-xl border border-line px-3 py-2 hover:bg-accent-soft/40"
+                className="block rounded-xl border border-line px-3 py-3 hover:bg-accent-soft/40"
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium">{q.label}</span>
@@ -95,11 +175,20 @@ export default async function AdminOpsPage() {
                   </Badge>
                 </div>
                 <p className="muted mt-1 text-xs">{q.detail}</p>
+                <p className="mt-2 text-xs font-semibold text-accent">Required action → open</p>
               </Link>
             </li>
           ))}
+          {!queues.length ? (
+            <li className="muted text-sm sm:col-span-2 lg:col-span-3">
+              No queues match this focus.{" "}
+              <Link href="/admin/ops" className="font-semibold text-accent">
+                Show all
+              </Link>
+            </li>
+          ) : null}
         </ul>
-        {daily.topComplaints.length ? (
+        {daily.topComplaints.length && (focus === "all" || focus === "complaint" || focus === "new") ? (
           <div className="mt-3">
             <p className="eyebrow">Top open complaints</p>
             <ul className="mt-1 space-y-1 text-sm">
@@ -116,113 +205,116 @@ export default async function AdminOpsPage() {
           </div>
         ) : null}
 
-        <div className="mt-3 border-t border-line pt-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="eyebrow">Care handoff</p>
-            <div className="flex flex-wrap gap-2">
-              <Badge tone={daily.careHandoff.unackedCareCustomers > 0 ? "warn" : "default"}>
-                {daily.careHandoff.unackedCareCustomers} unacked
-              </Badge>
-              <Badge tone={daily.careHandoff.awaitingReceiptCount > 0 ? "warn" : "default"}>
-                {daily.careHandoff.awaitingReceiptCount} awaiting receipt
-              </Badge>
+        {showHandoff ? (
+          <div id="care-handoff" className="mt-3 border-t border-line pt-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="eyebrow">Care handoff</p>
+              <div className="flex flex-wrap gap-2">
+                <Badge tone={daily.careHandoff.unackedCareCustomers > 0 ? "warn" : "default"}>
+                  {daily.careHandoff.unackedCareCustomers} unacked
+                </Badge>
+                <Badge tone={daily.careHandoff.awaitingReceiptCount > 0 ? "warn" : "default"}>
+                  {daily.careHandoff.awaitingReceiptCount} awaiting receipt
+                </Badge>
+              </div>
             </div>
-          </div>
-          <p className="muted mt-1 text-sm">{daily.careHandoff.summary}</p>
-          {daily.careHandoff.recentAcks.length ? (
-            <ul className="mt-2 space-y-1 text-sm">
-              {daily.careHandoff.recentAcks.map((a) => (
-                <li key={a.id}>
-                  <span className="font-medium">{a.customerName}</span>
-                  {" — "}
-                  {a.adviserName}: {a.title}
-                  <span className="muted">
-                    {" · "}
-                    {new Date(a.createdAt).toLocaleString("en-GB")}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          {daily.careHandoff.recentReceipts.length ? (
-            <div className="mt-2 space-y-1">
-              <p className="muted text-xs font-semibold uppercase tracking-wide">
-                Recent customer receipts
-              </p>
-              <ul className="space-y-1 text-sm">
-                {daily.careHandoff.recentReceipts.map((r) => (
-                  <li key={r.id}>
-                    <span className="font-medium">{r.customerName}</span>
-                    {" seen · "}
-                    {r.adviserName}
-                    {r.thanksPreview ? ` — “${r.thanksPreview}”` : ""}
+            <p className="muted mt-1 text-sm">{daily.careHandoff.summary}</p>
+            {showAcks && daily.careHandoff.recentAcks.length ? (
+              <ul className="mt-2 space-y-1 text-sm">
+                {daily.careHandoff.recentAcks.map((a) => (
+                  <li key={a.id}>
+                    <span className="font-medium">{a.customerName}</span>
+                    {" — "}
+                    {a.adviserName}: {a.title}
                     <span className="muted">
                       {" · "}
-                      {new Date(r.seenAt).toLocaleString("en-GB")}
+                      {new Date(a.createdAt).toLocaleString("en-GB")}
                     </span>
                   </li>
                 ))}
               </ul>
-            </div>
-          ) : null}
-          {daily.careHandoff.recentReminds.length ? (
-            <div className="mt-2 space-y-1">
-              <p className="muted text-xs font-semibold uppercase tracking-wide">
-                Recent ops reminds
-              </p>
-              <ul className="space-y-1 text-sm">
-                {daily.careHandoff.recentReminds.map((r) => (
-                  <li key={r.id} className="flex flex-wrap items-baseline gap-2">
-                    <span>
+            ) : null}
+            {showReceipts && daily.careHandoff.recentReceipts.length ? (
+              <div className="mt-2 space-y-1">
+                <p className="muted text-xs font-semibold uppercase tracking-wide">
+                  Recent customer receipts
+                </p>
+                <ul className="space-y-1 text-sm">
+                  {receipts.map((r) => (
+                    <li key={r.id}>
                       <span className="font-medium">{r.customerName}</span>
-                      {" — "}
-                      {r.adminName}
-                      {r.notificationCreated ? " reminded linked adviser" : " remind attempted"}
+                      {" seen · "}
+                      {r.adviserName}
+                      {r.thanksPreview ? ` — “${r.thanksPreview}”` : ""}
                       <span className="muted">
                         {" · "}
-                        {new Date(r.createdAt).toLocaleString("en-GB")}
+                        {new Date(r.seenAt).toLocaleString("en-GB")}
                       </span>
-                    </span>
-                    {r.stale ? (
-                      <Badge tone="warn">Awaiting answer 24h+</Badge>
-                    ) : r.awaitingAnswer ? (
-                      <Badge tone="warn">Awaiting answer</Badge>
-                    ) : (
-                      <Badge>Answered</Badge>
-                    )}
-                  </li>
-                ))}
-              </ul>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {showReminds && reminds.length ? (
+              <div className="mt-2 space-y-1">
+                <p className="muted text-xs font-semibold uppercase tracking-wide">
+                  Recent ops reminds
+                </p>
+                <ul className="space-y-1 text-sm">
+                  {reminds.map((r) => (
+                    <li key={r.id} className="flex flex-wrap items-baseline gap-2">
+                      <span>
+                        <span className="font-medium">{r.customerName}</span>
+                        {" — "}
+                        {r.adminName}
+                        {r.notificationCreated ? " reminded linked adviser" : " remind attempted"}
+                        <span className="muted">
+                          {" · "}
+                          {new Date(r.createdAt).toLocaleString("en-GB")}
+                          {r.ageHours != null ? ` · age ${r.ageHours}h` : ""}
+                        </span>
+                      </span>
+                      {r.stale ? (
+                        <Badge tone="warn">Awaiting answer 24h+</Badge>
+                      ) : r.awaitingAnswer ? (
+                        <Badge tone="warn">Awaiting answer</Badge>
+                      ) : (
+                        <Badge>Answered</Badge>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {showReminds && daily.careHandoff.recentRemindAnswers.length && focus !== "stale" ? (
+              <div className="mt-2 space-y-1">
+                <p className="muted text-xs font-semibold uppercase tracking-wide">
+                  Recent remind answers
+                </p>
+                <ul className="space-y-1 text-sm">
+                  {daily.careHandoff.recentRemindAnswers.map((r) => (
+                    <li key={r.id}>
+                      <span className="font-medium">{r.customerName}</span>
+                      {" — "}
+                      {r.adviserName} answered ops remind
+                      <span className="muted">
+                        {" · "}
+                        {new Date(r.answeredAt).toLocaleString("en-GB")}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            <div className="mt-2 flex flex-wrap gap-3 text-sm font-semibold text-accent">
+              <Link href="/admin/escalations">Remind from escalations</Link>
+              <Link href="/adviser?care=unacked">Open unacked care radar</Link>
+              <Link href="/adviser?care=ops_reminded">Open ops-reminded radar</Link>
+              <Link href="/adviser?care=awaiting">Open awaiting receipt</Link>
             </div>
-          ) : null}
-          {daily.careHandoff.recentRemindAnswers.length ? (
-            <div className="mt-2 space-y-1">
-              <p className="muted text-xs font-semibold uppercase tracking-wide">
-                Recent remind answers
-              </p>
-              <ul className="space-y-1 text-sm">
-                {daily.careHandoff.recentRemindAnswers.map((r) => (
-                  <li key={r.id}>
-                    <span className="font-medium">{r.customerName}</span>
-                    {" — "}
-                    {r.adviserName} answered ops remind
-                    <span className="muted">
-                      {" · "}
-                      {new Date(r.answeredAt).toLocaleString("en-GB")}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-          <div className="mt-2 flex flex-wrap gap-3 text-sm font-semibold text-accent">
-            <Link href="/admin/escalations">Remind from escalations</Link>
-            <Link href="/adviser?care=unacked">Open unacked care radar</Link>
-            <Link href="/adviser?care=ops_reminded">Open ops-reminded radar</Link>
-            <Link href="/adviser?care=awaiting">Open awaiting receipt</Link>
+            <OpsCareRemindButton unackedCount={daily.careHandoff.unackedCareCustomers} />
           </div>
-          <OpsCareRemindButton unackedCount={daily.careHandoff.unackedCareCustomers} />
-        </div>
+        ) : null}
       </Panel>
 
       <details className="mb-3 rounded-[var(--radius)] border border-line bg-white px-4 py-3">

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Badge, Button, PageHeader, Panel } from "@/components/ui";
+import { Badge, Button, EmptyState, InsightPanel, PageHeader, Panel } from "@/components/ui";
 import {
   classifyInboxKind,
   filterInboxItems,
@@ -31,12 +31,12 @@ const STATUS_CHIPS: { id: InboxStatusFilter; label: string }[] = [
 const KIND_CHIPS: { id: InboxKind | "all"; label: string }[] = [
   { id: "all", label: "All kinds" },
   { id: "recommendation", label: "Recommendations" },
-  { id: "connection", label: "Connections" },
-  { id: "data_quality", label: "Data quality" },
   { id: "adviser", label: "Adviser" },
-  { id: "estate", label: "Estate" },
   { id: "support", label: "Support" },
   { id: "privacy", label: "Privacy" },
+  { id: "connection", label: "Connections" },
+  { id: "data_quality", label: "Data quality" },
+  { id: "estate", label: "Estate" },
 ];
 
 function triageHref(status: InboxStatusFilter, kind: InboxKind | "all") {
@@ -47,11 +47,18 @@ function triageHref(status: InboxStatusFilter, kind: InboxKind | "all") {
   return q ? `/app/inbox?${q}` : "/app/inbox";
 }
 
-const priorityTone = (p: string): "default" | "warn" | "danger" => {
-  if (p === "critical") return "danger";
-  if (p === "important") return "warn";
-  return "default";
-};
+function sectionFor(item: InboxItem): "needs_action" | "adviser" | "wealthos" | "support" {
+  const kind = classifyInboxKind(item.category);
+  if (kind === "adviser") return "adviser";
+  if (kind === "support" || kind === "privacy") return "support";
+  if (item.priority === "critical" || item.priority === "important" || item.status === "unread") {
+    if (kind === "recommendation" || kind === "data_quality" || kind === "connection") {
+      return "needs_action";
+    }
+  }
+  if (kind === "recommendation" || kind === "data_quality" || kind === "estate") return "needs_action";
+  return "wealthos";
+}
 
 function InboxInner() {
   const searchParams = useSearchParams();
@@ -137,36 +144,54 @@ function InboxInner() {
     [items, statusFilter, kindFilter],
   );
 
+  const sections = useMemo(() => {
+    const buckets: Record<string, InboxItem[]> = {
+      needs_action: [],
+      adviser: [],
+      wealthos: [],
+      support: [],
+    };
+    for (const item of visible) {
+      buckets[sectionFor(item)].push(item);
+    }
+    return [
+      { id: "needs_action", title: "Needs action", items: buckets.needs_action },
+      { id: "adviser", title: "Adviser", items: buckets.adviser },
+      { id: "wealthos", title: "WealthOS", items: buckets.wealthos },
+      { id: "support", title: "Support & privacy", items: buckets.support },
+    ].filter((s) => s.items.length > 0);
+  }, [visible]);
+
   return (
     <main>
       <PageHeader
         title="Wealth Inbox"
-        subtitle="Triage recommendations, connections, adviser care, and estate gaps — know what to do next."
+        subtitle="What deserves attention — not an email client. Triage, then act."
         action={
-          <Button
-            type="button"
-            variant="soft"
-            disabled={busy}
-            onClick={() => void load(true)}
-          >
+          <Button type="button" variant="soft" disabled={busy} onClick={() => void load(true)}>
             Refresh
           </Button>
         }
       />
 
+      <InsightPanel eyebrow="How to use this">
+        Prioritise unread and important recommendations first. Mark read or dismiss when done —
+        resolved items leave the active desk.
+      </InsightPanel>
+
       {error ? (
-        <p className="mb-3 rounded-xl bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
+        <p className="mb-3 mt-3 rounded-xl bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
           {error}
         </p>
       ) : null}
 
       {message ? (
-        <p className="mb-3 text-sm" role="status">
+        <p className="mb-3 mt-3 text-sm" role="status">
           {message}
         </p>
       ) : null}
 
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+      <div className="mt-4 mb-3 flex flex-wrap items-center gap-2">
         <Badge tone={unread > 0 ? "warn" : "default"}>{unread} unread</Badge>
         <Badge>{items.length} active</Badge>
         {unread > 0 ? (
@@ -191,8 +216,8 @@ function InboxInner() {
               href={triageHref(chip.id, kindFilter)}
               className={
                 active
-                  ? "rounded-md border border-accent bg-accent-soft px-3 py-1 text-sm font-medium"
-                  : "muted rounded-md border border-line px-3 py-1 text-sm hover:border-accent"
+                  ? "rounded-full border border-accent bg-accent-soft px-3 py-1.5 text-sm font-semibold"
+                  : "muted rounded-full border border-line px-3 py-1.5 text-sm hover:border-accent"
               }
               aria-current={active ? "true" : undefined}
             >
@@ -210,8 +235,8 @@ function InboxInner() {
               href={triageHref(statusFilter, chip.id)}
               className={
                 active
-                  ? "rounded-md border border-accent bg-accent-soft px-3 py-1 text-sm font-medium"
-                  : "muted rounded-md border border-line px-3 py-1 text-sm hover:border-accent"
+                  ? "rounded-full border border-accent bg-accent-soft px-3 py-1.5 text-sm font-semibold"
+                  : "muted rounded-full border border-line px-3 py-1.5 text-sm hover:border-accent"
               }
               aria-current={active ? "true" : undefined}
             >
@@ -221,11 +246,12 @@ function InboxInner() {
         })}
       </div>
 
-      <div className="space-y-3" aria-live="polite">
+      <div className="space-y-6" aria-live="polite">
         {!items.length && !error ? (
-          <Panel>
-            <p className="muted text-sm">Inbox is clear. Refresh after life events or syncs.</p>
-          </Panel>
+          <EmptyState
+            title="Inbox is clear"
+            body="Nothing needs triage right now. Refresh after life events, syncs, or new recommendations."
+          />
         ) : null}
         {items.length && !visible.length ? (
           <Panel>
@@ -237,55 +263,64 @@ function InboxInner() {
             </p>
           </Panel>
         ) : null}
-        {visible.map((item) => {
-          const kind = classifyInboxKind(item.category);
-          return (
-            <Panel key={item.id} className={item.status === "unread" ? "border-accent" : undefined}>
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div>
-                  <p className="font-semibold">{item.title}</p>
-                  <p className="muted mt-1 text-sm">{item.body}</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Badge tone={priorityTone(item.priority)}>{item.priority}</Badge>
-                  <Badge>{inboxKindLabel(kind)}</Badge>
-                  <Badge tone={item.status === "unread" ? "warn" : "default"}>
-                    {item.status}
-                  </Badge>
-                </div>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {item.href ? (
-                  <Link
-                    href={item.href}
-                    className="btn btn-soft"
-                    onClick={() => void setStatus(item.id, "read")}
+
+        {sections.map((section) => (
+          <section key={section.id}>
+            <h2 className="font-display text-xl">{section.title}</h2>
+            <div className="mt-3 space-y-3">
+              {section.items.map((item) => {
+                const kind = classifyInboxKind(item.category);
+                return (
+                  <article
+                    key={item.id}
+                    className={`action-card ${item.status === "unread" ? "border-accent" : ""}`}
                   >
-                    Open
-                  </Link>
-                ) : null}
-                {item.status === "unread" ? (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    disabled={busy}
-                    onClick={() => void setStatus(item.id, "read")}
-                  >
-                    Mark read
-                  </Button>
-                ) : null}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  disabled={busy}
-                  onClick={() => void setStatus(item.id, "dismissed")}
-                >
-                  Dismiss
-                </Button>
-              </div>
-            </Panel>
-          );
-        })}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {item.status === "unread" ? <Badge tone="warn">Unread</Badge> : null}
+                      {item.priority === "critical" || item.priority === "important" ? (
+                        <Badge tone={item.priority === "critical" ? "danger" : "warn"}>
+                          Action required
+                        </Badge>
+                      ) : null}
+                      <Badge>{inboxKindLabel(kind)}</Badge>
+                    </div>
+                    <p className="mt-2 font-semibold">{item.title}</p>
+                    <p className="muted mt-1 text-sm leading-relaxed">{item.body}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {item.href ? (
+                        <Link
+                          href={item.href}
+                          className="btn btn-soft"
+                          onClick={() => void setStatus(item.id, "read")}
+                        >
+                          Open
+                        </Link>
+                      ) : null}
+                      {item.status === "unread" ? (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          disabled={busy}
+                          onClick={() => void setStatus(item.id, "read")}
+                        >
+                          Mark read
+                        </Button>
+                      ) : null}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        disabled={busy}
+                        onClick={() => void setStatus(item.id, "dismissed")}
+                      >
+                        Resolve / dismiss
+                      </Button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        ))}
       </div>
     </main>
   );

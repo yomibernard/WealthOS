@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Badge, PageHeader, Panel } from "@/components/ui";
+import { Badge, HeroMetric, InsightPanel, PageHeader, Panel } from "@/components/ui";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { loadFxRates } from "@/services/wealth";
@@ -22,7 +22,7 @@ export default async function BusinessPage() {
   if (!getFeatureFlags().businessIntel) {
     return (
       <main>
-        <PageHeader title="Business intelligence" subtitle="Temporarily unavailable." />
+        <PageHeader title="Business wealth" subtitle="Temporarily unavailable." />
       </main>
     );
   }
@@ -59,29 +59,39 @@ export default async function BusinessPage() {
     fx,
   );
 
+  const ofNetWorth =
+    nw.netWorthNgn !== 0
+      ? Math.abs(intel.netBusinessEquityNgn / Math.max(1, Math.abs(nw.netWorthNgn)))
+      : 0;
+
+  const byId = new Map(businesses.map((b) => [b.id, b]));
+
   return (
     <main>
       <PageHeader
-        title="Business intelligence"
-        subtitle="Ownership-adjusted equity and leverage — not a company valuation."
+        title="Business wealth"
+        subtitle="Private interests treated seriously — ownership-adjusted estimates, not precise company valuations."
       />
 
-      <Panel>
-        <div className="flex flex-wrap gap-2">
-          <Badge>{intel.engineVersion}</Badge>
-          <Badge tone={intel.concentrationOfAssets >= 0.45 ? "warn" : "default"}>
-            {formatPercent(intel.concentrationOfAssets * 100, 0)} of assets
-          </Badge>
-        </div>
-        <p className="font-display mt-3 text-4xl">
-          {formatNaira(intel.netBusinessEquityNgn, true)}
-        </p>
-        <p className="muted text-sm">Estimated net business equity</p>
-        <p className="mt-4 leading-relaxed">{intel.narrative}</p>
-        <p className="muted mt-3 text-xs">{intel.disclaimer}</p>
-      </Panel>
+      <HeroMetric
+        label="Estimated net business equity"
+        value={formatNaira(intel.netBusinessEquityNgn, true)}
+        hint={
+          <>
+            <Badge>{intel.engineVersion}</Badge>
+            <Badge tone={intel.concentrationOfAssets >= 0.45 ? "warn" : "default"}>
+              {formatPercent(intel.concentrationOfAssets * 100, 0)} of assets
+            </Badge>
+          </>
+        }
+      />
 
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <InsightPanel className="mt-4" eyebrow="Concentration">
+        Business represents about {formatPercent(ofNetWorth * 100, 0)} of estimated net worth.{" "}
+        {intel.narrative}
+      </InsightPanel>
+
+      <div className="mt-4 grid grid-cols-2 gap-3">
         <Panel>
           <p className="eyebrow">Owned value</p>
           <p className="font-display mt-1 text-2xl">
@@ -89,7 +99,7 @@ export default async function BusinessPage() {
           </p>
         </Panel>
         <Panel>
-          <p className="eyebrow">Business debt</p>
+          <p className="eyebrow">Debt exposure</p>
           <p className="font-display mt-1 text-2xl">
             {formatNaira(intel.businessDebtNgn, true)}
           </p>
@@ -101,7 +111,7 @@ export default async function BusinessPage() {
           </p>
         </Panel>
         <Panel>
-          <p className="eyebrow">Income dependency</p>
+          <p className="eyebrow">Income / dividend lens</p>
           <p className="font-display mt-1 text-2xl">
             {intel.incomeDependencyShare == null
               ? "—"
@@ -121,40 +131,46 @@ export default async function BusinessPage() {
         </Panel>
       ) : null}
 
-      <section className="mt-5" aria-labelledby="biz-holdings">
-        <h2 id="biz-holdings" className="font-display text-xl">
-          Holdings
-        </h2>
+      <section className="mt-5">
+        <h2 className="font-display text-xl">Holdings</h2>
         <div className="mt-3 space-y-3">
           {intel.holdings.length === 0 ? (
             <Panel>
               <p className="muted text-sm">
                 No business assets yet.{" "}
                 <Link href="/app/wealth/add" className="font-semibold text-accent">
-                  Add an asset
+                  Add an interest
                 </Link>
               </p>
             </Panel>
           ) : (
-            intel.holdings.map((h) => (
-              <Panel key={h.id}>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-semibold">{h.name}</p>
-                    <p className="muted text-sm">
-                      {h.verificationStatus.toLowerCase()}
-                      {h.stale ? " · stale valuation" : ""}
-                      {" · "}
-                      confidence {formatPercent(h.confidence * 100, 0)}
-                    </p>
+            intel.holdings.map((h) => {
+              const raw = byId.get(h.id);
+              return (
+                <article key={h.id} className="asset-tile">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft font-display text-lg text-accent">
+                        {(h.name[0] ?? "B").toUpperCase()}
+                      </div>
+                      <p className="mt-2 font-semibold">{h.name}</p>
+                      <p className="muted text-sm">
+                        Ownership {raw?.ownershipPercent ?? 100}% ·{" "}
+                        {h.verificationStatus.toLowerCase()}
+                        {h.stale ? " · stale valuation" : ""} · confidence{" "}
+                        {formatPercent(h.confidence * 100, 0)}
+                      </p>
+                    </div>
+                    <p className="font-display text-xl">{formatNaira(h.ownedValueNgn, true)}</p>
                   </div>
-                  <p className="font-display text-xl">{formatNaira(h.ownedValueNgn, true)}</p>
-                </div>
-              </Panel>
-            ))
+                </article>
+              );
+            })
           )}
         </div>
       </section>
+
+      <p className="muted mt-4 text-xs">{intel.disclaimer}</p>
     </main>
   );
 }

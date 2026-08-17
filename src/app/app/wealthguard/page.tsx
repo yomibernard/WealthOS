@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { Button, Field, PageHeader, Panel } from "@/components/ui";
+import { Button, Field, InsightPanel, PageHeader, Panel } from "@/components/ui";
 import { WealthGuardAssessment } from "@/components/wealthguard/WealthGuardAssessment";
 
 type Result = {
@@ -18,18 +18,33 @@ type Result = {
 
 type SourceMode = "text" | "link" | "file";
 
+const PIPELINE = [
+  "Provider",
+  "Return",
+  "Liquidity",
+  "Custody",
+  "Fees",
+  "Risk disclosure",
+] as const;
+
 export default function WealthGuardPage() {
   const [mode, setMode] = useState<SourceMode>("text");
   const [text, setText] = useState("");
   const [link, setLink] = useState("");
   const [fileName, setFileName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pipelineStep, setPipelineStep] = useState(0);
   const [result, setResult] = useState<Result | null>(null);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
     setResult(null);
+    setPipelineStep(0);
+
+    const tick = window.setInterval(() => {
+      setPipelineStep((s) => Math.min(PIPELINE.length - 1, s + 1));
+    }, 280);
 
     let payloadText = text.trim();
     let sourceType: string = mode;
@@ -59,29 +74,45 @@ export default function WealthGuardPage() {
       }
     }
 
-    const res = await fetch("/api/wealthguard", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: payloadText, sourceType }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    setResult(data);
+    try {
+      const res = await fetch("/api/wealthguard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: payloadText, sourceType }),
+      });
+      const data = await res.json();
+      setResult(data);
+    } finally {
+      window.clearInterval(tick);
+      setPipelineStep(PIPELINE.length - 1);
+      setLoading(false);
+    }
   }
 
   return (
     <main>
       <PageHeader
         title="WealthGuard"
-        subtitle="Drop an investment offer here — text, link note, or document reference. We extract claims and flag warning indicators without calling something a scam or safe."
+        subtitle="Check before you invest — flags gaps and unusual claims without auto-labelling scam or safe."
       />
 
-      <div className="mb-3 flex flex-wrap gap-2" role="tablist" aria-label="WealthGuard input type">
+      <section className="hero-metric">
+        <p className="eyebrow">Protect the decision</p>
+        <h2 className="font-display mt-1 text-3xl font-semibold tracking-tight">
+          Check before you invest
+        </h2>
+        <p className="muted mt-2 max-w-2xl text-sm leading-relaxed">
+          Paste text, note a link or WhatsApp forward, or reference a PDF/screenshot. WealthGuard
+          extracts claims and warning indicators — it never auto-labels an offer as a scam or as safe.
+        </p>
+      </section>
+
+      <div className="mt-4 flex flex-wrap gap-2" role="tablist" aria-label="WealthGuard input type">
         {(
           [
             ["text", "Paste text"],
             ["link", "Link / WhatsApp"],
-            ["file", "PDF / image note"],
+            ["file", "PDF / screenshot"],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -99,17 +130,21 @@ export default function WealthGuardPage() {
         ))}
       </div>
 
-      <Panel className="border-dashed">
-        <form className="space-y-4" onSubmit={onSubmit}>
+      <Panel className="mt-3 border-dashed">
+        <form className="space-y-4" onSubmit={(e) => void onSubmit(e)}>
           <p className="font-display text-lg font-semibold tracking-tight">
             Drop an investment offer here
           </p>
           <p className="muted text-sm leading-relaxed">
-            Support: pasted text, link notes, screenshots/PDFs as references. Binary OCR remains
-            limited — paste key claims for the strongest analysis.
+            Binary OCR remains limited — paste key claims for the strongest analysis. Demo rails stay
+            labelled simulated where applicable.
           </p>
           {mode === "link" ? (
-            <Field label="Link or channel note" id="link" hint="We do not auto-fetch arbitrary URLs in MVP.">
+            <Field
+              label="Link or channel note"
+              id="link"
+              hint="We do not auto-fetch arbitrary URLs in MVP."
+            >
               <input
                 id="link"
                 className="min-h-12 w-full rounded-xl border border-line bg-white px-3"
@@ -125,7 +160,7 @@ export default function WealthGuardPage() {
             <Field
               label="Document name"
               id="fileName"
-              hint="Binary OCR pipeline is Phase 2. Paste the important text for analysis now."
+              hint="Paste the important text for analysis now."
             >
               <input
                 id="fileName"
@@ -139,11 +174,7 @@ export default function WealthGuardPage() {
           ) : null}
 
           <Field
-            label={
-              mode === "text"
-                ? "Investment offer text"
-                : "Offer details / extracted text"
-            }
+            label={mode === "text" ? "Investment offer text" : "Offer details / extracted text"}
             id="offer"
           >
             <textarea
@@ -166,6 +197,29 @@ export default function WealthGuardPage() {
         </form>
       </Panel>
 
+      {loading ? (
+        <section className="action-card mt-4" aria-live="polite">
+          <p className="eyebrow">Analysis pipeline</p>
+          <ol className="mt-3 grid gap-2 sm:grid-cols-3">
+            {PIPELINE.map((step, i) => (
+              <li
+                key={step}
+                className={`rounded-[var(--radius-sm)] border px-3 py-2 text-sm font-semibold ${
+                  i <= pipelineStep
+                    ? "border-accent bg-accent-soft text-accent"
+                    : "border-line bg-white text-muted"
+                }`}
+              >
+                {step}
+              </li>
+            ))}
+          </ol>
+          <p className="muted mt-3 text-sm">
+            Checking provider, return claims, liquidity, custody, fees, and risk disclosure…
+          </p>
+        </section>
+      ) : null}
+
       {result?.error ? (
         <Panel className="mt-4">
           <p className="text-danger" role="alert">
@@ -175,16 +229,22 @@ export default function WealthGuardPage() {
       ) : null}
 
       {result && !result.error ? (
-        <WealthGuardAssessment
-          overallOutcome={result.overallOutcome}
-          providerVerification={result.providerVerification}
-          transparency={result.transparency}
-          returnClaim={result.returnClaim}
-          explanation={result.explanation}
-          warningIndicators={result.warningIndicators ?? []}
-          extracted={result.extracted ?? {}}
-          version={result.version}
-        />
+        <>
+          <InsightPanel className="mt-4" eyebrow="Outcomes you will see">
+            Lower concern · Further checks required · Significant warning indicators — never “scam”
+            or “safe”.
+          </InsightPanel>
+          <WealthGuardAssessment
+            overallOutcome={result.overallOutcome}
+            providerVerification={result.providerVerification}
+            transparency={result.transparency}
+            returnClaim={result.returnClaim}
+            explanation={result.explanation}
+            warningIndicators={result.warningIndicators ?? []}
+            extracted={result.extracted ?? {}}
+            version={result.version}
+          />
+        </>
       ) : null}
     </main>
   );

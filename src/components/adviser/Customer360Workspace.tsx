@@ -7,16 +7,20 @@ export type Customer360TabId =
   | "overview"
   | "care"
   | "wealth"
+  | "goals"
   | "actions"
   | "ai"
+  | "documents"
   | "timeline";
 
 const TAB_LABELS: { id: Customer360TabId; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "care", label: "Care" },
   { id: "wealth", label: "Wealth" },
+  { id: "goals", label: "Goals" },
   { id: "actions", label: "Actions" },
   { id: "ai", label: "AI history" },
+  { id: "documents", label: "Documents" },
   { id: "timeline", label: "Timeline" },
 ];
 
@@ -25,8 +29,10 @@ export function Customer360Workspace({
   overview,
   care,
   wealth,
+  goals,
   actions,
   ai,
+  documents,
   timeline,
   copilot,
   defaultTab = "overview",
@@ -35,8 +41,10 @@ export function Customer360Workspace({
   overview: ReactNode;
   care: ReactNode;
   wealth: ReactNode;
+  goals: ReactNode;
   actions: ReactNode;
   ai: ReactNode;
+  documents: ReactNode;
   timeline: ReactNode;
   copilot: ReactNode;
   defaultTab?: Customer360TabId;
@@ -46,8 +54,10 @@ export function Customer360Workspace({
     overview,
     care,
     wealth,
+    goals,
     actions,
     ai,
+    documents,
     timeline,
   };
 

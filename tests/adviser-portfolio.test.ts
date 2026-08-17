@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildPortfolioCareRadar,
+  derivePortfolioNextAction,
   filterPortfolioCareRadar,
   formatCareAckCue,
   parsePortfolioCareFilter,
@@ -42,6 +43,29 @@ const sample = [
 ];
 
 describe("adviser portfolio care radar", () => {
+  it("derives next actions by severity", () => {
+    expect(
+      derivePortfolioNextAction({
+        openComplaints: 1,
+        openPrivacy: 1,
+        openEscalations: 2,
+        needsFirstAck: true,
+        awaitingReceipt: true,
+        opsReminded: true,
+      }),
+    ).toBe("Review complaint");
+    expect(
+      derivePortfolioNextAction({
+        openComplaints: 0,
+        openPrivacy: 0,
+        openEscalations: 0,
+        needsFirstAck: false,
+        awaitingReceipt: false,
+        opsReminded: false,
+      }),
+    ).toBe("Routine book review");
+  });
+
   it("sorts complaints ahead of clear books", () => {
     const radar = buildPortfolioCareRadar(sample);
 

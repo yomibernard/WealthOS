@@ -38,6 +38,8 @@ async function main() {
   await prisma.provider.deleteMany();
   await prisma.fxRate.deleteMany();
   await prisma.healthScoreConfig.deleteMany();
+  await prisma.webAuthnCredential.deleteMany();
+  await prisma.authSessionEvent.deleteMany();
   await prisma.user.deleteMany();
 
   const passwordHash = await bcrypt.hash("WealthOSdemo1!", 10);

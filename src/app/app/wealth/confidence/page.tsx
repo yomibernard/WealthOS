@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Badge, PageHeader, Panel } from "@/components/ui";
+import { Badge, HeroMetric, InsightPanel, PageHeader, Panel } from "@/components/ui";
 import { RemediationActions } from "@/components/DataQualityClient";
 import { getSessionUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { buildHomeDashboard } from "@/services/wealth";
-import { buildDataQualityReport } from "@/engines/data-quality";
+import { assessItem, buildDataQualityReport } from "@/engines/data-quality";
 import { formatCurrency, provenanceLabel } from "@/lib/format";
 
 export default async function ConfidencePage() {
@@ -19,61 +19,111 @@ export default async function ConfidencePage() {
     prisma.liability.findMany({ where: { userId: user.id }, orderBy: { balance: "desc" } }),
   ]);
 
-  const report = buildDataQualityReport(
-    [
-      ...assets.map((a) => ({
-        id: a.id,
-        kind: "asset" as const,
-        name: a.name,
-        source: a.source,
-        verificationStatus: a.verificationStatus,
-        confidence: a.confidence,
-        lastValuationDate: a.lastValuationDate,
-        currency: a.currency,
-        categoryOrType: a.category,
-      })),
-      ...liabilities.map((l) => ({
-        id: l.id,
-        kind: "liability" as const,
-        name: l.name,
-        source: l.source,
-        verificationStatus: l.verificationStatus,
-        confidence: l.confidence,
-        lastValuationDate: l.lastValuationDate,
-        currency: l.currency,
-        categoryOrType: l.type,
-      })),
-    ],
-    dash.netWorth.confidence,
-  );
+  const qualityInputs = [
+    ...assets.map((a) => ({
+      id: a.id,
+      kind: "asset" as const,
+      name: a.name,
+      source: a.source,
+      verificationStatus: a.verificationStatus,
+      confidence: a.confidence,
+      lastValuationDate: a.lastValuationDate,
+      currency: a.currency,
+      categoryOrType: a.category,
+    })),
+    ...liabilities.map((l) => ({
+      id: l.id,
+      kind: "liability" as const,
+      name: l.name,
+      source: l.source,
+      verificationStatus: l.verificationStatus,
+      confidence: l.confidence,
+      lastValuationDate: l.lastValuationDate,
+      currency: l.currency,
+      categoryOrType: l.type,
+    })),
+  ];
+
+  const report = buildDataQualityReport(qualityInputs, dash.netWorth.confidence);
+  const assessed = qualityInputs.map((i) => assessItem(i));
 
   const valueById = new Map<string, number>([
     ...assets.map((a) => [a.id, a.value] as const),
     ...liabilities.map((l) => [l.id, l.balance] as const),
   ]);
 
+  const verified = assessed.filter(
+    (i) =>
+      i.verificationStatus === "VERIFIED" &&
+      !i.issues.some((x) => x.code === "stale_valuation" && x.severity === "high"),
+  );
+  const needsRefresh = assessed.filter(
+    (i) =>
+      i.verificationStatus === "STALE" ||
+      i.issues.some((x) => x.code === "stale_valuation"),
+  );
+  const estimated = assessed.filter(
+    (i) =>
+      i.verificationStatus === "ESTIMATED" &&
+      !needsRefresh.some((n) => n.id === i.id),
+  );
+
+  const missingImpact =
+    report.highPriorityCount > 0
+      ? `Refreshing ${report.highPriorityCount} high-priority line(s) is the fastest way to lift overall confidence (now ${Math.round(dash.netWorth.confidence * 100)}%).`
+      : report.items.length > 0
+        ? "Optional refreshes on estimated lines will tighten the picture without inventing balances."
+        : "No material gaps — keep quarterly confirms on property and private holdings.";
+
   return (
     <main>
       <PageHeader
         title="Data confidence"
-        subtitle="Estimated values are never presented as precise verified facts. Fix stale lines first."
+        subtitle="Which lines are trustworthy, which need a refresh, and which remain estimates."
       />
-      <Panel>
-        <p className="eyebrow">Overall confidence</p>
-        <p className="font-display mt-1 text-4xl">
-          {Math.round(dash.netWorth.confidence * 100)}%
-        </p>
-        <p className="muted mt-2 text-sm">
-          Quality score {report.overallScore}/100 · {report.highPriorityCount} high-priority item(s)
-        </p>
-        <p className="mt-3 text-sm leading-relaxed">{report.summary}</p>
-        <Link href="/app/wealth/add" className="btn btn-ghost mt-4 inline-flex">
-          Add missing holding
+
+      <HeroMetric
+        label="Overall confidence"
+        value={`${Math.round(dash.netWorth.confidence * 100)}%`}
+        hint={
+          <Badge tone={report.highPriorityCount > 0 ? "warn" : "default"}>
+            Quality {report.overallScore}/100 · {report.highPriorityCount} high-priority
+          </Badge>
+        }
+      />
+
+      <InsightPanel className="mt-4" eyebrow="Estimated impact of missing data">
+        {missingImpact}
+      </InsightPanel>
+
+      <div className="mt-4">
+        <Link href="/app/wealth/add" className="btn btn-accent">
+          Improve my wealth picture
         </Link>
-      </Panel>
+      </div>
+
+      <ConfidenceBucket
+        title="Verified"
+        empty="No fully verified holdings yet — connected or confirmed lines will appear here."
+        items={verified}
+        valueById={valueById}
+      />
+      <ConfidenceBucket
+        title="Needs refresh"
+        empty="Nothing urgently stale — keep confirming ageing valuations."
+        items={needsRefresh}
+        valueById={valueById}
+        showRemediation
+      />
+      <ConfidenceBucket
+        title="Estimated"
+        empty="No estimated-only lines in this bucket."
+        items={estimated}
+        valueById={valueById}
+      />
 
       {report.items.length ? (
-        <div className="mt-3 space-y-3">
+        <div className="mt-5 space-y-3">
           <p className="eyebrow px-1">Remediation queue</p>
           {report.items.map((item) => (
             <Panel key={`${item.kind}-${item.id}`}>
@@ -106,15 +156,13 @@ export default async function ConfidencePage() {
           ))}
         </div>
       ) : (
-        <Panel className="mt-3">
+        <Panel className="mt-5">
           <p className="font-medium">No remediation items</p>
-          <p className="muted mt-1 text-sm">
-            Nothing looks urgently stale. Keep confirming property and private holdings every quarter.
-          </p>
+          <p className="muted mt-1 text-sm">{report.summary}</p>
         </Panel>
       )}
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-5 space-y-3">
         <p className="eyebrow px-1">All assets</p>
         {assets.map((a) => (
           <Panel key={a.id}>
@@ -132,5 +180,53 @@ export default async function ConfidencePage() {
         ))}
       </div>
     </main>
+  );
+}
+
+function ConfidenceBucket({
+  title,
+  empty,
+  items,
+  valueById,
+  showRemediation,
+}: {
+  title: string;
+  empty: string;
+  items: ReturnType<typeof assessItem>[];
+  valueById: Map<string, number>;
+  showRemediation?: boolean;
+}) {
+  return (
+    <section className="mt-5">
+      <h2 className="font-display text-xl">{title}</h2>
+      {items.length ? (
+        <ul className="mt-3 space-y-2">
+          {items.map((item) => (
+            <li key={`${item.kind}-${item.id}`} className="asset-tile">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="font-semibold">{item.name}</p>
+                  <p className="muted text-sm">
+                    {item.kind} ·{" "}
+                    {formatCurrency(valueById.get(item.id) ?? 0, item.currency, true)} ·{" "}
+                    {item.verificationStatus}
+                  </p>
+                </div>
+                <Badge>{Math.round(item.confidence * 100)}%</Badge>
+              </div>
+              {showRemediation ? (
+                <RemediationActions
+                  id={item.id}
+                  kind={item.kind}
+                  currentValue={valueById.get(item.id) ?? 0}
+                />
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="muted mt-2 text-sm">{empty}</p>
+      )}
+    </section>
   );
 }

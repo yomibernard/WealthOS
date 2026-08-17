@@ -109,7 +109,8 @@ export function SecurityBiometricsPanel() {
         </h2>
         <p className="muted mt-2 text-sm leading-relaxed">
           Your biometric data remains on your device. WealthOS only receives confirmation that
-          authentication succeeded — we never store fingerprints or face templates.
+          authentication succeeded — we never store fingerprints or face templates. Enable only when
+          you want faster unlock.
         </p>
       </div>
 

@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Badge, Button, PageHeader, Panel } from "@/components/ui";
+import {
+  Badge,
+  Button,
+  EmptyState,
+  InsightPanel,
+  PageHeader,
+  Panel,
+} from "@/components/ui";
 import { CHANNEL_COPY, type NotificationPrefs } from "@/lib/notification-prefs";
 import { resolveNotificationLink } from "@/lib/notification-links";
 import {
@@ -13,6 +20,7 @@ import {
   type CustomerNotificationKind,
   type CustomerNotificationReadFilter,
 } from "@/engines/customer-notifications";
+import { normalizeCategory } from "@/lib/notification-prefs";
 
 type Note = {
   id: string;
@@ -47,6 +55,8 @@ function triageHref(
   return q ? `/app/notifications?${q}` : "/app/notifications";
 }
 
+const GROUP_ORDER = ["critical", "important", "advisory", "informational"] as const;
+
 function NotificationsInner() {
   const searchParams = useSearchParams();
   const readRaw = searchParams.get("read");
@@ -66,6 +76,7 @@ function NotificationsInner() {
   const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [showPrefs, setShowPrefs] = useState(false);
 
   async function load() {
     const [nRes, pRes] = await Promise.all([
@@ -164,21 +175,49 @@ function NotificationsInner() {
     [notes, readFilter, kindFilter],
   );
 
+  const grouped = useMemo(() => {
+    const map = new Map<string, Note[]>();
+    for (const key of GROUP_ORDER) map.set(key, []);
+    for (const n of visible) {
+      const cat = normalizeCategory(n.category);
+      map.get(cat)!.push(n);
+    }
+    return GROUP_ORDER.map((key) => ({
+      key,
+      title: key.charAt(0).toUpperCase() + key.slice(1),
+      items: map.get(key)!,
+    })).filter((g) => g.items.length > 0);
+  }, [visible]);
+
   return (
     <main>
       <PageHeader
         title="Notifications"
-        subtitle="Triage care, support, privacy, and cadence alerts — channels stay under your control."
+        subtitle="Critical · Important · Advisory · Information — without duplicating your Inbox desk."
+        action={
+          <button
+            type="button"
+            className="btn btn-ghost text-sm"
+            onClick={() => setShowPrefs((v) => !v)}
+          >
+            {showPrefs ? "Hide preferences" : "Preferences"}
+          </button>
+        }
       />
 
+      <InsightPanel eyebrow="Inbox vs notifications">
+        Inbox is for actionable triage. Notifications are channel alerts and cadence — open Inbox when
+        you need to act on recommendations.
+      </InsightPanel>
+
       {message ? (
-        <p className="mb-3 text-sm" role="status">
+        <p className="mb-3 mt-3 text-sm" role="status">
           {message}
         </p>
       ) : null}
 
-      {prefs ? (
-        <Panel className="mb-4 space-y-3">
+      {showPrefs && prefs ? (
+        <Panel className="mb-4 mt-4 space-y-3">
           <p className="eyebrow">Channels</p>
           {CHANNEL_COPY.map((ch) => (
             <label
@@ -215,7 +254,7 @@ function NotificationsInner() {
         </Panel>
       ) : null}
 
-      <Panel className="mb-4 space-y-3">
+      <Panel className="mb-4 mt-4 space-y-3">
         <p className="eyebrow">Generate now</p>
         <div className="flex flex-wrap gap-2">
           <Button
@@ -239,6 +278,9 @@ function NotificationsInner() {
           </Link>
           <Link href="/app/reports" className="btn btn-ghost">
             Open reports
+          </Link>
+          <Link href="/app/inbox" className="btn btn-ghost">
+            Open inbox
           </Link>
         </div>
       </Panel>
@@ -268,8 +310,8 @@ function NotificationsInner() {
               href={triageHref(chip.id, kindFilter)}
               className={
                 active
-                  ? "rounded-md border border-accent bg-accent-soft px-3 py-1 text-sm font-medium"
-                  : "muted rounded-md border border-line px-3 py-1 text-sm hover:border-accent"
+                  ? "rounded-full border border-accent bg-accent-soft px-3 py-1.5 text-sm font-semibold"
+                  : "muted rounded-full border border-line px-3 py-1.5 text-sm hover:border-accent"
               }
               aria-current={active ? "true" : undefined}
             >
@@ -287,8 +329,8 @@ function NotificationsInner() {
               href={triageHref(readFilter, chip.id)}
               className={
                 active
-                  ? "rounded-md border border-accent bg-accent-soft px-3 py-1 text-sm font-medium"
-                  : "muted rounded-md border border-line px-3 py-1 text-sm hover:border-accent"
+                  ? "rounded-full border border-accent bg-accent-soft px-3 py-1.5 text-sm font-semibold"
+                  : "muted rounded-full border border-line px-3 py-1.5 text-sm hover:border-accent"
               }
               aria-current={active ? "true" : undefined}
             >
@@ -298,73 +340,70 @@ function NotificationsInner() {
         })}
       </div>
 
-      <div className="space-y-3">
-        {visible.map((n) => {
-          const link = resolveNotificationLink(n);
-          const kind = classifyCustomerNotificationKind(n);
-          return (
-            <Panel key={n.id}>
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge
-                  tone={
-                    n.category.toLowerCase() === "important" ||
-                    n.category.toLowerCase() === "critical"
-                      ? "warn"
-                      : "default"
-                  }
-                >
-                  {n.category}
-                </Badge>
-                <Badge>{customerNotificationKindLabel(kind)}</Badge>
-                <Badge tone={n.read ? "default" : "warn"}>
-                  {n.read ? "Read" : "Unread"}
-                </Badge>
-              </div>
-              <p className="mt-2 font-semibold">{n.title}</p>
-              <p className="muted mt-1 whitespace-pre-wrap text-sm">{n.body}</p>
-              <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                <p className="muted text-xs">
-                  {new Date(n.createdAt).toLocaleString("en-NG")}
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  {link ? (
-                    <Link href={link.href} className="text-sm font-semibold text-accent">
-                      {link.label}
-                    </Link>
-                  ) : null}
-                  {!n.read ? (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="!min-h-0 !px-0 !py-0 text-sm"
-                      disabled={busy === n.id}
-                      onClick={() => void markRead(n.id)}
-                    >
-                      {busy === n.id ? "Saving…" : "Mark as read"}
-                    </Button>
-                  ) : null}
-                </div>
-              </div>
-            </Panel>
-          );
-        })}
-        {!notes.length ? (
-          <Panel>
-            <p className="muted text-sm">
-              No notifications in your enabled channels yet. Generate a report or digest above.
-            </p>
-          </Panel>
-        ) : null}
-        {notes.length && !visible.length ? (
-          <Panel>
-            <p className="muted text-sm">
-              No notifications match this triage filter.{" "}
-              <Link href="/app/notifications" className="font-semibold text-accent">
-                Show all
-              </Link>
-            </p>
-          </Panel>
-        ) : null}
+      {!notes.length ? (
+        <EmptyState
+          title="No notifications yet"
+          body="Generate a report or digest above, or wait for care and cadence alerts in your enabled channels."
+        />
+      ) : null}
+      {notes.length && !visible.length ? (
+        <Panel>
+          <p className="muted text-sm">
+            No notifications match this triage filter.{" "}
+            <Link href="/app/notifications" className="font-semibold text-accent">
+              Show all
+            </Link>
+          </p>
+        </Panel>
+      ) : null}
+
+      <div className="space-y-6">
+        {grouped.map((group) => (
+          <section key={group.key}>
+            <h2 className="font-display text-xl">{group.title}</h2>
+            <div className="mt-3 space-y-3">
+              {group.items.map((n) => {
+                const link = resolveNotificationLink(n);
+                const kind = classifyCustomerNotificationKind(n);
+                return (
+                  <article key={n.id} className="asset-tile">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge tone={!n.read ? "warn" : "default"}>
+                        {n.read ? "Read" : "Unread"}
+                      </Badge>
+                      <Badge>{customerNotificationKindLabel(kind)}</Badge>
+                    </div>
+                    <p className="mt-2 font-semibold">{n.title}</p>
+                    <p className="muted mt-1 whitespace-pre-wrap text-sm leading-relaxed">{n.body}</p>
+                    <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                      <p className="muted text-xs">
+                        {new Date(n.createdAt).toLocaleString("en-NG")}
+                      </p>
+                      <div className="flex flex-wrap gap-3">
+                        {link ? (
+                          <Link href={link.href} className="text-sm font-semibold text-accent">
+                            {link.label}
+                          </Link>
+                        ) : null}
+                        {!n.read ? (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="!min-h-0 !px-0 !py-0 text-sm"
+                            disabled={busy === n.id}
+                            onClick={() => void markRead(n.id)}
+                          >
+                            {busy === n.id ? "Saving…" : "Mark as read"}
+                          </Button>
+                        ) : null}
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        ))}
       </div>
     </main>
   );
