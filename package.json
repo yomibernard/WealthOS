@@ -24,6 +24,7 @@
     "db:down": "docker compose down",
     "db:rehearse-postgres": "node scripts/rehearse-postgres.mjs",
     "launch:check": "node scripts/launch-check.mjs",
+    "launch:rehearse-prod": "node scripts/launch-rehearse-prod.mjs",
     "release:check": "node scripts/release-check.mjs",
     "smoke": "node scripts/smoke-journeys.mjs",
     "smoke:hosted": "node scripts/smoke-hosted.mjs",

@@ -101,6 +101,7 @@
 - [x] Ops queue care remind pack `v0.1.20` (`npm run pilot:freeze`)
 - [x] Adviser ops-remind cues pack `v0.1.21` (`npm run pilot:freeze`)
 - [x] Ops remind-answer close-loop pack `v0.1.22` (`npm run pilot:freeze`)
+- [x] Prod launch-gate rehearsal `npm run launch:rehearse-prod` (fixture fail-closed + pass; owner still runs prod `launch:check` on host env)
 - [ ] `LAUNCH_PROFILE=production npm run launch:check` (expected fail until prod secrets + Postgres URL)
 - [ ] Hosted deploy smoke (`SMOKE_BASE_URL=… npm run smoke:hosted` — see [DEPLOY.md](./DEPLOY.md))
 - [ ] Human sign-off on `LAUNCH_REVIEW.md`

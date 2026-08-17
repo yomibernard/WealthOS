@@ -966,3 +966,10 @@ Ops remind-answer close-loop freeze pack **v0.1.22**:
 
 - `npm run pilot:freeze` checks remind-answer helpers, Care handoff trail, smoke, DEMO
 - Changelog rolled; VERSION / LAUNCH_REVIEW / MVP_STATUS aligned
+
+## Phase 30.1 delivered (17 Aug 2026)
+
+Prod launch-gate rehearsal:
+
+- Shared `scripts/lib/launch-evaluate.mjs` for CLI parity with `src/lib/launch-gate.ts`
+- `npm run launch:rehearse-prod` proves fail-closed + hardened Postgres fixture without reading real secrets

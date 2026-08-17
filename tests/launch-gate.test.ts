@@ -1,4 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { evaluateLaunchGate } from "@/lib/launch-gate";
 
 describe("launch gate", () => {
@@ -38,5 +41,17 @@ describe("launch gate", () => {
     });
     expect(report.ok).toBe(true);
     expect(report.profile).toBe("production");
+  });
+
+  it("ships launch:rehearse-prod and passes fixture rehearsal", () => {
+    const root = process.cwd();
+    expect(existsSync(join(root, "scripts", "launch-rehearse-prod.mjs"))).toBe(true);
+    expect(existsSync(join(root, "scripts", "lib", "launch-evaluate.mjs"))).toBe(true);
+    const res = spawnSync("node", [join("scripts", "launch-rehearse-prod.mjs")], {
+      cwd: root,
+      encoding: "utf8",
+    });
+    expect(res.status).toBe(0);
+    expect(res.stdout).toMatch(/Prod launch rehearsal OK/);
   });
 });

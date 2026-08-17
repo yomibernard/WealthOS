@@ -78,6 +78,7 @@ npm run build && npm run start
 - Probe: `GET /api/health` (includes `config.demoMode` + `config.databaseKind`, never secrets)
 - Dev gate: `npm run launch:check`
 - Prod gate: `LAUNCH_PROFILE=production npm run launch:check` (must pass before public pilot)
+- Prod rehearsal (fixture envs, no real secrets): `npm run launch:rehearse-prod` — proves fail-closed + pass fixture; still run the prod gate against the real host env
 - Umbrella: `npm run release:check`
 
 ### Post-deploy hosted smoke
